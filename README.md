@@ -84,7 +84,18 @@ for imol in range(Nmol):
 
         os.mkdir(os.path.join(filedir, title))
 
+
         os.system(f'cp Geoopt_wB97XD3_def2TZVP.com geom_UFF.xyz {title}/')
 
 geom_file.close()
+```
+# Generate a plot of txt file by python
+```
+python3
+import matplotlib.pyplot as plt
+import numpy as np
+A= np.load.txt("textfilename.txt")
+plt.plot(A)
+plt.grid()
+plt.show()
 ```
