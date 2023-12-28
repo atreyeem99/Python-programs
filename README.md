@@ -99,3 +99,31 @@ plt.plot(A)
 plt.grid()
 plt.show()
 ```
+# use different functional groups on one compound
+```
+string_template = "C(=O)C({})=C({}){}"
+
+# Words to fill in the brackets
+groups = ['', 'C', 'N','O','F','CC','C=C','C#C','C#N','C=N','CN','CO','C(=O)','CF','OC']
+
+Ngrps=len(groups)
+
+file1=open('acyclic_aldehyde.smi','w')
+
+for i in range(Ngrps):
+    for j in range(Ngrps):
+        for k in range(Ngrps):
+            groupi=groups[i]
+            groupj=groups[j]
+            groupk=groups[k]
+            if len(groupi) != 0:
+                groupi='('+groupi+')'
+            if len(groupj) != 0:
+                groupj='('+groupj+')'
+            mol='C(=O)C'+groupi+'=C'+groupj+groupk
+            name='acyclic_ald_'+str(i)+'_'+str(j)+'_'+str(k)
+            file1.write(mol+' '+name+'\n')
+    
+
+file1.close()
+```
