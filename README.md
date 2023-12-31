@@ -48,12 +48,12 @@ for imol in range(Nmol):
 
 geom_file.close()
 ```
-# preinp
+# prepinp_geom
 ```
 import os
 
-Nmol = 225
-geomfile='cpo.xyz'
+Nmol = 4
+geomfile='comp_UFF_tight.xyz'
 
 filedir = os.getcwd()
 
@@ -84,8 +84,56 @@ for imol in range(Nmol):
 
         os.mkdir(os.path.join(filedir, title))
 
-
         os.system(f'cp Geoopt_wB97XD3_def2TZVP.com geom_UFF.xyz {title}/')
+
+geom_file.close()
+
+```
+# prepinp_dft
+```
+import os
+
+Nmol = 5
+
+geomfile='comp_UFF_tight.xyz' 
+geom_file = open(geomfile, 'r')
+
+geomfiledft='comp_DFT_S0.xyz'
+geom_file_dft = open(geomfiledft, 'r')
+
+filedir = os.getcwd()
+
+for imol in range(Nmol):
+
+    line = geom_file.readline().strip()  # Nat
+
+    if line:
+
+        # read 2 lines from geomfiledft
+        title = geom_file_dft.readline().strip() # 1st line in DFT xyz, Nat
+        title = geom_file_dft.readline().strip() # 2nd line in DFT xyz, title
+
+        Nat = int(line)
+        title = geom_file.readline().strip() # title from UFF file
+        print(Nat, title)
+
+        inputfile= open('geom_DFT_S0.xyz', 'w')
+
+        inputfile.write(f'{Nat}\n')
+        inputfile.write(f'{title}\n')
+
+        for iat in range(1, Nat + 1):
+            line = geom_file.readline().split()   # read coordinates from UFF, never used
+            line = geom_file_dft.readline().split() # read coordinates from DFT file
+            sym=line[0]
+            R=[float(line[1]), float(line[2]), float(line[3])]
+            inputfile.write(f'{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n')
+
+        inputfile.close()
+
+        #os.mkdir(os.path.join(filedir, title))
+
+        os.system(f'cp TDDFT_wB97XD3_def2TZVP.com geom_DFT_S0.xyz {title}/')
 
 geom_file.close()
 ```
