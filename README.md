@@ -89,6 +89,11 @@ for imol in range(Nmol):
 geom_file.close()
 
 ```
+ - to run the program give the command
+   ```
+   python3 nmol geom.xyz geom_UFF.xyz
+   ```
+   where nmol is number of molecules
 # prepinp_dft
 ```
 import os
