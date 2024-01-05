@@ -175,3 +175,33 @@ for i in range(Ngrps):
 
 file1.close()
 ```
+# to plot the data from a txt file 
+```
+import matplotlib.pyplot as plt
+
+def plot_column(input_file, column_index):
+    try:
+        with open(input_file, 'r') as file:
+            lines = file.readlines()
+            y_values = [float(line.split()[column_index]) for line in lines]
+    except FileNotFoundError:
+        print(f"File not found: {input_file}")
+        return
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return
+
+    # Plot the data
+    plt.plot(y_values, label=f'Column {column_index}')
+    plt.xlim(1000,2000)
+    plt.title(f'Plot of Column {column_index} from Input File')
+    plt.xlabel('Data Point Index')
+    plt.ylabel(f'Column {column_index}')
+    plt.legend()
+    plt.show()
+
+# Example usage:
+input_file_path = '/home/atreyee/project/orca_manual/esd/benzene_esd.txt'  # Replace with your actual file path
+column_to_plot = 1  # Replace with the desired column index
+plot_column(input_file_path, column_to_plot)
+```
