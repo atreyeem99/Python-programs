@@ -48,6 +48,12 @@ for imol in range(Nmol):
 
 geom_file.close()
 ```
+```
+ - to run the program give the command
+   ```
+   python3 obminimize.py nmol geom.xyz geom_UFF.xyz
+   ```
+   where nmol is number of molecules
 # prepinp_geom
 ```
 import os
@@ -87,13 +93,8 @@ for imol in range(Nmol):
         os.system(f'cp Geoopt_wB97XD3_def2TZVP.com geom_UFF.xyz {title}/')
 
 geom_file.close()
-
 ```
- - to run the program give the command
-   ```
-   python3 nmol geom.xyz geom_UFF.xyz
-   ```
-   where nmol is number of molecules
+
 # prepinp_dft
 ```
 import os
