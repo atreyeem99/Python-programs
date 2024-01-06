@@ -180,6 +180,35 @@ for i in range(Ngrps):
 
 file1.close()
 ```
+```
+#string_template = "C1{}C{}=C{}NC(=O)N=1"
+
+# Words to fill in the brackets
+groups = ['','N','C','F'] 
+
+Ngrps=len(groups)
+
+file1=open('1H_2pyramidinone.smi','w')
+
+for i in range(Ngrps):
+    for j in range(Ngrps):
+        for k in range(Ngrps):
+            groupi=groups[i]
+            groupj=groups[j]
+            groupk=groups[k]
+            if len(groupi) != 0:
+                groupi='('+groupi+')'
+            if len(groupj) != 0:
+                groupj='('+groupj+')'
+            if len(groupk) != 0:
+                groupk='('+groupk+')' 
+            mol='C1'+groupi+'C'+groupj+'=C'+groupk+'NC(=O)N=1'
+            name='1H_2pyramidinone_'+str(i)+'_'+str(j)+'_'+str(k)
+            file1.write(mol+' '+name+'\n')
+    
+
+file1.close()
+```
 # to plot the data from a txt file 
 ```
 import matplotlib.pyplot as plt
