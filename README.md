@@ -48,7 +48,6 @@ for imol in range(Nmol):
 
 geom_file.close()
 ```
-```
  - to run the program give the command
    ```
    python3 obminimize.py nmol geom.xyz geom_UFF.xyz
@@ -157,7 +156,7 @@ plt.show()
 ```
 string_template = "C(=O)C({})=C({}){}"
 
-# Words to fill in the brackets
+
 groups = ['', 'C', 'N','O','F','CC','C=C','C#C','C#N','C=N','CN','CO','C(=O)','CF','OC']
 
 Ngrps=len(groups)
@@ -181,10 +180,10 @@ for i in range(Ngrps):
 
 file1.close()
 ```
+
 ```
 #string_template = "C1{}C{}=C{}NC(=O)N=1"
 
-# Words to fill in the brackets
 groups = ['','N','C','F'] 
 
 Ngrps=len(groups)
@@ -210,6 +209,7 @@ for i in range(Ngrps):
 
 file1.close()
 ```
+
 # to plot the data from a txt file 
 ```
 import matplotlib.pyplot as plt
@@ -235,8 +235,8 @@ def plot_column(input_file, column_index):
     plt.legend()
     plt.show()
 
-# Example usage:
 input_file_path = '/home/atreyee/project/orca_manual/esd/benzene_esd.txt'  # Replace with your actual file path
 column_to_plot = 1  # Replace with the desired column index
 plot_column(input_file_path, column_to_plot)
+
 ```
