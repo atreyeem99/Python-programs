@@ -240,3 +240,5 @@ column_to_plot = 1  # Replace with the desired column index
 plot_column(input_file_path, column_to_plot)
 
 ```
+# to generate CO spectra
+
