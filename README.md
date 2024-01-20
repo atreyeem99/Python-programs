@@ -240,5 +240,56 @@ column_to_plot = 1  # Replace with the desired column index
 plot_column(input_file_path, column_to_plot)
 
 ```
-# to generate CO spectra
+# To calculate mean standard error, mean absolute error and standard deviation error
+```
+import csv
+import numpy as np
 
+def read_column(filename, column_index):
+    data = []
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            try:
+                value = float(row[column_index])
+                data.append(value)
+            except (ValueError, IndexError):
+                pass
+    return data
+
+def calculate_mean_std_error(data1, data2):
+    mse = np.mean(data1-data2)
+    mae = np.mean(np.abs(data1-data2))
+    sde = np.std(data1-data2)
+    
+    return mse,mae,sde
+
+def main():
+    # Replace 'file1.csv' and 'file2.csv' with the actual file names
+    file1 = 'file1.csv'
+    file2='file2.csv'
+    
+    # Assuming the 3rd column is at index 2 (0-based index)
+    column_index = 2
+
+    # Read the 3rd column from each file
+    data1 = read_column(file1, column_index)
+    data2 = read_column(file2, column_index)
+
+    # Calculate mean and standard error
+    data1=np.array(data1)
+    data2=np.array(data2)
+    mse,mae,sde = calculate_mean_std_error(data2, data1)
+    print(data1)
+    print(data2)
+   
+   
+
+    print(mse,mae,sde)
+
+    return
+
+if __name__ == "__main__":
+    main()
+
+```
