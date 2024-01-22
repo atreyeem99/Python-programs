@@ -293,3 +293,57 @@ if __name__ == "__main__":
     main()
 
 ```
+# To read the csv filenames from a file and to find the errors
+```
+import csv
+import numpy as np
+
+def read_column(filename, column_index):
+    data = []
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            try:
+                value = float(row[column_index])
+                data.append(value)
+            except (ValueError, IndexError):
+                pass
+    return data
+
+def calculate_mean_std_error(data1, data2):
+    mse = np.mean(data1 - data2)
+    mae = np.mean(np.abs(data1 - data2))
+    sde = np.std(data1 - data2)
+
+    return mse, mae, sde
+
+def main():
+    list_file = 'list.txt'
+    column_index = 2
+    file1 = 'a.csv'
+    data1 = read_column(file1, column_index)
+    with open(list_file, 'r') as file:
+        # Read the list of CSV file names
+        files=[]
+        m=[]
+        for line in file:
+            m.append(line.strip())
+            files.append('stringa'+line.strip()+'stringb.csv')
+        #files = [line.strip() for line in file]
+   
+     
+    for i in range(len(files)):
+            # Read the 3rd column from each file
+            data2 = read_column(files[i], column_index)
+
+            # Calculate mean and standard error
+            data1 = np.array(data1)
+            data2 = np.array(data2)
+            mse, mae, sde = calculate_mean_std_error(data2, data1)
+            output = "{xc:20s}{val1:20.3f} {val2:20.3f} {val3:20.3f}"
+            print(output.format(xc=m[i],val1=mse, val2=mae, val3=sde))
+
+
+if __name__ == "__main__":
+     main()
+```
