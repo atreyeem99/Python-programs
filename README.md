@@ -389,3 +389,117 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# write a program to read a csv file which has the first column as the names of xyz files. Then go to ech xyz file and see which molecule has the wanted atom. Then calculate the distance between the coordinates of that atom and all the atoms, then sort the distances in ascending order. After that with the indexes of the 3 atoms with shortest distance, calculate the vector distance between the fluorine atom and the 3 other atoms. Then do the above program with angle calculation. Then plot the fifth column of csv file vs the calculated deviations.
+```
+import csv
+import math
+import matplotlib.pyplot as plt
+
+def read_csv_file(csv_file_path):
+    data = []
+    with open(csv_file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            data.append(row)
+    return data
+
+def read_xyz_file(file_path):
+    atoms = []
+    with open(file_path+'.xyz', 'r') as file:
+        num_atoms = int(file.readline())
+        file.readline()  # Skip the comment line
+
+        for _ in range(num_atoms):
+            line = file.readline().split()
+            atom_symbol, x, y, z = line[0], float(line[1]), float(line[2]), float(line[3])
+            atoms.append((atom_symbol, (x, y, z)))
+
+    return atoms
+
+def calculate_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1]
+    x2, y2, z2 = atom2[1]
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+    return distance
+
+def calculate_vector_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1]
+    x2, y2, z2 = atom2[1]
+    distance_vector = (x2 - x1, y2 - y1, z2 - z1)
+    return distance_vector
+
+def calculate_angle(vector1, vector2):
+    dot_product = sum(a * b for a, b in zip(vector1, vector2))
+    magnitude1 = math.sqrt(sum(a**2 for a in vector1))
+    magnitude2 = math.sqrt(sum(b**2 for b in vector2))
+    
+    cos_theta = dot_product / (magnitude1 * magnitude2)
+    angle_rad = math.acos(max(-1, min(1, cos_theta)))  # Ensure the value is within [-1, 1] for acos
+    angle_deg = math.degrees(angle_rad)
+    
+    return angle_deg
+
+def main():
+    csv_file_path = 'top100.csv'  # Replace with the path to your CSV file
+    data = read_csv_file(csv_file_path)
+    print(data)
+    
+    deviations = []  # List to store deviations
+    y_values = []  # List to store values for the y-axis
+
+    for row in data:
+        xyz_file = row[0]
+        atoms = read_xyz_file(xyz_file)
+
+        nitrogen_atoms = [atom for atom in atoms if atom[0] == 'N']
+
+        if len(nitrogen_atoms) == 1:
+            nitrogen_atom = nitrogen_atoms[0]
+            print(f"\nXYZ File: {xyz_file}")
+            print(f"Coordinates of the nitrogen atom: {nitrogen_atom[1]}")
+
+            distances = []
+            for i, atom in enumerate(atoms):
+                if atom != nitrogen_atom:
+                    distance = calculate_distance(nitrogen_atom, atom)
+                    distances.append((i, distance))
+
+            # Sort distances in ascending order
+            sorted_distances = sorted(distances, key=lambda x: x[1])
+
+            # Get the indexes of the 3 atoms with shortest distance
+            closest_atoms_indexes = [index for index, _ in sorted_distances[:3]]
+
+            # Calculate vector distances between the fluorine atom and the 3 closest atoms
+            vectors = [calculate_vector_distance(nitrogen_atom, atoms[index]) for index in closest_atoms_indexes]
+
+            angles = []
+            for i in range(len(vectors)):
+                for j in range(i + 1, len(vectors)):
+                    angle = calculate_angle(vectors[i], vectors[j])
+                    angles.append(angle)
+
+            average_angle = sum(angles) / len(angles)
+            deviation_from_ideal = 109.5 - average_angle
+
+            print(f"\nAverage angle: {average_angle:.2f} degrees")
+            print(f"Deviation from (109.5 degrees): {deviation_from_ideal:.2f} degrees")
+
+            deviations.append(deviation_from_ideal)
+            y_values.append(float(row[4]))  # Assuming the 4th column is numeric for the y-axis
+
+        #else:
+         #   print(f"\nXYZ File: {xyz_file}")
+          #  print("Error: More than one or no nitrogen atom found.")
+
+    # Plotting
+    plt.scatter(deviations, y_values, marker='o', color='blue')
+    plt.title('Deviation vs. Y Values')
+    plt.xlabel('Deviation from 109.5')
+    plt.ylabel('Y Values')
+    plt.grid(True)
+    plt.show()
+
+if __name__ == "__main__":
+    main()
+```
