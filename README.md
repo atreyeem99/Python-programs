@@ -503,3 +503,135 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# With Plane to point distance
+```
+import csv
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+def read_csv_file(csv_file_path):
+    file_list = []
+    with open(csv_file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            file_list.append(row)
+    return file_list
+
+def read_xyz_file(file_path):
+   # print (file_path)
+    atoms = []
+    with open(file_path+'.xyz', 'r') as file:
+        num_atoms = int(file.readline())
+        file.readline()  # Skip the comment line
+
+        for _ in range(num_atoms):
+            line = file.readline().split()
+            atom_symbol, x, y, z = line[0], float(line[1]), float(line[2]), float(line[3])
+            atoms.append((atom_symbol, (x, y, z)))
+
+    return atoms
+
+def calculate_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1]
+    x2, y2, z2 = atom2[1]
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+    return distance
+
+def calculate_vector_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1]
+    x2, y2, z2 = atom2[1]
+    distance_vector = (x2 - x1, y2 - y1, z2 - z1)
+    return distance_vector
+
+def calculate_plane_normal(vector1, vector2):
+    normal_vector = np.cross(vector1, vector2)
+    return normal_vector
+
+def calculate_distance_to_plane(point, plane_point, plane_normal):
+    distance_to_plane = np.abs(np.dot(plane_normal, np.array(point) - np.array(plane_point)))
+    return distance_to_plane
+
+def main():
+     csv_file_path = 'topall.csv'  # Replace with the path to your CSV file
+     output_csv_path = 'distances_to_plane_output.csv'  # Replace with the desired output path
+     data= read_csv_file(csv_file_path)
+     #print(data)
+
+     distances_to_plane = []  # List to store distances to the plane
+     abc_values=[]
+    #for xyz_file in xyz_files:
+     for row in data:
+        xyz_file = row[0]
+        atoms = read_xyz_file(xyz_file)
+        
+        nitrogen_atoms = [atom for atom in atoms if atom[0] == 'N']
+        
+        if len(nitrogen_atoms) == 1:
+            nitrogen_atom = nitrogen_atoms[0]
+
+            distances = []
+            for i, atom in enumerate(atoms):
+                if atom != nitrogen_atom:
+                    distance = calculate_distance(nitrogen_atom, atom)
+                    distances.append((i, distance))
+
+            # Sort distances in ascending order
+            sorted_distances = sorted(distances, key=lambda x: x[1])
+
+            # Get the indexes of the 3 atoms with the shortest distance
+            closest_atoms_indexes = [index for index, _ in sorted_distances[:3]]
+
+            # Calculate vector distances between the fluorine atom and the 3 closest atoms
+            #vectors = [calculate_vector_distance(nitrogen_atom, atoms[index]) for index in closest_atoms_indexes]
+            i1=closest_atoms_indexes[0]
+            i2=closest_atoms_indexes[1]
+            i3=closest_atoms_indexes[2]
+            vector1=np.array(atoms[i2][1])-np.array(atoms[i1][1])
+            vector2=np.array(atoms[i3][1])-np.array(atoms[i1][1])
+
+            # Calculate the normal vector to the plane
+            plane_normal = calculate_plane_normal(vector1, vector2)
+            a=plane_normal[0]
+            b=plane_normal[1]
+            c=plane_normal[2]
+            d=-np.dot(plane_normal,np.array(atoms[i1][1]))
+            #print(d)
+            x0=nitrogen_atom[1][0]
+            y0=nitrogen_atom[1][1]
+            z0=nitrogen_atom[1][2]
+            distance_to_plane=np.abs(a*x0+b*y0+c*z0+d)/np.sqrt(a**2+b**2+c**2)
+
+            # Calculate the distance from the fluorine atom to the plane
+           # distance_to_plane = calculate_distance_to_plane(nitrogen_atom[1], atoms[closest_atoms_indexes[0]][1], plane_normal)
+            #print(distance_to_plane)
+            d1=sorted_distances[0][1]
+            #print(d1)
+            d2=sorted_distances[1][1]
+            d3=sorted_distances[2][1]
+            #print(d1,d2,d3)
+            if d1<1.6 and d2<1.6 and d3<1.6 and float(row[4])<0.3 and distance_to_plane<0.05:
+                print(d1,d2,d3,distance_to_plane,xyz_file,float(row[4]))
+                distances_to_plane.append(distance_to_plane)
+                #print(float(row))
+                abc_values.append(float(row[4]))
+
+    # Save distances to the plane to a CSV file
+   # with open(output_csv_path, 'w', newline='') as output_csv:
+    #    csv_writer = csv.writer(output_csv)
+     #   csv_writer.writerow(['Distance to Plane'])
+      #  csv_writer.writerows([[distance] for distance in distances_to_plane])
+
+    #print(f"Distances to the plane saved to {output_csv_path}")
+
+     plt.scatter(distances_to_plane, stg_values, marker='o', color='blue')
+     plt.title('Deviation vs. Y Values')
+     plt.xlabel('distance to plane')
+     plt.ylabel('abc Values')
+     plt.grid(True)
+     plt.show()
+
+
+if __name__ == "__main__":
+    main()
+```
