@@ -635,3 +635,18 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# calculation of gap in partition coeff
+```
+r=1.9872036*10**-3 # 
+t=298.15
+hartree2kcm=
+
+
+g_oct=
+g_water=
+g_gap=(g_oct-g_water)*hartree2kcm
+g_gap=-3.3944058230052323
+log_p=(-g_gap)/(2.303*r*t)
+
+print(log_p)
+```
