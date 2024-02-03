@@ -650,3 +650,4 @@ log_p=(-g_gap)/(2.303*r*t)
 
 print(log_p)
 ```
+# error calculatiin
