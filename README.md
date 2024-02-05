@@ -650,4 +650,38 @@ log_p=(-g_gap)/(2.303*r*t)
 
 print(log_p)
 ```
-# error calculatiin
+# merge csv files into one table with proper alignment 
+```
+import pandas as pd
+import numpy as np
+
+# Read CSV files
+file1 = 'file1.csv'
+file2 = 'file2.csv'
+file3 = 'file3.csv'
+
+df1 = pd.read_csv(file1)
+df2 = pd.read_csv(file2)
+df3 = pd.read_csv(file3)
+
+# Concatenate dataframes side by side
+merged_df = pd.concat([df1, df2, df3], axis=1)
+
+# Round off numbers to 3 decimal places
+merged_df = merged_df.round(3)
+
+# Display the resulting dataframe
+Nrows=len(merged_df.values[0])+1
+Ncols=len(merged_df.values)-1
+
+
+for i in range(Nrows):
+    print(i+1,end=' & ')
+    for j in range(Ncols-1):
+        print(merged_df.values[i][j],end=' & ')
+        if np.mod(j+1,3)==0:
+            print(end='& ')
+    for j in range(Ncols-1,Ncols):
+        print(merged_df.values[i][j],end=' \\\\ ')
+    print('')
+```
