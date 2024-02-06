@@ -685,3 +685,29 @@ for i in range(Nrows):
         print(merged_df.values[i][j],end=' \\\\ ')
     print('')
 ```
+# Print different types of error from csv files
+```
+import csv
+import numpy as np
+
+def read_column(filename, column_index):
+    data = []
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            try:
+                value = float(row[column_index])
+                data.append(value)
+            except (ValueError, IndexError):
+                pass
+    return data
+
+def calculate_mean_std_error(data1, data2):
+    minE =np.min(data1 - data2)
+    maxE =np.max(data1 - data2)
+    mse = np.mean(data1 - data2)
+    mae = np.mean(np.abs(data1 - data2))
+    sde = np.std(data1 - data2)
+
+    return minE,maxE,mse, mae, sde
+```
