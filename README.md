@@ -711,3 +711,20 @@ def calculate_mean_std_error(data1, data2):
 
     return minE,maxE,mse, mae, sde
 ```
+# print the rows of csv file within a range in a column
+```
+import pandas as pd
+
+# Load the CSV file into a pandas DataFrame
+df = pd.read_csv('file1.csv')
+
+# Set the range for the 4th column (assuming it's zero-indexed)
+min_value = 0.5
+max_value = 0.8
+
+# Filter rows based on the range of values in the 4th column
+filtered_df = df[(df.iloc[:, 4] >= min_value) & (df.iloc[:, 4] <= max_value)]
+
+# Print the filtered DataFrame
+print(filtered_df)
+```
