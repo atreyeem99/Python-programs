@@ -728,3 +728,27 @@ filtered_df = df[(df.iloc[:, 4] >= min_value) & (df.iloc[:, 4] <= max_value)]
 # Print the filtered DataFrame
 print(filtered_df)
 ```
+# range within range
+```
+import pandas as pd
+
+# Load the CSV file into a pandas DataFrame
+df = pd.read_csv('file1.csv')
+
+# Set the range for the 4th column (assuming it's zero-indexed)
+min_value_4th_col = 0.3
+max_value_4th_col = 0.5
+
+# Filter rows based on the range of values in the 4th column
+filtered_df_4th_col = df[(df.iloc[:, 4] >= min_value_4th_col) & (df.iloc[:, 4] <= max_value_4th_col)]
+
+# Set the range for the 1st column
+min_value_1st_col = 3
+max_value_1st_col = 4
+
+# Further filter rows based on the range of values in the 1st column
+filtered_df = filtered_df_4th_col[(filtered_df_4th_col.iloc[:, 1] >= min_value_1st_col) & (filtered_df_4th_col.iloc[:, 1] <= max_value_1st_col)]
+
+# Print the final filtered DataFrame
+print(filtered_df)
+```
