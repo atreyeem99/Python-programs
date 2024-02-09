@@ -752,3 +752,25 @@ filtered_df = filtered_df_4th_col[(filtered_df_4th_col.iloc[:, 1] >= min_value_1
 # Print the final filtered DataFrame
 print(filtered_df)
 ```
+# scattered plot of 2 csv files 
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the first CSV file
+df1 = pd.read_csv('file1.csv')
+
+# Read the second CSV file
+df2 = pd.read_csv('file2.csv')
+
+# Extract the second column from each DataFrame
+x_values = df2.iloc[:, 1]  # Assuming the second column is indexed at 1
+y_values = df1.iloc[:, 1]  # Assuming the second column is indexed at 1
+
+# Plotting
+plt.scatter(x_values, y_values)
+plt.xlabel('Second column of file2')
+plt.ylabel('Second column of file1')
+plt.title('Scatter Plot')
+plt.show()
+```
