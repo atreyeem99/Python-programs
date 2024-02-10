@@ -774,3 +774,21 @@ plt.ylabel('Second column of file1')
 plt.title('Scatter Plot')
 plt.show()
 ```
+# How to find which rows has an empty 4th column in csv file
+```
+import pandas as pd
+
+def find_rows_with_empty_fourth_column(csv_file):
+    df = pd.read_csv(csv_file)
+    empty_rows = df[df.iloc[:, 3].isnull()]
+    return empty_rows
+
+if __name__ == "__main__":
+    csv_file = 'your_file.csv'  # Replace 'your_file.csv' with your CSV file path
+    empty_rows = find_rows_with_empty_fourth_column(csv_file)
+    if not empty_rows.empty:
+        print("Rows with an empty fourth column:")
+        print(empty_rows)
+    else:
+        print("No rows with an empty fourth column found.")
+```
