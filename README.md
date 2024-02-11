@@ -792,3 +792,22 @@ if __name__ == "__main__":
     else:
         print("No rows with an empty fourth column found.")
 ```
+# to read a csv file and print the 12 rows having smallest values of 4th column
+```
+import pandas as pd
+
+def print_smallest_12_rows(csv_file):
+    # Read CSV file into a pandas DataFrame
+    df = pd.read_csv(csv_file)
+    
+    # Sort DataFrame based on the fourth column
+    sorted_df = df.sort_values(by=df.columns[3])  # Assuming the fourth column is the last column
+    
+    # Print the first 12 rows (smallest values)
+    print("First 12 rows with smallest values of the fourth column:")
+    print(sorted_df.head(12))
+
+if __name__ == "__main__":
+    csv_file = 'your_file.csv'  # Replace 'your_file.csv' with the path to your CSV file
+    print_smallest_12_rows(csv_file)
+```
