@@ -811,3 +811,40 @@ if __name__ == "__main__":
     csv_file = 'your_file.csv'  # Replace 'your_file.csv' with the path to your CSV file
     print_smallest_12_rows(csv_file)
 ```
+# write a program to plot kde for 4 different pairs of csv files and then plot in 2x2 panel plot
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+
+# Read CSV files and extract second column for each pair
+data_pairs = []
+for i in range(4):
+    df1 = pd.read_csv(f'file1_{i+1}.csv')
+    df2 = pd.read_csv(f'file2_{i+1}.csv')
+    data_pairs.append((df1.iloc[:, 1], df2.iloc[:, 1]))
+
+# Create a 2x2 grid of subplots
+fig, axs = plt.subplots(2, 2)
+
+# Plot KDE for each pair in a subplot
+for i, (data1, data2) in enumerate(data_pairs):
+    kde1 = gaussian_kde(data1)
+    kde2 = gaussian_kde(data2)
+    x_values = sorted(data1)
+    
+    row = i // 2
+    col = i % 2
+    axs[row, col].plot(x_values, kde1(x_values), label='KDE1')
+    axs[row, col].plot(x_values, kde2(x_values), label='KDE2')
+    axs[row, col].set_xlabel('X-axis label')  # Replace 'X-axis label' with your desired label
+    axs[row, col].set_ylabel('Density')  # Replace 'Density' with your desired label
+    axs[row, col].set_title(f'Pair {i+1}')  # Set title for each subplot
+    axs[row, col].legend()
+
+# Adjust layout to prevent overlapping
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+```
