@@ -870,3 +870,54 @@ plt.ylabel('Second column of file1')
 plt.title('Scatter Plot')
 plt.show()
 ```
+# read 2 csv files and print the rows having the 5th column in a common range 
+```
+import csv
+
+def read_csv(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        csv_reader = csv.reader(file)
+        for row in csv_reader:
+            data.append(row)
+    return data
+
+def filter_rows_by_range(data, column_index, min_value, max_value):
+    filtered_rows = []
+    for row in data:
+        if min_value <= float(row[column_index]) <= max_value:
+            filtered_rows.append(row)
+    return filtered_rows
+
+def main():
+    file1_path = 'file1.csv'
+    file2_path = 'file2.csv'
+    
+    # Read CSV files
+    file1_data = read_csv(file1_path)
+    file2_data = read_csv(file2_path)
+    
+    # Set range for the 5th column
+    column_index = 4  # Assuming 5th column (0-indexed)
+    min_value = 10
+    max_value = 20
+    
+    # Filter rows by range for both files
+    file1_filtered_rows = filter_rows_by_range(file1_data, column_index, min_value, max_value)
+    file2_filtered_rows = filter_rows_by_range(file2_data, column_index, min_value, max_value)
+    
+    # Find common rows
+    common_rows = []
+    for row1 in file1_filtered_rows:
+        for row2 in file2_filtered_rows:
+            if row1[column_index] == row2[column_index]:
+                common_rows.append(row1)
+    
+    # Print common rows
+    print("Rows with values in common range in both files:")
+    for row in common_rows:
+        print(row)
+
+if __name__ == "__main__":
+    main()
+```
