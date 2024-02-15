@@ -921,3 +921,51 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# write a program to read a csv file which has the first column as the names of xyz files.read the xyz file of that same name and then print the following into a new csv file. The sixth column of the csv file, total number of atoms in the coordinate file, individual atoms in one column, the xyz coordinates of each atom in each column, 2nd ,third and 4th column of that csv files  all in different columns
+```
+import csv
+
+def read_xyz_file(filename):
+    atoms = []
+    coordinates = []
+    
+    with open(filename, 'r') as f:
+        iline=0
+        
+        if iline==0:
+            num_atoms = int(f.readline())
+            iline=iline+1
+        
+        for line in f:
+            if iline>1:
+                atom, x, y, z = line.split()
+                atoms.append(atom)
+                coordinates.append([float(x), float(y), float(z)])
+            iline=iline+1
+    return num_atoms, atoms, coordinates
+
+def main():
+    csv_filename = input("Enter CSV filename: ")
+    xyz_files = []
+    with open(csv_filename, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for i, row in enumerate(csv_reader):
+            if i < 3:  # Read only the first 3 rows
+                xyz_files.append((row[0] + ".xyz", row[2], row[3], row[4]))  # Add required columns from original CSV
+
+    output_rows = []
+    for xyz_file, col3, col4, col5 in xyz_files:
+        num_atoms, atoms, coordinates = read_xyz_file(xyz_file)
+        output_rows.append([xyz_file, num_atoms, atoms, coordinates, col3, col4, col5])
+
+    output_csv_filename = "output.csv"  # Output CSV filename
+    with open(output_csv_filename, 'w', newline='') as output_csv_file:
+        csv_writer = csv.writer(output_csv_file)
+        csv_writer.writerow(["XYZ_File", "Num_Atoms", "Atoms", "Coordinates", "Column_3", "Column_4", "Column_5"])
+        csv_writer.writerows(output_rows)
+
+    print(f"Data written to {output_csv_filename}")
+
+if __name__ == "__main__":
+    main()
+```
