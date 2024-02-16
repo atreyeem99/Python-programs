@@ -969,3 +969,39 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# read a csv file and find difference of 14th and 11th column for all rows
+```
+import csv
+
+def calculate_difference(csv_filename):
+    differences = []
+    with open(csv_filename, 'r') as file:
+        csv_reader = csv.reader(file)
+        next(csv_reader)  # Skip header row if present
+        for row in csv_reader:
+            if len(row) >= 14:  # Check if row has at least 14 columns
+                try:
+                    col_14 = float(row[13])  # Index 13 represents the 14th column (0-indexed)
+                    col_11 = float(row[10])  # Index 10 represents the 11th column (0-indexed)
+                    difference = col_14 - col_11
+                    differences.append(difference)
+                except ValueError:
+                    print("Error: Non-numeric value found in columns 11 or 14 in a row.")
+            else:
+                print("Error: Row does not have enough columns.")
+
+    return differences
+
+def main():
+    csv_filename = input("Enter the name of the CSV file: ")
+    differences = calculate_difference(csv_filename)
+    if differences:
+        print("Differences between 14th and 11th columns for each row:")
+        for difference in differences:
+            print(difference)
+    else:
+        print("No differences calculated.")
+
+if __name__ == "__main__":
+    main()
+```
