@@ -1005,3 +1005,25 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# Find the union and intersection of 2 dataframes with pandas
+```
+import pandas as pd
+
+# Sample DataFrames
+df1 = pd.DataFrame({'A': [1, 2, 3, 4],
+                    'B': ['a', 'b', 'c', 'd']})
+
+df2 = pd.DataFrame({'A': [3, 4, 5, 6],
+                    'B': ['c', 'd', 'e', 'f']})
+
+# Union
+union_df = pd.concat([df1, df2]).drop_duplicates()
+
+# Intersection
+intersection_df = pd.merge(df1, df2, how='inner')
+
+print("Union:")
+print(union_df)
+print("\nIntersection:")
+print(intersection_df)
+```
