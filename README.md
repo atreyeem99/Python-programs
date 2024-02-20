@@ -1044,3 +1044,17 @@ filtered_df = df[(df['A'] >= lower_bound) & (df['A'] <= upper_bound)]
 # Print the filtered DataFrame
 print(filtered_df)
 ```
+# how to print unique entries in a list with frequencies
+```
+from collections import Counter
+
+# Sample list
+my_list = ['a', 'b', 'c', 'a', 'b', 'a', 'd', 'b', 'c']
+
+# Count the frequency of each element in the list
+frequency_counter = Counter(my_list)
+
+# Print unique entries along with their frequencies
+for item, frequency in frequency_counter.items():
+    print(f"Item: {item}, Frequency: {frequency}")
+```
