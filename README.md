@@ -1058,3 +1058,22 @@ frequency_counter = Counter(my_list)
 for item, frequency in frequency_counter.items():
     print(f"Item: {item}, Frequency: {frequency}")
 ```
+# find the 10 largest values of one column in datafunction and the apply a condition of range for another column. print only those of the 10 which satisties it
+```
+import pandas as pd
+
+# Example DataFrame
+data = {'Column1': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        'Column2': [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]}
+
+df = pd.DataFrame(data)
+
+# Find the 10 largest values of Column1
+largest_values = df.nlargest(10, 'Column1')
+
+# Apply condition to filter rows based on Column2
+filtered_values = largest_values[largest_values['Column2'] >= 50]
+
+# Print the filtered values
+print(filtered_values)
+```
