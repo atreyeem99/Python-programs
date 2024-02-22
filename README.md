@@ -1077,3 +1077,29 @@ filtered_values = largest_values[largest_values['Column2'] >= 50]
 # Print the filtered values
 print(filtered_values)
 ```
+# from the 2 data frames we found the smallest 25 values, now we want the corresponding index of those 25 values from the dataframe
+```
+import pandas as pd
+
+# Assuming df1 and df2 are your DataFrames
+# df1 and df2 should contain the same indices to get the correct corresponding indices
+
+# Example DataFrames
+df1 = pd.DataFrame({'A': [10, 20, 30, 40, 50],
+                    'B': [1, 2, 3, 4, 5]})
+
+df2 = pd.DataFrame({'A': [15, 25, 35, 45, 55],
+                    'B': [6, 7, 8, 9, 10]})
+
+# Concatenate the DataFrames
+concatenated_df = pd.concat([df1, df2])
+
+# Find the smallest 25 values
+smallest_25_values = concatenated_df.min().nsmallest(25)
+
+# Get the corresponding indices
+corresponding_indices = concatenated_df[concatenated_df.isin(smallest_25_values)].stack().index.tolist()
+
+print("Corresponding Indices:")
+print(corresponding_indices)
+```
