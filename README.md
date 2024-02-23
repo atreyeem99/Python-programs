@@ -1103,3 +1103,18 @@ corresponding_indices = concatenated_df[concatenated_df.isin(smallest_25_values)
 print("Corresponding Indices:")
 print(corresponding_indices)
 ```
+# suppose i print 3 columns. the first two already have headers. How to include header in the 3rd one
+```
+# Assuming you have data for the first two columns and a header for the third column
+column1_data = [1, 2, 3]
+column2_data = ['A', 'B', 'C']
+column3_header = "Header3"
+column3_data = [10, 20, 30]
+
+# Printing headers for the first two columns
+print("Column1 Column2", column3_header)
+
+# Printing data for all three columns
+for data1, data2, data3 in zip(column1_data, column2_data, column3_data):
+    print(data1, data2, data3)
+```
