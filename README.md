@@ -1118,3 +1118,15 @@ print("Column1 Column2", column3_header)
 for data1, data2, data3 in zip(column1_data, column2_data, column3_data):
     print(data1, data2, data3)
 ```
+# np function to arrange in ascending order
+```
+import numpy as np
+
+# Example array
+arr = np.array([3, 1, 5, 2, 4])
+
+# Sort the array in ascending order
+arr_sorted = np.sort(arr)
+
+print("Sorted array:", arr_sorted)
+```
