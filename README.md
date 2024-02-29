@@ -1192,6 +1192,7 @@ if __name__ == "__main__":
     main()
 ```
 # read 2 csv files and plot the 2nd column of one file in y axis vs the second column of the other in x axis
+```
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -1207,4 +1208,26 @@ plt.xlabel('Second column of file2')
 plt.ylabel('Second column of file1')
 plt.title('Scatter Plot')
 plt.show()
+```
+# read 3 csv files and convert them into one table and round off the numbers to 3 decimal places and the gap between the numbers should be properly adjusted 
+```
+import pandas as pd
+
+# Read CSV files
+file1 = 'file1.csv'
+file2 = 'file2.csv'
+file3 = 'file3.csv'
+
+df1 = pd.read_csv(file1)
+df2 = pd.read_csv(file2)
+df3 = pd.read_csv(file3)
+
+# Combine dataframes into one
+merged_df = pd.concat([df1, df2, df3], ignore_index=True)
+
+# Round off numbers to 3 decimal places
+merged_df = merged_df.round(3)
+
+# Display the resulting dataframe
+print(merged_df)
 ```
