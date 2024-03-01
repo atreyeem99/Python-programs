@@ -1231,3 +1231,24 @@ merged_df = merged_df.round(3)
 # Display the resulting dataframe
 print(merged_df)
 ```
+# Get the 10 with largest values of one datafrae and with in a range for for another
+```
+import pandas as pd
+
+# Sample DataFrame
+df = pd.DataFrame({'A': [10, 20, 30, 40, 50],
+                   'B': [5, 15, 25, 35, 45]})
+
+# Define the range for column 'B'
+range_B_lower = 20
+range_B_upper = 40
+
+# Filter the DataFrame based on the range for column 'B'
+filtered_df = df[(df['B'] >= range_B_lower) & (df['B'] <= range_B_upper)]
+
+# Get the 10 entries with largest values in column 'A' from the filtered DataFrame
+top_10_largest_A = filtered_df.nlargest(10, 'A')
+
+# Print the result
+print(top_10_largest_A)
+```
