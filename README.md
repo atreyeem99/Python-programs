@@ -1252,3 +1252,31 @@ top_10_largest_A = filtered_df.nlargest(10, 'A')
 # Print the result
 print(top_10_largest_A)
 ```
+# plot an equation vs another
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the range for x1 and x2
+x1 = np.linspace(-2, 2, 400)
+x2 = np.linspace(-2, 2, 400)
+
+# Create a meshgrid for x1 and x2
+X1, X2 = np.meshgrid(x1, x2)
+
+# Define the equations
+equation1 = X1**2 + X2**2 - 1
+equation2 = 2*X1**2 - X2 - 1
+
+# Plot the equations
+plt.figure(figsize=(8, 6))
+plt.contour(X1, X2, equation1, levels=[0], colors='blue', label='x1^2 + x2^2 - 1 = 0')
+plt.contour(X1, X2, equation2, levels=[0], colors='red', label='2*x1^2 - x2 - 1 = 0')
+plt.xlabel('x1')
+plt.ylabel('x2')
+plt.title('Intersection of Equations')
+plt.legend()
+plt.grid(True)
+plt.axis('equal')
+plt.show()
+```
