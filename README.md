@@ -1280,3 +1280,48 @@ plt.grid(True)
 plt.axis('equal')
 plt.show()
 ```
+# prepinp.sh 
+```
+import os
+
+Nmol = 100
+geomfile='100_geom.xyz'
+
+filedir = os.getcwd()
+
+geom_file = open(geomfile, 'r')
+
+for imol in range(Nmol):
+
+    line = geom_file.readline().strip()
+
+    if line:
+
+        Nat = int(line)
+        title = geom_file.readline().strip()
+
+        mol=new_name = "Mol_{:05d}".format(imol+1)
+
+        print(mol)
+
+        geomfile='geom_DFT_S0.xyz'
+
+        inputfile= open(geomfile, 'w')
+
+        inputfile.write(f'{Nat}\n')
+        inputfile.write(f'{mol}\n')
+
+        for iat in range(1, Nat + 1):
+            line = geom_file.readline().split()
+            sym=line[0]
+            R=[float(line[1]), float(line[2]), float(line[3])]
+            inputfile.write(f'{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n')
+
+        inputfile.close()
+
+        os.mkdir(os.path.join(filedir, mol))
+
+        os.system(f'cp tddft.com {geomfile} {mol}/')
+
+geom_file.close()
+```
