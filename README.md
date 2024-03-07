@@ -1376,3 +1376,38 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# write a program to copy one particular xyz per folder to a separate folder.
+```
+import os
+import shutil
+
+def copy_xyz_file(src_folder, dest_folder, filename='xyz_file_to_copy.xyz'):
+    for root, dirs, files in os.walk(src_folder):
+        for file in files:
+            if file == filename:
+                src_path = os.path.join(root, file)
+                dest_path = os.path.join(dest_folder, file)
+                shutil.copyfile(src_path, dest_path)
+                print(f"Copied {file} from {src_folder} to {dest_folder}")
+
+def main():
+    # Source folder containing subfolders with XYZ files
+    src_root_folder = 'source_root_folder'
+    
+    # Destination folder where selected XYZ files will be copied
+    dest_folder = 'destination_folder'
+
+    # Filename of the XYZ file to copy
+    xyz_filename = 'xyz_file_to_copy.xyz'
+
+    # Create the destination folder if it does not exist
+    if not os.path.exists(dest_folder):
+        os.makedirs(dest_folder)
+
+    # Copy the specified XYZ file from each folder to the destination folder
+    for root, dirs, files in os.walk(src_root_folder):
+        copy_xyz_file(root, dest_folder, xyz_filename)
+
+if __name__ == "__main__":
+    main()
+```
