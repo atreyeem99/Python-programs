@@ -1411,3 +1411,4 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# Write a python program to create a csv file with the second and third column of the bash extract output
