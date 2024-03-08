@@ -1412,3 +1412,47 @@ if __name__ == "__main__":
     main()
 ```
 # Write a python program to create a csv file with the second and third column of the bash extract output
+# 
+```import os
+import csv
+
+def check_xyz_file(file_path):
+    results = []
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        data = [line.strip().split() for line in lines[2:] if len(line.strip().split()) == 4]
+        for i in range(min(10, len(data))):
+            atom_type = data[i][0]
+            if atom_type == 'S':
+                results.extend([1, 0, 0])
+            elif atom_type == 'P':
+                results.extend([0, 1, 0])
+            elif atom_type == 'C':
+                results.extend([0, 0, 1])
+            else:
+                results.extend([0, 0, 0])
+    return results
+
+def main():
+    # Root directory containing folders with XYZ files
+    root_dir = 'path_to_root_directory'
+
+    # CSV file to store results
+    csv_file = 'results.csv'
+
+    with open(csv_file, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Iterate through each folder and process XYZ files
+        for foldername in os.listdir(root_dir):
+            folder_path = os.path.join(root_dir, foldername)
+            if os.path.isdir(folder_path):
+                xyz_file_path = os.path.join(folder_path, 'your_specific_xyz_file.xyz')
+                if os.path.isfile(xyz_file_path):
+                    results = check_xyz_file(xyz_file_path)
+                    writer.writerow(results)
+                    print(f"Processed {xyz_file_path}")
+
+if __name__ == "__main__":
+    main()
+```
