@@ -1479,3 +1479,30 @@ X, residuals, rank, singular_values = np.linalg.lstsq(A, B_numeric, rcond=None)
 print("The unknown vector X:")
 print(X)
 ```
+# 
+```
+def main():
+    # Load coefficients matrix A from CSV
+    A_filename = 'coefficients.csv'
+    A = load_csv(A_filename)
+
+    # Load vector B from CSV
+    B_filename = 'vector_b.csv'
+    B = load_csv(B_filename)
+
+    # Check dimensions
+    m_A, n_A = A.shape
+    m_B, n_B = B.shape
+    if m_A != m_B:
+        print("Error: Number of rows in A does not match the length of B.")
+        return
+    if n_B != 1:
+        print("Error: Vector B should have only one column.")
+        return
+
+    # Solve the linear equation AX = B
+    X = solve_linear_equation(A, B)
+
+    print("Solution vector X:")
+    print(X)
+```
