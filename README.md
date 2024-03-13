@@ -1515,3 +1515,42 @@ df = pd.read_csv('your_file.csv')
 # Print the second column
 print(df.iloc[:, 1])
 ```
+# I want to extract the 3rd column of all the csv files and put those columns side by side in a new csv file with the csv file name as the header of the columns
+```
+import os
+import csv
+
+def extract_third_columns(input_folder, output_file):
+    # Get a list of CSV files in the input folder
+    csv_files = [file for file in os.listdir(input_folder) if file.endswith('.csv')]
+
+    if not csv_files:
+        print("No CSV files found in the input folder.")
+        return
+
+    # Dictionary to store third columns from each CSV file
+    third_columns = {}
+
+    # Iterate through each CSV file
+    for csv_file in csv_files:
+        with open(os.path.join(input_folder, csv_file), 'r', newline='') as file:
+            reader = csv.reader(file)
+            # Extract the third column and store it in the dictionary
+            third_columns[csv_file] = [row[2] for row in reader]
+
+    # Write the collected third columns to the output CSV file
+    with open(output_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        # Write headers
+        writer.writerow([os.path.splitext(csv_file)[0] for csv_file in csv_files])
+        # Transpose the data and write it to the output file
+        for i in range(len(third_columns[csv_files[0]])):
+            writer.writerow([third_columns[csv_file][i] for csv_file in csv_files])
+
+    print(f"Third columns from {len(csv_files)} CSV files have been extracted and saved to {output_file}.")
+
+# Example usage:
+input_folder = 'input_folder_path'  # Replace 'input_folder_path' with the path to your folder containing CSV files
+output_file = 'output_file.csv'     # Specify the name of the output CSV file
+extract_third_columns(input_folder, output_file)
+```
