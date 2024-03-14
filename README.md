@@ -1554,3 +1554,31 @@ input_folder = 'input_folder_path'  # Replace 'input_folder_path' with the path 
 output_file = 'output_file.csv'     # Specify the name of the output CSV file
 extract_third_columns(input_folder, output_file)
 ```
+# plot for X1/4 + X2/8 + 11/8   and   -X1/8 - X2/4 + 1
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the range for x1 and x2
+x1 = np.linspace(-10, 10, 400)
+x2 = np.linspace(-10, 10, 400)
+
+# Create a meshgrid for x1 and x2
+X1, X2 = np.meshgrid(x1, x2)
+
+# Define the equations
+equation1 = X1/4 + X2/8 + 11/8
+equation2 = -X1/8 - X2/4 + 1
+
+# Plot the equations
+plt.figure(figsize=(8, 6))
+plt.contour(X1, X2, equation1, levels=[0], colors='blue', label='X1/4 + X2/8 + 11/8 = 0')
+plt.contour(X1, X2, equation2, levels=[0], colors='red', label='-X1/8 - X2/4 + 1 = 0')
+plt.xlabel('X1')
+plt.ylabel('X2')
+plt.title('Intersection of Equations')
+plt.legend()
+plt.grid(True)
+plt.axis('equal')
+plt.show()
+```
