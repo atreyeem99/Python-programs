@@ -1582,3 +1582,31 @@ plt.grid(True)
 plt.axis('equal')
 plt.show()
 ```
+# Here also add something to print the index of the points beside the points in the plot
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the CSV files
+df1 = pd.read_csv('a1.csv')
+df2 = pd.read_csv('a1.csv')
+
+# Extracting relevant columns
+x = df1.iloc[:, 2]  # Third column of the first CSV file
+y = df1.iloc[:, 1] - df2.iloc[:, 1]  # Second column of first CSV - Second column of second CSV
+y = np.abs(y)
+
+# Plotting
+plt.scatter(x, y)
+plt.xlabel('X Axis Label')
+plt.ylabel('Y Axis Label')
+plt.title('Plotting Difference of Columns')
+plt.grid(True)
+
+# Annotating points with index
+for i, (xi, yi) in enumerate(zip(x, y)):
+    plt.text(xi, yi, str(i), fontsize=8, verticalalignment='bottom', horizontalalignment='right')
+
+plt.show()
+```
