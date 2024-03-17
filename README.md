@@ -1582,6 +1582,27 @@ plt.grid(True)
 plt.axis('equal')
 plt.show()
 ```
+# load 2 csv files. Then plot in y axis the 2nd column of first csv file - second column of the other. In x axis it will be the third column of the first csv file
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV files
+df1 = pd.read_csv('file1.csv')
+df2 = pd.read_csv('file2.csv')
+
+# Extracting relevant columns
+x = df1.iloc[:, 2]  # Third column of the first CSV file
+y = df1.iloc[:, 1] - df2.iloc[:, 1]  # Second column of first CSV - Second column of second CSV
+
+# Plotting
+plt.plot(x, y)
+plt.xlabel('X Axis Label')
+plt.ylabel('Y Axis Label')
+plt.title('Plotting Difference of Columns')
+plt.grid(True)
+plt.show()
+```
 # Here also add something to print the index of the points beside the points in the plot
 ```
 import pandas as pd
