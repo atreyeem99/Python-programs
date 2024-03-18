@@ -1631,3 +1631,35 @@ for i, (xi, yi) in enumerate(zip(x, y)):
 
 plt.show()
 ```
+# a python program to change the 3rd, 4th and fifth column of one csv file with the 3rd, 4th column of the new csv file
+```
+import csv
+
+def modify_csv(input_file, new_file):
+    # Read the contents of the original CSV file
+    with open(input_file, 'r', newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+    # Read the contents of the new CSV file
+    with open(new_file, 'r', newline='') as f:
+        reader = csv.reader(f)
+        new_data = list(reader)
+
+    # Modify the specified columns in the original CSV file with corresponding columns from the new CSV file
+    for i, row in enumerate(data):
+        if i < len(new_data):
+            data[i][2] = new_data[i][2]  # Modify 3rd column
+            data[i][3] = new_data[i][3]  # Modify 4th column
+            data[i][4] = new_data[i][3]  # Modify 5th column
+
+    # Write the modified data to a new CSV file
+    with open('modified.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+
+if __name__ == "__main__":
+    input_file = 'original.csv'  # Specify the original CSV file
+    new_file = 'new.csv'  # Specify the new CSV file
+    modify_csv(input_file, new_file)
+```
