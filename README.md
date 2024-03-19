@@ -1663,3 +1663,31 @@ if __name__ == "__main__":
     new_file = 'new.csv'  # Specify the new CSV file
     modify_csv(input_file, new_file)
 ```
+# find column 6-column 5 in the csv file and arrange the results in ascending order
+
+```
+import csv
+
+def print_sorted_differences(input_file):
+    # Read the contents of the CSV file
+    with open(input_file, 'r', newline='') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip the header
+        differences = []
+
+        # Calculate the difference between column 6 and column 5 for each row
+        for row in reader:
+            col_5 = float(row[5])
+            col_6 = float(row[6])
+            difference = col_6 - col_5
+            differences.append(difference)
+
+        # Sort and print the differences in ascending order
+        sorted_differences = sorted(differences)
+        for diff in sorted_differences:
+            print(diff)
+
+if __name__ == "__main__":
+    input_file = 'original.csv'  # Specify the CSV file
+    print_sorted_differences(input_file)
+```
