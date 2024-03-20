@@ -1691,3 +1691,42 @@ if __name__ == "__main__":
     input_file = 'original.csv'  # Specify the CSV file
     print_sorted_differences(input_file)
 ```
+```
+import os
+import csv
+
+def collect_last_columns(input_folder, output_file):
+    # Get a list of CSV files in the input folder
+    csv_files = [file for file in os.listdir(input_folder) if file.endswith('.csv')]
+
+    if not csv_files:
+        print("No CSV files found in the input folder.")
+        return
+
+    # Dictionary to store data from each CSV file
+    csv_data = {}
+
+    # Iterate through each CSV file
+    for csv_file in csv_files:
+        with open(os.path.join(input_folder, csv_file), 'r', newline='') as file:
+            reader = csv.reader(file)
+            # Read each row of the CSV file and store it in the dictionary
+            csv_data[csv_file] = [row for row in reader]
+
+    # Write the collected data to the output CSV file
+    with open(output_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        # Write headers
+        writer.writerow(['File Name'] + [f'Column_{i+1}' for i in range(len(csv_data[csv_files[0]][0]))])
+        # Write data for each CSV file
+        for csv_file in csv_files:
+            for row in csv_data[csv_file]:
+                writer.writerow([csv_file] + row)
+
+    print(f"All columns from {len(csv_files)} CSV files have been collected and saved to {output_file}.")
+
+# Example usage:
+input_folder = 'input_folder_path'  # Replace 'input_folder_path' with the path to your folder containing CSV files
+output_file = 'output_file.csv'     # Specify the name of the output CSV file
+collect_last_columns(input_folder, output_file)
+```
