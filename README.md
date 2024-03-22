@@ -1756,3 +1756,41 @@ if __name__ == "__main__":
     input_file = 'original.csv'  # Specify the CSV file
     print_sorted_differences(input_file)
 ```
+# Histogram
+```
+import matplotlib.pyplot as plt
+import pandas as pd
+
+def draw_histogram(csv_file, column1, column2):
+    # Read the CSV file into a DataFrame
+    data = pd.read_csv(csv_file)
+    
+    # Extract the columns
+    col1_data = data[column1]
+    col2_data = data[column2]
+    
+    # Create a figure and axis object
+    fig, ax = plt.subplots()
+    
+    # Plot histograms for both columns
+    ax.hist(col1_data, alpha=0.5, label=column1)
+    ax.hist(col2_data, alpha=0.5, label=column2)
+    
+    # Add labels and title
+    ax.set_xlabel('Values')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Histogram of {} and {}'.format(column1, column2))
+    
+    # Add legend
+    ax.legend()
+    
+    # Show the plot
+    plt.show()
+
+# Example usage
+csv_file = 'data.csv'  # Replace 'data.csv' with your CSV file
+column1 = 'Column1'     # Replace 'Column1' with the name of the first column
+column2 = 'Column2'     # Replace 'Column2' with the name of the second column
+
+draw_histogram(csv_file, column1, column2)
+```
