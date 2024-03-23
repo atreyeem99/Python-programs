@@ -1794,3 +1794,28 @@ column2 = 'Column2'     # Replace 'Column2' with the name of the second column
 
 draw_histogram(csv_file, column1, column2)
 ```
+# white a python program to convert a text file to csv file format
+```
+import csv
+
+def convert_text_to_csv(input_file, output_file, delimiter=','):
+    # Open the text file for reading
+    with open(input_file, 'r') as infile:
+        # Open the CSV file for writing
+        with open(output_file, 'w', newline='') as outfile:
+            writer = csv.writer(outfile, delimiter=delimiter)
+            
+            # Read each line from the text file
+            for line in infile:
+                # Split the line using the delimiter
+                data = line.strip().split(delimiter)
+                
+                # Write the data to the CSV file
+                writer.writerow(data)
+
+# Example usage
+input_file = 'input.txt'   # Replace 'input.txt' with the name of your text file
+output_file = 'output.csv' # Name of the output CSV file
+
+convert_text_to_csv(input_file, output_file)
+```
