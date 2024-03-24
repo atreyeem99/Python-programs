@@ -1819,3 +1819,35 @@ output_file = 'output.csv' # Name of the output CSV file
 
 convert_text_to_csv(input_file, output_file)
 ```
+```
+import matplotlib.pyplot as plt
+import pandas as pd
+
+def plot_bar_chart(csv_file):
+    # Read the CSV file into a DataFrame
+    data = pd.read_csv(csv_file, header=None, names=['Category', 'Value'])
+    
+    # Extracting category labels and corresponding values
+    categories = data['Category']
+    values = data['Value']
+    
+    # Create a bar plot
+    plt.figure(figsize=(10, 6))  # Adjust figure size if necessary
+    plt.bar(categories, values, color='skyblue')
+    
+    # Add labels and title
+    plt.xlabel('Categories')
+    plt.ylabel('Values')
+    plt.title('Bar Plot')
+    
+    # Rotate x-axis labels if needed
+    plt.xticks(rotation=45)
+    
+    # Show plot
+    plt.tight_layout()
+    plt.show()
+
+# Example usage
+csv_file = 'data.csv'  # Replace 'data.csv' with the name of your CSV file
+plot_bar_chart(csv_file)
+```
