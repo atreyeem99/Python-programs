@@ -1819,6 +1819,7 @@ output_file = 'output.csv' # Name of the output CSV file
 
 convert_text_to_csv(input_file, output_file)
 ```
+# bar plot
 ```
 import matplotlib.pyplot as plt
 import pandas as pd
