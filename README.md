@@ -209,6 +209,31 @@ for i in range(Ngrps):
 
 file1.close()
 ```
+```
+g_r_rt=-192.93949117
+dg_r_rt=0.05818173
+dg_r_1000K=-0.03679196
+g_r_1000K= g_r_rt-dg_r_rt+dg_r_1000K
+
+se_r_dlpno=-192.776810360853
+g_r_1000_dlpno=se_r_dlpno+dg_r_1000K
+
+g_ts_rt=-192.83678263
+dg_ts_rt=0.05145363
+dg_ts_1000K=-0.05211098
+g_ts_1000K= g_ts_rt-dg_ts_rt+dg_ts_1000K
+
+se_ts_dlpno=-192.6635437519
+g_ts_1000_dlpno=se_ts_dlpno+dg_ts_1000K
+
+au2kcm=au2kcm=627.5096080305927
+
+g_barr_1000_dft=(g_ts_1000K-g_r_1000K)*au2kcm
+g_barr_1000_dlpno=(g_ts_1000_dlpno-g_r_1000_dlpno)*au2kcm
+
+print(g_barr_1000_dft)
+print(g_barr_1000_dlpno)
+```
 
 # to plot the data from a txt file 
 ```
