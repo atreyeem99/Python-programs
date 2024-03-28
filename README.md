@@ -1877,3 +1877,26 @@ def plot_bar_chart(csv_file):
 csv_file = 'data.csv'  # Replace 'data.csv' with the name of your CSV file
 plot_bar_chart(csv_file)
 ```
+# write a python program to find the unknown vecytor X where there is AX=B, where A is a mxn coeffecient matrix, X is nx1 matrix and B is mx1 matrix. Here A is one csv file, and B is the first column of another csv file. the first column of b csv file is string. do accordingly
+```
+import numpy as np
+import pandas as pd
+
+# Load the coefficient matrix A from CSV
+A = pd.read_csv('A.csv', header=None).to_numpy()
+
+# Load the B matrix from CSV
+B_data = pd.read_csv('B.csv', header=None)
+B = B_data.iloc[:, 1:].to_numpy()
+
+# Convert the string column in B to numeric
+B_strings = B_data.iloc[:, 0]
+B_numeric = pd.to_numeric(B_strings, errors='coerce').fillna(0).to_numpy()
+
+# Perform the least squares calculation to find X
+X, residuals, rank, singular_values = np.linalg.lstsq(A, B_numeric, rcond=None)
+
+# Print the unknown vector X
+print("The unknown vector X:")
+print(X)
+```
