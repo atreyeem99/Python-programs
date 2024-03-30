@@ -53,7 +53,7 @@ geom_file.close()
    python3 obminimize.py nmol geom.xyz geom_UFF.xyz
    ```
    where nmol is number of molecules
-# prepinp_geom
+# prepinp_geom : to create folders with opt input file and xyz coordinates
 ```
 import os
 
