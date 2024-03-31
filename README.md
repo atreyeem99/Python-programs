@@ -94,7 +94,7 @@ for imol in range(Nmol):
 geom_file.close()
 ```
 
-# prepinp_dft
+# prepinp_dft: to create folders with tddft input file and xyz coordinates
 ```
 import os
 
