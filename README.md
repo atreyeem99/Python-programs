@@ -152,7 +152,7 @@ plt.plot(A)
 plt.grid()
 plt.show()
 ```
-# use different functional groups on one compound
+# use different functional groups on one compound using smiles. All probable combinations are obtained
 ```
 string_template = "C(=O)C({})=C({}){}"
 
