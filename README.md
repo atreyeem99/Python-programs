@@ -318,7 +318,7 @@ if __name__ == "__main__":
     main()
 
 ```
-# To read the csv filenames from a file and to find the errors
+# To read the csv filenames from a file and to find the errors mse mae and sde
 ```
 import csv
 import numpy as np
