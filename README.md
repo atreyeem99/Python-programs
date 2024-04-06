@@ -1939,3 +1939,22 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+# summation of a column of csv file using numpy
+```
+import numpy as np
+import csv
+
+def sum_second_column(csv_file):
+    with open(csv_file, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip header row
+        data = [float(row[1]) for row in reader]
+
+    total_sum = np.sum(data)
+    return total_sum
+
+# Example usage:
+csv_file = 'output.csv'  # Replace with the path to your CSV file
+total_sum = sum_second_column(csv_file)
+print("Summation of the second column:", total_sum)
+```
