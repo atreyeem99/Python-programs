@@ -1958,3 +1958,36 @@ csv_file = 'output.csv'  # Replace with the path to your CSV file
 total_sum = sum_second_column(csv_file)
 print("Summation of the second column:", total_sum)
 ```
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load data from the first CSV file
+df1 = pd.read_csv('file1.csv')
+x1 = df1.index
+y1_col2 = df1.iloc[:, 1]  # 2nd column
+y1_col3 = df1.iloc[:, 2]  # 3rd column
+
+# Load data from the second CSV file
+df2 = pd.read_csv('file2.csv')
+x2 = df2.index
+y2_col2 = df2.iloc[:, 1]  # 2nd column
+y2_col3 = df2.iloc[:, 2]  # 3rd column
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+plt.plot(x1, y1_col2, label='File 1 - Column 2')
+plt.plot(x1, y1_col3, label='File 1 - Column 3')
+plt.plot(x2, y2_col2, label='File 2 - Column 2')
+plt.plot(x2, y2_col3, label='File 2 - Column 3')
+
+# Add labels and title
+plt.xlabel('Index')
+plt.ylabel('Value')
+plt.title('Spectrum Plot')
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.show()
+```
