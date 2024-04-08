@@ -1958,6 +1958,7 @@ csv_file = 'output.csv'  # Replace with the path to your CSV file
 total_sum = sum_second_column(csv_file)
 print("Summation of the second column:", total_sum)
 ```
+# Plot columns with respect to index
 import matplotlib.pyplot as plt
 import pandas as pd
 
