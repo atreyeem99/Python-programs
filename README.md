@@ -1958,7 +1958,9 @@ csv_file = 'output.csv'  # Replace with the path to your CSV file
 total_sum = sum_second_column(csv_file)
 print("Summation of the second column:", total_sum)
 ```
+
 # Plot columns with respect to index
+```
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -1991,4 +1993,27 @@ plt.legend()
 # Show plot
 plt.grid(True)
 plt.show()
+```
+# convert .spectrum to .csv
+```
+import csv
+
+def convert_spectrum_to_csv(input_file, output_file):
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    # Assuming .spectrum file format: wavelength intensity error flag
+    data = [line.strip().split() for line in lines]
+
+    # Write data to CSV file
+    with open(output_file, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(data)
+
+    print(f"Conversion complete. CSV file saved as {output_file}")
+
+# Example usage:
+input_file = 'input.spectrum'  # Replace 'input.spectrum' with your file path
+output_file = 'output.csv'  # Specify the name/path for the output CSV file
+convert_spectrum_to_csv(input_file, output_file)
 ```
