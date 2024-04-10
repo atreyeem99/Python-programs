@@ -1994,7 +1994,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
-# convert .spectrum to .csv
+# convert .spectrum file to .csv file
 ```
 import csv
 
