@@ -2017,3 +2017,41 @@ input_file = 'input.spectrum'  # Replace 'input.spectrum' with your file path
 output_file = 'output.csv'  # Specify the name/path for the output CSV file
 convert_spectrum_to_csv(input_file, output_file)
 ```
+# save the plot as pdf
+```
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load data from the first CSV file
+df1 = pd.read_csv('file1.csv')
+x1 = df1.iloc[:, 0]  # Assuming the index is the first column
+y1_col2 = df1.iloc[:, 1]  # 2nd column
+y1_col3 = df1.iloc[:, 2]  # 3rd column
+
+# Load data from the second CSV file
+df2 = pd.read_csv('file2.csv')
+x2 = df2.iloc[:, 0]  # Assuming the index is the first column
+y2_col2_scaled = df2.iloc[:, 1] / 240  # 2nd column scaled
+y2_col3_scaled = df2.iloc[:, 2] / 240  # 3rd column scaled
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+plt.plot(x1, y1_col2, label='File 1 - Column 2')
+plt.plot(x1, y1_col3, label='File 1 - Column 3')
+plt.plot(x2, y2_col2_scaled, label='File 2 - Column 2 (Scaled)')
+plt.plot(x2, y2_col3_scaled, label='File 2 - Column 3 (Scaled)')
+
+# Add labels and title
+plt.xlabel('Index')
+plt.ylabel('Value')
+plt.title('Spectrum Plot')
+plt.legend()
+
+# Save plot as PDF
+plt.grid(True)
+plt.savefig('spectrum_plot.pdf')
+
+# Show plot
+plt.show()
+```
