@@ -2055,3 +2055,4 @@ plt.savefig('spectrum_plot.pdf')
 # Show plot
 plt.show()
 ```
+# Learn to plot Jablonski diagram withpython
