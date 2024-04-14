@@ -2102,3 +2102,42 @@ for T in Ts:
     print(f'Temperature: {T} K, Boltzmann-Averaged Property: {ave_prop:.4f}')
 print(f'Fast thermalization average is:                  {np.mean(prop):.4f}')
 ```
+# find the lowest value of the 2nd column of a csv file, and then find its corresponding 3rd column value. Now multiply the second column value by 27, then find the difference between that value and the corresponding 3rd column value found
+```
+import csv
+
+# Function to find the lowest value in the second column and corresponding third column value
+def find_min_and_corresponding(csv_file):
+    min_value = float('inf')
+    corresponding_value = None
+    with open(csv_file, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row) >= 3:
+                second_column_value = float(row[1])
+                if second_column_value < min_value:
+                    min_value = second_column_value
+                    corresponding_value = float(row[2])
+    return min_value, corresponding_value
+
+# Calculate the difference between the multiplied second column value and corresponding third column value
+def calculate_difference(min_value, corresponding_value):
+    multiplied_value = min_value * 27
+    difference = multiplied_value - corresponding_value
+    return difference
+
+# Main function
+def main():
+    csv_file = "your_csv_file.csv"  # Replace "your_csv_file.csv" with your actual CSV file path
+    min_value, corresponding_value = find_min_and_corresponding(csv_file)
+    if min_value is not None and corresponding_value is not None:
+        difference = calculate_difference(min_value, corresponding_value)
+        print("Lowest value in the second column:", min_value)
+        print("Corresponding value in the third column:", corresponding_value)
+        print("Difference after multiplication:", difference)
+    else:
+        print("CSV file is empty or doesn't contain necessary columns.")
+
+if __name__ == "__main__":
+    main()
+```
