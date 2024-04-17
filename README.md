@@ -1877,7 +1877,7 @@ def plot_bar_chart(csv_file):
 csv_file = 'data.csv'  # Replace 'data.csv' with the name of your CSV file
 plot_bar_chart(csv_file)
 ```
-# write a python program to find the unknown vecytor X where there is AX=B, where A is a mxn coeffecient matrix, X is nx1 matrix and B is mx1 matrix. Here A is one csv file, and B is the first column of another csv file. the first column of b csv file is string. do accordingly
+# write a python program to find the unknown vector X where there is AX=B, where A is a mxn coeffecient matrix, X is nx1 matrix and B is mx1 matrix. Here A is one csv file, and B is the first column of another csv file. the first column of b csv file is string. 
 ```
 import numpy as np
 import pandas as pd
@@ -2141,4 +2141,4 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-# 
+#
