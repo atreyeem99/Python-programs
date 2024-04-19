@@ -2142,3 +2142,30 @@ if __name__ == "__main__":
     main()
 ```
 # To  draw horizontal lines for jablonski
+```
+import matplotlib.pyplot as plt
+
+# Function to draw a bunch of horizontal lines
+def draw_horizontal_lines(y_positions, x_shift=0, color='black'):
+    for y in y_positions:
+        plt.axhline(y=y, xmin=x_shift, xmax=1, color=color)
+
+# Define the positions of the first bunch of lines
+lower_lines = [1, 2, 3, 4]
+
+# Define the positions of the second bunch of lines (shifted a little to the right)
+upper_lines = [6, 7, 8, 9]
+
+# Define the amount of shift for the second bunch of lines
+shift_amount = 0.5
+
+# Draw the lines
+draw_horizontal_lines(lower_lines)
+draw_horizontal_lines(upper_lines, x_shift=shift_amount)
+
+# Adjust the x-axis limits to give space for the second bunch of lines
+plt.xlim(0, 1 + shift_amount)
+
+# Show the plot
+plt.show()
+```
