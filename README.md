@@ -2197,3 +2197,31 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+# Plot histograms with the 2nd column of each of the 3 csv files. One histogram should be in red, one in blue, one in green. 
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV files
+file1 = 'file1.csv'
+file2 = 'file2.csv'
+file3 = 'file3.csv'
+
+df1 = pd.read_csv(file1)
+df2 = pd.read_csv(file2)
+df3 = pd.read_csv(file3)
+
+# Plot histograms
+plt.hist(df1.iloc[:, 1], color='red', alpha=0.5, label='File 1')
+plt.hist(df2.iloc[:, 1], color='blue', alpha=0.5, label='File 2')
+plt.hist(df3.iloc[:, 1], color='green', alpha=0.5, label='File 3')
+
+# Add labels and legend
+plt.xlabel('Values')
+plt.ylabel('Frequency')
+plt.title('Histogram of Second Column')
+plt.legend()
+
+# Show plot
+plt.show()
+```
