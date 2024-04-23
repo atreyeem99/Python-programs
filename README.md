@@ -2226,3 +2226,49 @@ plt.legend()
 plt.show()
 ```
 ## Remember to use header=NONE
+# 6-panel histogram plot, colour light , bin width same
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV files
+file1 = 'file1.csv'
+file2 = 'file2.csv'
+file3 = 'file3.csv'
+
+df1 = pd.read_csv(file1, header=None)
+df2 = pd.read_csv(file2, header=None)
+df3 = pd.read_csv(file3, header=None)
+
+# Define the columns to plot
+columns_to_plot = [1, 3, 4, 5, 6, 7]  # 2nd, 4th, 5th, 6th, 7th, and 8th columns
+
+# Define titles for each subplot
+titles = ['2nd Column', '4th Column', '5th Column', '6th Column', '7th Column', '8th Column']
+
+# Create subplots
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 10))
+
+# Plot histograms for each column
+for i, ax in enumerate(axes.flat):
+    col_index = columns_to_plot[i]
+    min_val = min(df1.iloc[:, col_index].min(), df2.iloc[:, col_index].min(), df3.iloc[:, col_index].min())
+    max_val = max(df1.iloc[:, col_index].max(), df2.iloc[:, col_index].max(), df3.iloc[:, col_index].max())
+    bin_width = (max_val - min_val) / 30  # Adjust the denominator for desired number of bins
+    ax.hist(df1.iloc[:, col_index], bins=int((max_val - min_val) / bin_width), range=(min_val, max_val), color='red', alpha=0.3, label='File 1')
+    ax.hist(df2.iloc[:, col_index], bins=int((max_val - min_val) / bin_width), range=(min_val, max_val), color='blue', alpha=0.3, label='File 2')
+    ax.hist(df3.iloc[:, col_index], bins=int((max_val - min_val) / bin_width), range=(min_val, max_val), color='green', alpha=0.3, label='File 3')
+    ax.set_xlabel('Values')
+    ax.set_ylabel('Frequency')
+    ax.set_title(titles[i])
+    ax.legend()
+
+# Adjust layout
+plt.tight_layout()
+
+# Save the figure as a PDF
+plt.savefig('histograms.pdf')
+
+# Show plot
+plt.show()
+```
