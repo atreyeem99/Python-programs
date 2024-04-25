@@ -2272,4 +2272,53 @@ plt.savefig('histograms.pdf')
 # Show plot
 plt.show()
 ```
-# 
+# Morse potetial plot
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define Morse potential function
+def morse_potential(r, D, a, re):
+    return D * (1 - np.exp(-a * (r - re)))**2
+
+# Define parameters for Morse potential
+D1 = 1.0    # Depth of potential well for first curve
+a1 = 1.0    # Width parameter for first curve
+re1 = 1.0   # Equilibrium bond length for first curve
+
+D2 = 0.8    # Depth of potential well for second curve
+a2 = 1.2    # Width parameter for second curve
+re2 = 1.2   # Equilibrium bond length for second curve
+
+# Generate r values
+r = np.linspace(0.1, 5, 100)
+
+# Calculate Morse potential values for first curve
+potential1 = morse_potential(r, D1, a1, re1)
+
+# Calculate Morse potential values for second curve
+potential2 = morse_potential(r, D2, a2, re2)
+
+# Plot Morse potential curve 1
+plt.plot(r, potential1, label='Morse Potential 1')
+
+# Plot Morse potential curve 2 shifted upwards
+plt.plot(r, potential2 + max(potential1), label='Morse Potential 2')
+
+# Define levels for horizontal lines (using the larger of the two depths)
+levels = np.linspace(0, max(D1, D2), 5)
+
+# Plot horizontal lines
+for level in levels:
+    plt.axhline(y=level, color='gray', linestyle='--', linewidth=0.5)
+
+# Add labels and legend
+plt.xlabel('Interatomic distance (r)')
+plt.ylabel('Potential Energy')
+plt.title('Morse Potential Curves')
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.show()
+```
