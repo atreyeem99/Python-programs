@@ -2322,4 +2322,4 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
-#
+# Min E and Max E
