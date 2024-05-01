@@ -2323,4 +2323,28 @@ plt.grid(True)
 plt.show()
 ```
 # Min E and Max E with mse mae sde errors
+
+# plot
+```
+import matplotlib.pyplot as plt
+
+# Sample data
+x = [1, 2, 3, 4, 5]
+y = [2, 3, 5, 7, 11]
+
+# Length of the lines
+line_length = 0.2  # Adjust this value as needed
+
+# Plotting with longer lines
+for i in range(len(x)):
+    plt.plot([x[i] - line_length/2, x[i] + line_length/2], [y[i], y[i]], color='blue')
+
+# Customizing plot
+plt.title('Plot with Small Horizontal Lines (Slightly Longer)')
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.grid(True)
+
+# Display the plot
+plt.show()
 ```
