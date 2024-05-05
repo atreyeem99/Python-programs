@@ -2628,3 +2628,57 @@ program conngo
 
 end program conngo
 ```
+```
+import os
+import bz2
+
+# Function to extract geometries from trajectory file
+def extract_geometries(file_path):
+    geometries = []
+    with bz2.open(file_path, 'rt', encoding='utf-8', errors='ignore') as file:
+        lines = file.readlines()
+        geom_start = False
+        for line in lines:
+            if 'CARTESIAN COORDINATES (ANGSTROEM)' in line:
+                geom_start = True
+                geometry = []
+                next(file)  # Skip the header line
+                next(file)  # Skip the line indicating the number of atoms
+            elif geom_start:
+                atom_info = line.split()[1:]
+                if len(atom_info) > 0:  # Check if it's not an empty line
+                    geometry.append(atom_info)
+                    if len(geometry) == 20:  # Assuming 20 atoms per geometry
+                        geometries.append(geometry)
+                        geometry = []
+        return geometries
+
+# Function to save geometries into XYZ files
+def save_geometries(geometries, output_folder):
+    for i, geometry in enumerate(geometries):
+        traj_folder = os.path.join(output_folder, f'traj{i+1}')
+        os.makedirs(traj_folder, exist_ok=True)
+        xyz_file_path = os.path.join(traj_folder, f'traj{i+1}.xyz')
+        with open(xyz_file_path, 'w') as xyz_file:
+            xyz_file.write(f"{len(geometry)}\n\n")
+            for atom_info in geometry:
+                xyz_file.write(f"{atom_info[0]} {' '.join(atom_info[1:])}\n")
+        print(f"XYZ file saved: {xyz_file_path}")
+
+# Main function
+def main():
+    # Path to the compressed trajectory file
+    compressed_trajectory_file = "path/to/compressed_trajectory_file.out.bz2"
+
+    # Output folder
+    output_folder = "path/to/output_folder"
+
+    # Extract geometries from the compressed trajectory file
+    geometries = extract_geometries(compressed_trajectory_file)
+
+    # Save geometries into XYZ files inside corresponding folders
+    save_geometries(geometries, output_folder)
+
+if __name__ == "__main__":
+    main()
+```
