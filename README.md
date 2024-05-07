@@ -2628,7 +2628,7 @@ program conngo
 
 end program conngo
 ```
-# extract cartesian coordinates from output 
+# extract cartesian coordinates from output and create folders with xyz file present
 ```
 import os
 import bz2
