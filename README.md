@@ -110,6 +110,7 @@ for imol in range(Nmol):
 
 geom_file.close()
 ```
+- ` python3 obminimize nmol file.sdf file.xyz`
 `python3 obminimize nmol file.sdf file.xyz`
 # prepinp_geom : to create folders with opt input file and xyz coordinates
 ```
