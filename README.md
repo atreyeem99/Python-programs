@@ -2407,7 +2407,7 @@ plt.grid(True)
 # Display the plot
 plt.show()
 ```
-# compare sdf and xyz file
+# compare sdf and xyz file with ConnG0
 ```
 ! compile  gfortran CheckConnGO.f90 -o CheckConnGO.x
 program conngo
