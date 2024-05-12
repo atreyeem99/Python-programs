@@ -719,7 +719,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-# calculation of gap in partition coeff
+# calculation of gap in partition coefficient
 ```
 r=1.9872036*10**-3 # 
 t=298.15
