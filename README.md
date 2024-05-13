@@ -2684,7 +2684,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-# merge csv
+# merge csv into one csv
 ```
 import csv
 
