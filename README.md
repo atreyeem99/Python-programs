@@ -2684,4 +2684,31 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-# 
+# merge csv
+```
+import csv
+
+def merge_csv_files(file1, file2, file3, output_file):
+    with open(file1, 'r') as f1, open(file2, 'r') as f2, open(file3, 'r') as f3, open(output_file, 'w', newline='') as out_file:
+        reader1 = csv.reader(f1)
+        reader2 = csv.reader(f2)
+        reader3 = csv.reader(f3)
+        writer = csv.writer(out_file)
+
+        # Skip headers
+        next(reader1)
+        next(reader2)
+        next(reader3)
+
+        for col1, col2, col3 in zip(reader1, reader2, reader3):
+            merged_row = col1 + col2 + col3
+            writer.writerow(merged_row)
+
+# Usage example
+file1 = 'file1.csv'
+file2 = 'file2.csv'
+file3 = 'file3.csv'
+output_file = 'merged.csv'
+
+merge_csv_files(file1, file2, file3, output_file)
+```
