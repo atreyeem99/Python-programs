@@ -2747,3 +2747,23 @@ for a in ag:
                                                 num = num + 1
 print(num)
 ```
+# remove comma
+```
+import csv
+
+def csv_to_xyz(input_file, output_file):
+    with open(input_file, 'r') as csv_file, open(output_file, 'w') as xyz_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            # Check if the row has at least two elements
+            if len(row) >= 2:
+                # Remove commas and second column
+                row.pop(1)
+                # Write the row to the xyz file with spaces between each column
+                xyz_file.write(' '.join(row) + '\n')
+
+# Example usage:
+input_file = 'input.csv'
+output_file = 'output.xyz'
+csv_to_xyz(input_file, output_file)
+```
