@@ -2712,3 +2712,38 @@ output_file = 'merged.csv'
 
 merge_csv_files(file1, file2, file3, output_file)
 ```
+# smiles combination
+```
+file1=open('invest.smi','w')
+ag = ['c','n']
+bg = ['c','n']
+cg = ['c','n']
+dg = ['c','n']
+eg = ['c','n']
+fg = ['c','n']
+gg = ['c','n']
+hg = ['c','n']
+ig = ['c','n']
+jg = ['c','n']
+kg = ['c','n']
+lg = ['c','n']
+
+num = 0 
+for a in ag:
+    for b in bg:
+        for c in cg:
+            for d in dg:
+                for e in eg:
+                    for f in fg:
+                        for g in gg:
+                            for h in hg:
+                                for i in ig:
+                                    for j in jg:
+                                        for k in kg:
+                                            for l in lg:
+                                                mol = "{}1{}{}2{}{}{}{}3{}{}{}{}({}1)N23".format(a,b,c,d,e,f,g,h,i,j,k,l) 
+                                                name='invest_'+str(num)
+                                                file1.write(mol+' '+name+'\n')
+                                                num = num + 1
+print(num)
+```
