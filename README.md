@@ -2767,3 +2767,29 @@ input_file = 'input.csv'
 output_file = 'output.xyz'
 csv_to_xyz(input_file, output_file)
 ```
+# extrac single point energies from output file
+```
+import numpy as np
+import csv
+
+# Read lines from input file
+with open('scan.out', 'r') as file:
+    lines = file.readlines()
+
+# List to store energies
+energies = []
+
+# Extract energies from FINAL SINGLE POINT ENERGY lines
+for line in lines:
+    if "FINAL SINGLE POINT ENERGY" in line:
+        energy_str = line.split()[-1]  # Extract the energy value
+        energies.append(float(energy_str))  # Convert energy to float and store
+
+# Write energies to a CSV file
+with open('energies.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Energy'])  # Write header
+    writer.writerows(map(lambda x: [x], energies))
+
+print("Energies saved to energies.csv")
+```
