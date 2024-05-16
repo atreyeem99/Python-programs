@@ -2793,3 +2793,52 @@ with open('energies.csv', 'w', newline='') as csvfile:
 
 print("Energies saved to energies.csv")
 ```
+```
+import numpy as np
+from scipy.integrate import odeint
+
+# Define the function for the differential equations
+def projectile_motion(state, t, d):
+    x, vx, z, vz = state
+    dxdt = vx
+    dvxdt = -d * vx / m
+    dzdt = vz
+    dvzdt = -g - d * vz / m
+    return [dxdt, dvxdt, dzdt, dvzdt]
+
+# Parameters
+m = 0.156  # mass of a standard cricket ball in kg
+g = 9.81  # acceleration due to gravity in m/s^2
+theta = np.deg2rad(45)  # initial angle in radians
+d = 0.01  # drag coefficient
+x_threshold = 80  # desired displacement in x-direction
+
+# Function to calculate displacement in x-direction
+def calculate_displacement(v0):
+    # Initial conditions
+    x0 = 0
+    vx0 = v0 * np.cos(theta)
+    z0 = 0
+    vz0 = v0 * np.sin(theta)
+
+    # Time array
+    t = np.linspace(0, 10, 1000)
+
+    # Solve differential equations
+    state0 = [x0, vx0, z0, vz0]
+    states = odeint(projectile_motion, state0, t, args=(d,))
+
+    # Find the maximum displacement in x-direction
+    max_x_displacement = np.max(states[:, 0])
+    return max_x_displacement
+
+# Iterate through different launch velocities
+launch_velocities = np.linspace(40, 100, 1000)
+valid_launch_velocities = []
+for v0 in launch_velocities:
+    if calculate_displacement(v0) > x_threshold:
+        valid_launch_velocities.append(v0)
+
+print("Launch velocities for which displacement in x is greater than 80 m:")
+print(valid_launch_velocities)
+```
