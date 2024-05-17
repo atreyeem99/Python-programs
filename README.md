@@ -2843,5 +2843,27 @@ print("Launch velocities for which displacement in x is greater than 80 m:")
 print(valid_launch_velocities)
 ```
 ```
-Triangulenes104_B3LYP_def2TZVP_Orca.xyz
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file into a pandas DataFrame
+df = pd.read_csv("extracted_data.csv")
+
+# Extract the 6th column (assuming zero-indexed, so it's index 5)
+column_6 = df.iloc[:, 5]
+
+# Plot the histogram
+plt.figure(figsize=(8, 6))
+plt.hist(column_6, bins=20, color='skyblue', edgecolor='black', alpha=0.7)
+plt.title("Histogram of 6th Column")
+plt.xlabel("Values")
+plt.ylabel("Frequency")
+plt.grid(True)
+
+# Save the figure as a PDF
+plt.savefig("histogram.pdf", format='pdf')
+
+# Show the plot
+plt.show()
+
 ```
