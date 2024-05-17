@@ -2842,3 +2842,6 @@ for v0 in launch_velocities:
 print("Launch velocities for which displacement in x is greater than 80 m:")
 print(valid_launch_velocities)
 ```
+```
+Triangulenes104_B3LYP_def2TZVP_Orca.xyz
+```
