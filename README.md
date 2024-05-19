@@ -2933,3 +2933,4 @@ plt.savefig("scatter_plot.pdf", format='pdf')
 # Show the plot
 plt.show()
 ```
+# histogram and 
