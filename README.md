@@ -2973,3 +2973,55 @@ plt.savefig("scatter_plot.pdf", format='pdf')
 # Show the plot
 plt.show()
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Read the first CSV file into a pandas DataFrame
+df1 = pd.read_csv("file1.csv")
+
+# Read the second CSV file into a pandas DataFrame
+df2 = pd.read_csv("file2.csv")
+
+# Extract the 6th column (zero-indexed, so it's index 5) from both DataFrames
+column_6_file1 = df1.iloc[:, 5]
+column_6_file2 = df2.iloc[:, 5]
+
+# Extract the last column (assuming the last column index) from the first DataFrame
+last_column_file1 = df1.iloc[:, -1]
+
+# Create a boolean mask for points where the last column in file1 contains "CS"
+mask_file1_cs = last_column_file1.str.contains("CS")
+
+# Create a scatter plot
+plt.figure(figsize=(8, 8))  # Make the figure square
+
+# Plot points where the last column in file1 contains "CS" in red
+plt.scatter(column_6_file1[mask_file1_cs], column_6_file2[mask_file1_cs], color='red', alpha=0.5, edgecolor='black', label='CS')
+
+# Plot points where the last column in file1 does not contain "CS" in blue
+plt.scatter(column_6_file1[~mask_file1_cs], column_6_file2[~mask_file1_cs], color='blue', alpha=0.5, edgecolor='black', label='Not CS')
+
+# Add a y=x line
+min_val = min(min(column_6_file1), min(column_6_file2))
+max_val = max(max(column_6_file1), max(column_6_file2))
+plt.plot([min_val, max_val], [min_val, max_val], color='green', linestyle='--')
+
+plt.title("Scatter Plot of 6th Column from file1 vs 6th Column from file2")
+plt.xlabel("6th Column of file1")
+plt.ylabel("6th Column of file2")
+plt.grid(True)
+
+# Set the aspect ratio of the plot to be equal
+plt.gca().set_aspect('equal', adjustable='box')
+
+# Add a legend
+plt.legend()
+
+# Save the figure as a PDF
+plt.savefig("scatter_plot.pdf", format='pdf')
+
+# Show the plot
+plt.show()
+```
