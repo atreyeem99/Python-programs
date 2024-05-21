@@ -2973,6 +2973,7 @@ plt.savefig("scatter_plot.pdf", format='pdf')
 # Show the plot
 plt.show()
 ```
+# to mark points with abc as 9th column
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -2991,17 +2992,17 @@ column_6_file2 = df2.iloc[:, 5]
 # Extract the last column (assuming the last column index) from the first DataFrame
 last_column_file1 = df1.iloc[:, -1]
 
-# Create a boolean mask for points where the last column in file1 contains "CS"
+# Create a boolean mask for points where the last column in file1 contains "abc"
 mask_file1_cs = last_column_file1.str.contains("CS")
 
 # Create a scatter plot
 plt.figure(figsize=(8, 8))  # Make the figure square
 
 # Plot points where the last column in file1 contains "CS" in red
-plt.scatter(column_6_file1[mask_file1_cs], column_6_file2[mask_file1_cs], color='red', alpha=0.5, edgecolor='black', label='CS')
+plt.scatter(column_6_file1[mask_file1_cs], column_6_file2[mask_file1_cs], color='red', alpha=0.5, edgecolor='black', label='abs')
 
 # Plot points where the last column in file1 does not contain "CS" in blue
-plt.scatter(column_6_file1[~mask_file1_cs], column_6_file2[~mask_file1_cs], color='blue', alpha=0.5, edgecolor='black', label='Not CS')
+plt.scatter(column_6_file1[~mask_file1_cs], column_6_file2[~mask_file1_cs], color='blue', alpha=0.5, edgecolor='black', label='Not abs')
 
 # Add a y=x line
 min_val = min(min(column_6_file1), min(column_6_file2))
