@@ -3026,3 +3026,30 @@ plt.savefig("scatter_plot.pdf", format='pdf')
 # Show the plot
 plt.show()
 ```
+# print the row with minimum value in 6th column in the 3 sets of colours
+```
+import pandas as pd
+
+# Read the CSV file into a pandas DataFrame
+df1 = pd.read_csv("file1.csv")
+
+# Extract the necessary columns
+first_column = df1.iloc[:, 0]
+sixth_column = df1.iloc[:, 5]
+
+# Define the sets for different colors
+red_set = {"Mol_00003", "Mol_00021", "Mol_00088"}
+blue_set = {"Mol_00000", "Mol_00001", "Mol_00002", "Mol_00007", "Mol_00008", "Mol_00009", "Mol_00013", "Mol_00014", "Mol_00017", "Mol_00045", "Mol_00046", "Mol_00047", "Mol_00051", "Mol_00055", "Mol_00056", "Mol_00083"}
+
+# Filter the DataFrame for each set and find the row with the minimum value in the 6th column
+def print_min_row(set_name, set_values):
+    filtered_df = df1[df1.iloc[:, 0].isin(set_values)]
+    min_row = filtered_df.loc[filtered_df.iloc[:, 5].idxmin()]
+    print(f"Row with minimum value in the 6th column for {set_name}:")
+    print(min_row)
+
+# Print the row with minimum value in the 6th column for each set
+print_min_row("ER", red_set)
+print_min_row("ED", blue_set)
+print_min_row("M", set(first_column) - red_set - blue_set)
+```
