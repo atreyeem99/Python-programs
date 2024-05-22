@@ -3053,3 +3053,29 @@ print_min_row("ER", red_set)
 print_min_row("ED", blue_set)
 print_min_row("M", set(first_column) - red_set - blue_set)
 ```
+# density plot
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# List of CSV file paths
+csv_files = ['data_1.csv', 'data_2.csv', 'data_3.csv', 'data_4.csv', 'data_5.csv']
+# Read the 6th column (index 5) from each CSV file into a list
+columns_data = []
+
+for file in csv_files:
+    df = pd.read_csv(file)
+    if df.shape[1] > 5:  # Ensure the file has at least 6 columns
+        columns_data.append(df.iloc[:, 5])  # Extract the 6th column
+
+# Concatenate all columns into a single Series for plotting
+all_data = pd.concat(columns_data, ignore_index=True)
+
+# Plot density plot
+plt.figure(figsize=(10, 6))
+all_data.plot(kind='density')
+plt.title('Density Plot of the 6th Column from 5 CSV Files')
+plt.xlabel('Values')
+plt.ylabel('Density')
+plt.show()
+```
