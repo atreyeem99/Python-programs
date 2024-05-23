@@ -3079,3 +3079,71 @@ plt.xlabel('Values')
 plt.ylabel('Density')
 plt.show()
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the first CSV file into a pandas DataFrame
+df1 = pd.read_csv("file1.csv")
+
+# Read the second CSV file into a pandas DataFrame
+df2 = pd.read_csv("file2.csv")
+
+# Extract the 6th column (index 5) from both DataFrames
+column_6_file1 = df1.iloc[:, 5]
+column_6_file2 = df2.iloc[:, 5]
+
+# Extract the first column to determine the colors
+first_column = df1.iloc[:, 0]
+
+# Define the sets for different colors
+red_set = {"Mol_00003", "Mol_00021", "Mol_00088"}
+blue_set = {"Mol_00000", "Mol_00001", "Mol_00002", "Mol_00007", "Mol_00008", "Mol_00009", "Mol_00013", "Mol_00014", "Mol_00017", "Mol_00045", "Mol_00046", "Mol_00047", "Mol_00051", "Mol_00055", "Mol_00056", "Mol_00083"}
+
+# Determine the colors and labels based on the first column
+colors = []
+labels = []
+for value in first_column:
+    if value in red_set:
+        colors.append("darkred")
+        labels.append("ER")
+    elif value in blue_set:
+        colors.append("darkblue")
+        labels.append("ED")
+    else:
+        colors.append("darkgreen")
+        labels.append("M")
+
+# Create a scatter plot
+plt.figure(figsize=(8, 8))  # Make the figure square
+
+# Plot points
+scatter = plt.scatter(column_6_file1, column_6_file2, c=colors, alpha=0.7, edgecolor='black')
+
+# Add a y=x line
+min_val = min(min(column_6_file1), min(column_6_file2))
+max_val = max(max(column_6_file1), max(column_6_file2))
+plt.plot([min_val, max_val], [min_val, max_val], color='grey', linestyle='--')
+
+# Add title and labels
+plt.title("Scatter Plot of 6th Column from file1 vs 6th Column from file2")
+plt.xlabel("6th Column of file1")
+plt.ylabel("6th Column of file2")
+plt.grid(True)
+
+# Set the aspect ratio of the plot to be equal
+plt.gca().set_aspect('equal', adjustable='box')
+
+# Add a legend
+from matplotlib.lines import Line2D
+legend_elements = [Line2D([0], [0], marker='o', color='w', label='E1', markerfacecolor='darkred', markersize=10, markeredgecolor='black'),
+                   Line2D([0], [0], marker='o', color='w', label='E2', markerfacecolor='darkblue', markersize=10, markeredgecolor='black'),
+                   Line2D([0], [0], marker='o', color='w', label='E3', markerfacecolor='darkgreen', markersize=10, markeredgecolor='black')]
+plt.legend(handles=legend_elements, title='Legend')
+
+# Save the figure as a PDF
+plt.savefig("scatter_plot.pdf", format='pdf')
+
+# Show the plot
+plt.show()
+```
