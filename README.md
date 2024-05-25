@@ -3184,6 +3184,8 @@ combined_df = pd.DataFrame({
 print("Combined DataFrame:")
 print(combined_df)
 ```
+
+# plot columns
 ```
 import matplotlib.pyplot as plt
 import pandas as pd
