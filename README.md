@@ -3184,3 +3184,31 @@ combined_df = pd.DataFrame({
 print("Combined DataFrame:")
 print(combined_df)
 ```
+```
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load the CSV file
+df = pd.read_csv('your_file.csv')
+
+# Get the column names except for the last column
+columns_to_plot = df.columns[:-1]
+
+# Skip the header row while plotting
+data = pd.read_csv('your_file.csv', skiprows=1)
+
+# Print some information for debugging
+print("Columns to plot:", columns_to_plot)
+print("Data head:")
+print(data.head())
+
+# Plot each column
+for column in columns_to_plot:
+    plt.plot(data[column], label=column)
+
+plt.xlabel('Index')
+plt.ylabel('Values')
+plt.title('Plot of each column excluding the last column')
+plt.legend()
+plt.show()
+```
