@@ -3214,6 +3214,7 @@ plt.title('Plot of each column excluding the last column')
 plt.legend()
 plt.show()
 ```
+```
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -3235,4 +3236,54 @@ plt.ylabel('Values')
 plt.title('Plot of each column excluding the last column')
 plt.legend()
 plt.show()
+```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+hartree2kcalmol = 627.509
+
+def plot_multiple_csvs(csv_files):
+    # Ensure there are exactly 4 files, one for each method
+    if len(csv_files) != 4:
+        raise ValueError("Please provide exactly four CSV files.")
+
+    # Labels for the plot
+    labels = ['.....']
+
+    # Generate x-axis values from -0.5 to +0.5 in 101 points
+    x = np.linspace(-0.5, 0.5, 101)
+
+    # Read each CSV file and plot its data
+    for i, csv_file in enumerate(csv_files):
+        # Read the CSV file into a DataFrame, skipping the header row if it exists
+        df = pd.read_csv(csv_file, header=0)
+
+        # Number of columns in the DataFrame
+        num_columns = df.shape[1]
+
+        for col_index in range(num_columns):
+            try:
+                column = df.iloc[:, col_index].astype(float).to_numpy()
+                column = column - np.min(column)
+                column = column * hartree2kcalmol
+                plt.plot(x, column, label=f'{labels[i]} col{col_index+1}')
+            except ValueError:
+                print(f"Skipping non-numeric column: {df.columns[col_index]} in file {csv_file}")
+
+    plt.xlabel('Displacement [Å]')
+    plt.ylabel('E [kcal/mol]')
+    plt.title('Plot of CSV Columns from Multiple Files')
+    plt.legend()
+    #plt.ylim(0, 10)
+    #plt.xlim(15, 25)
+    # Save the plot as a PDF
+    plt.savefig('scan_all_methods_multiple_csvs.pdf')
+    plt.show()
+
+# Usage example
+csv_files = ['energies1.csv', 'energie2.csv', 'en3.csv', 'energi4.csv']  # Replace with the paths to your CSV files
+plot_multiple_csvs(csv_files)
+
 ```
