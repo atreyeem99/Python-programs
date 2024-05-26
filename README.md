@@ -3214,6 +3214,7 @@ plt.title('Plot of each column excluding the last column')
 plt.legend()
 plt.show()
 ```
+# plot DNC
 ```
 import matplotlib.pyplot as plt
 import pandas as pd
