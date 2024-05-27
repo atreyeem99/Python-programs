@@ -3288,3 +3288,28 @@ csv_files = ['energies1.csv', 'energie2.csv', 'en3.csv', 'energi4.csv']  # Repla
 plot_multiple_csvs(csv_files)
 
 ```
+# Round off
+```
+def main():
+    # Example values
+    values = [3.1415926535, 2.7182818284, 1.6180339887, 0.5772156649, 1.4142135623, 2.3025850929, 1.7320508075]
+
+    # First five values rounded to four decimal places
+    rounded_values_4_format = [format(value, ".4f") for value in values[:5]]
+    rounded_values_4_fstring = [f"{value:.4f}" for value in values[:5]]
+
+    # Last two values rounded to two decimal places
+    rounded_values_2_format = [format(value, ".2f") for value in values[5:]]
+    rounded_values_2_fstring = [f"{value:.2f}" for value in values[5:]]
+
+    # Combine the results for easier comparison
+    rounded_values_format = rounded_values_4_format + rounded_values_2_format
+    rounded_values_fstring = rounded_values_4_fstring + rounded_values_2_fstring
+
+    print("Rounded values using format function and f-strings side by side:")
+    for i, (value_format, value_fstring) in enumerate(zip(rounded_values_format, rounded_values_fstring), start=1):
+        print(f"Value {i}: {value_format} (format) | {value_fstring} (f-string)")
+
+if __name__ == "__main__":
+    main()
+```
