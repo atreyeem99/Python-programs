@@ -3314,3 +3314,40 @@ if __name__ == "__main__":
     main()
 ```
 # Read csv file, with certain ponts in x axis
+# print in one table, using do loop, 10th column of 1st csv, the 6th column of 1st csv file, 6th column of second csv , difference between the values of the 6th columns of the 2 csv,9th columns of first csv 
+```
+import pandas as pd
+
+# Read the first and second CSV files into pandas DataFrames
+df1 = pd.read_csv("file1.csv")
+df2 = pd.read_csv("file2.csv")
+
+# Initialize lists to hold the extracted data
+col_10_file1 = []
+col_6_file1 = []
+col_6_file2 = []
+differences = []
+col_9_file1 = []
+
+# Loop over each row
+for i in range(len(df1)):
+    # Extract the relevant columns
+    col_10_file1.append(df1.iloc[i, 9])
+    col_6_file1.append(df1.iloc[i, 5])
+    col_6_file2.append(df2.iloc[i, 5])
+    differences.append(df1.iloc[i, 5] - df2.iloc[i, 5])
+    col_9_file1.append(df1.iloc[i, 8])
+
+# Combine the extracted columns into a single DataFrame
+combined_df = pd.DataFrame({
+    "10th Column (File 1)": col_10_file1,
+    "6th Column (File 1)": col_6_file1,
+    "6th Column (File 2)": col_6_file2,
+    "Difference": differences,
+    "9th Column (File 1)": col_9_file1
+})
+
+# Print the combined DataFrame
+print("Combined DataFrame:")
+print(combined_df)
+```
