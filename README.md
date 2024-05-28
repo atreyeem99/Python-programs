@@ -3351,3 +3351,25 @@ combined_df = pd.DataFrame({
 print("Combined DataFrame:")
 print(combined_df)
 ```
+# python program to plot the difference between the first and 7th column of a csv file. Use pandas
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file into a pandas DataFrame
+df = pd.read_csv('your_file.csv')
+
+# Assuming your CSV has headers, you can access columns by their names
+first_column = df.iloc[:, 0]  # Assuming first column is indexed at 0
+seventh_column = df.iloc[:, 6]  # Assuming seventh column is indexed at 6
+
+# Calculate the difference
+difference = seventh_column - first_column
+
+# Plot the difference
+plt.plot(difference)
+plt.title('Difference between First and Seventh Column')
+plt.xlabel('Index')
+plt.ylabel('Difference')
+plt.show()
+```
