@@ -3425,3 +3425,4 @@ for var1 in var1_values:
 
 print("All combinations have been created.")
 ```
+# remove duplicates too
