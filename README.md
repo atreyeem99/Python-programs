@@ -3426,3 +3426,55 @@ for var1 in var1_values:
 print("All combinations have been created.")
 ```
 # remove duplicates too
+# Contour plot
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('contour_data.csv')
+
+
+# Extract x, y, and z values
+x = data.iloc[:, 0]  # Assuming x is in the first column
+y = data.iloc[:, 1]  # Assuming y is in the second column
+z = data.iloc[:, 2]  # Assuming z is in the third column
+
+
+levels = np.linspace(np.min(z),np.max(z),200)
+
+xi = np.arange(1.3,1.5+0.01,0.01)
+yi = np.arange(1.3,1.5+0.01,0.01)
+
+xi,yi = np.meshgrid(xi,yi)
+zi = griddata((x,y),z,(xi,yi),method='cubic')
+# Aggregate z values for unique combinations of x and y
+# z_aggregated = data.groupby([x, y])[z.name].mean().unstack().values
+
+# Create meshgrid for contour plot
+# X, Y = np.meshgrid(np.unique(x), np.unique(y))
+
+# Plot contour
+contour = plt.contour(xi,yi,zi, levels=levels)
+#plt.clabel(contour,inline=True,fontsize=8)
+
+zi = griddata((y,x),z,(xi,yi),method='cubic')
+# Aggregate z values for unique combinations of x and y
+# z_aggregated = data.groupby([x, y])[z.name].mean().unstack().values
+
+# Create meshgrid for contour plot
+# X, Y = np.meshgrid(np.unique(x), np.unique(y))
+
+# Plot contour
+contour = plt.contour(xi,yi,zi, levels=levels)
+
+#plt.clabel(contour,inline=True,fontsize=8)
+
+
+plt.xlabel(data.columns[0])  # Label x-axis with the first column name
+plt.ylabel(data.columns[1])  # Label y-axis with the second column name
+plt.title('Contour Plot')
+plt.show()
+```
