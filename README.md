@@ -3478,6 +3478,7 @@ plt.ylabel(data.columns[1])  # Label y-axis with the second column name
 plt.title('Contour Plot')
 plt.show()
 ```
+# extract the 1st column of a.csv and place it as the 3rd column of b.csv and the total merged csv should be a c.csv
 ```
 import csv
 
