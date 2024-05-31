@@ -3505,3 +3505,55 @@ with open('c.csv', 'w', newline='') as file_c:
     writer = csv.writer(file_c)
     writer.writerows(rows_b)
 ```
+# contour 2
+```
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('contour_data_wB97XD.csv')
+
+# Extract x, y, and z values
+x = data.iloc[:, 0]  
+y = data.iloc[:, 1]  
+z = data.iloc[:, 2]  
+
+
+n = np.size(x)
+
+for i in range(n):
+    if x[i] != y[i]: 
+        x = np.append(x, y[i])
+        y = np.append(y, x[i])
+        z = np.append(z, z[i])
+
+
+cmap = plt.cm.BuGn # pellet
+
+dE = 0.001  # contour difference 
+numb = int((np.max(z)- np.min(z))/dE) # grid size
+levels = np.linspace(np.min(z),np.max(z),numb)
+
+
+
+xi = np.linspace(x.min(), x.max(), 1024)
+yi = np.linspace(y.min(), y.max(), 1024)
+
+
+xi, yi = np.meshgrid(xi, yi)
+zi = griddata((x, y), z, (xi, yi), method='cubic')
+
+
+fig, ax = plt.subplots(figsize=(10, 8))
+
+cp = plt.contourf(xi, yi, zi, levels=levels, cmap=cmap)
+# plt.colorbar(cp) # Makrking countour line values
+
+
+contour = plt.contour(xi, yi, zi,  levels=levels, colors='black', linewidths=0.5)
+plt.clabel(contour, inline=True, fontsize=8) # Makrking countour line values
+
+
+plt.title('XXXXXXXXXXXXXXXXXXXXXXXXXX')
+plt.xlabel("XXXXXXXXXXXXXXXXXXXXXXXXXX ")
+plt.ylabel("XXXXXXXXXXXXXXXXXXXXXXXXXX ")
+
+plt.show()
+```
