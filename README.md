@@ -3558,3 +3558,28 @@ plt.ylabel("XXXXXXXXXXXXXXXXXXXXXXXXXX ")
 plt.show()
 ```
 # choose colour palette 
+```
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import ListedColormap
+
+# Assuming z is your data
+z = np.random.rand(100, 100)  # Example data
+
+cmap = plt.cm.viridis
+
+# Create a new colormap with alpha
+alpha = 0.5  # Adjust the alpha value (0: fully transparent, 1: fully opaque)
+cmap_colors = cmap(np.arange(cmap.N))
+cmap_colors[:, -1] = alpha  # Change the alpha values
+cmap_alpha = ListedColormap(cmap_colors)
+
+dE = 0.001  # contour difference 
+numb = int((np.max(z) - np.min(z)) / dE)  # grid size
+levels = np.linspace(np.min(z), np.max(z), 200)
+
+# Create the contour plot with the custom colormap
+plt.contourf(z, levels=levels, cmap=cmap_alpha)
+plt.colorbar()
+plt.show()
+```
