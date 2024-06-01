@@ -3583,3 +3583,23 @@ plt.contourf(z, levels=levels, cmap=cmap_alpha)
 plt.colorbar()
 plt.show()
 ```
+```
+def main():
+    # Example values
+    values = [3.1415926535, 2.7182818284, 1.6180339887, 0.5772156649, 1.4142135623, 2.3025850929, 1.7320508075]
+
+    # First five values rounded to four decimal places
+    rounded_values_4 = [format(value, ".4f") for value in values[:5]]
+
+    # Last two values rounded to two decimal places
+    rounded_values_2 = [format(value, ".2f") for value in values[5:]]
+
+    # Combine the results
+    rounded_values = rounded_values_4 + rounded_values_2
+
+    # Print the values side by side with space in between
+    print(" ".join(rounded_values))
+
+if __name__ == "__main__":
+    main()
+```
