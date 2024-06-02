@@ -3603,3 +3603,34 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('your_csv_file.csv')
+
+# Extract x, y, and z values
+x = data.iloc[:, 0]  # Assuming x is in the first column
+y = data.iloc[:, 1]  # Assuming y is in the second column
+z = data.iloc[:, 2]  # Assuming z is in the third column
+
+# Aggregate z values for unique combinations of x and y
+z_aggregated = data.groupby([x, y])[z.name].mean().unstack().values
+
+# Create meshgrid for contour plot
+X, Y = np.meshgrid(np.unique(x), np.unique(y))
+
+# Plot contour
+plt.contour(X, Y, z_aggregated)
+plt.xlabel(data.columns[0])  # Label x-axis with the first column name
+plt.ylabel(data.columns[1])  # Label y-axis with the second column name
+plt.title('Contour Plot')
+
+# Save the figure as a PNG file
+plt.savefig('contour_plot.png')
+
+# Show the plot
+plt.show()
+```
