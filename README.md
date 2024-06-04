@@ -3732,3 +3732,45 @@ with open('c.csv', 'w', newline='') as file_c:
     writer = csv.writer(file_c)
     writer.writerows(rows_b)
 ```
+# 
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+hartree2kcalmol = 627.509
+
+def plot_single_csv(csv_file):
+    # Label for the plot
+    label = 'Single CSV Data'
+
+    # Generate x-axis values from -0.5 to +0.5 in 101 points
+    x = np.linspace(-0.5, 0.5, 101)
+
+    # Read the CSV file into a DataFrame, skipping the header row if it exists
+    df = pd.read_csv(csv_file, header=0)
+
+    # Number of columns in the DataFrame
+    num_columns = df.shape[1]
+
+    for col_index in range(num_columns):
+        try:
+            column = df.iloc[:, col_index].astype(float).to_numpy()
+            column = column - np.min(column)
+            column = column * hartree2kcalmol
+            plt.plot(x, column, label=f'{label} col{col_index+1}')
+        except ValueError:
+            print(f"Skipping non-numeric column: {df.columns[col_index]} in file {csv_file}")
+
+    plt.xlabel('Displacement [Å]')
+    plt.ylabel('E [kcal/mol]')
+    plt.title('Plot of Columns from Single CSV File')
+    plt.legend()
+    # Save the plot as a PDF
+    plt.savefig('single_csv_plot.pdf')
+    plt.show()
+
+# Usage example
+csv_file = 'energies_wB97XD3_101pts.csv'  # Replace with the path to your CSV file
+plot_single_csv(csv_file)
+```
