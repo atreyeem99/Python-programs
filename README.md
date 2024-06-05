@@ -3774,4 +3774,31 @@ def plot_single_csv(csv_file):
 csv_file = 'energies_wB97XD3_101pts.csv'  # Replace with the path to your CSV file
 plot_single_csv(csv_file)
 ```
-# plot 
+# add a column in the left of the already existing column. The column should include values from -2.5 to 2.5 with increment of 0.05 . Like. -2.5,-2.45,-2.45........2.4,2.45 , 2.5. There should be 101 values in that column.
+```
+import pandas as pd
+import numpy as np
+
+# Define the function to add a new column and save to a new CSV
+def add_new_column_to_csv(input_csv, output_csv):
+    # Read the existing CSV file into a DataFrame
+    df = pd.read_csv(input_csv)
+    
+    # Create the new column with values from -2.5 to 2.5 in increments of 0.05 and round to 2 decimal places
+    new_column = np.round(np.arange(-2.5, 2.55, 0.05), 2)
+    
+    # Ensure the new column length matches the DataFrame length
+    if len(new_column) > len(df):
+        new_column = new_column[:len(df)]
+    elif len(new_column) < len(df):
+        raise ValueError("The new column has fewer values than the number of rows in the DataFrame.")
+    
+    # Add the new column to the DataFrame at the first position
+    df.insert(0, 'New_Column', new_column)
+    
+    # Save the updated DataFrame to a new CSV file
+    df.to_csv(output_csv, index=False)
+
+# Example usage:
+# add_new_column_to_csv('input.csv', 'output.csv')
+```
