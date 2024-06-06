@@ -3801,4 +3801,5 @@ def add_new_column_to_csv(input_csv, output_csv):
 
 # Example usage:
 # add_new_column_to_csv('input.csv', 'output.csv')
+add_new_column_to_csv('Mol.csv', 'output.csv')
 ```
