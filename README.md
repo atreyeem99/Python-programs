@@ -3803,3 +3803,52 @@ def add_new_column_to_csv(input_csv, output_csv):
 # add_new_column_to_csv('input.csv', 'output.csv')
 add_new_column_to_csv('Mol.csv', 'output.csv')
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV file
+file_path = 'scan_all_data.csv'
+try:
+    df = pd.read_csv(file_path, on_bad_lines='skip')
+except Exception as e:
+    print(f"Error reading the CSV file: {e}")
+
+# Conversion factor from Hartree to eV
+conversion_factor = 27.2114
+
+# Define the specific values for the first column
+x_values = [-2.5, -2, -1.8, -1.5, -1, -0.5, 0, 0, 0.5, 1, 1.5, 1.8, 2, 2.5]
+
+# Filter rows where the first column has the specified values and the 3rd, 4th, and 5th columns have non-missing values
+filtered_df = df[df[df.columns[0]].isin(x_values)].dropna(subset=[df.columns[2], df.columns[3], df.columns[4]])
+
+# Extract the relevant columns
+x = filtered_df.iloc[:, 0]
+y1 = filtered_df.iloc[:, 2] * conversion_factor
+y2 = filtered_df.iloc[:, 3] * conversion_factor
+y3 = filtered_df.iloc[:, 4] * conversion_factor
+y4 = filtered_df.iloc[:, 1] * conversion_factor  # Include the second column and convert it to eV
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+# Plot each y column
+plt.plot(x, y1, label='S$_1$', marker='o')
+plt.plot(x, y2, label='T$_1$', marker='o')
+plt.plot(x, y3, label='STG', marker='o')
+plt.plot(x, y4, label='Second Column', marker='o')  # Plot the second column
+
+# Setting the x-axis limits
+plt.xlim(-2.5, 2.5)
+# plt.ylim(-1, 2.0)
+
+# Adding labels and title
+plt.xlabel('DNC')
+plt.ylabel('Energy (eV)')
+plt.title('Scan plot of the excited states and STG')
+plt.legend()
+
+# Show plot
+plt.show()
+```
