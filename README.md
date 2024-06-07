@@ -3852,3 +3852,33 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+hartree2ev = 27.2114
+
+def plot_second_column_eV(csv_file):
+    # Read the CSV file into a DataFrame, skipping the header row if it exists
+    df = pd.read_csv(csv_file, header=0)
+
+    # Extract the second column
+    column = df.iloc[:, 1].astype(float).to_numpy()
+    column = column - np.min(column)
+    column = column * hartree2ev
+
+    # Generate x-axis values from -0.5 to +0.5 in 101 points
+    x = np.linspace(-2.5, 2.5, len(column))
+
+    # Plot the data
+    plt.plot(x, column)
+    plt.xlabel('Displacement [Å]')
+    plt.ylabel('E [eV]')
+    plt.title('Plot of Second Column from CSV File (in eV)')
+    plt.show()
+
+# Usage example
+csv_file = 'Mol89_energies_wB97XD3_0.05.csv'  # Replace with the path to your CSV file
+plot_second_column_eV(csv_file)
+```
