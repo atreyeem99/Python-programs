@@ -3882,6 +3882,7 @@ def plot_second_column_eV(csv_file):
 csv_file = 'Mol89_energies_wB97XD3_0.05.csv'  # Replace with the path to your CSV file
 plot_second_column_eV(csv_file)
 ```
+# Plot first column
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
