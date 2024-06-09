@@ -3950,3 +3950,30 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV file into a pandas DataFrame
+df = pd.read_csv("your_csv_file.csv")
+
+# Filter the DataFrame based on the values in the first column (DNC)
+filtered_df = df[df['DNC'].isin([-2.5, -2, -1.8, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 1.8, 2, 2.5])]
+
+# Include the row at DNC=0.0
+filtered_df = filtered_df.append(df[df['DNC'] == 0.0])
+
+# Plot the 3rd, 4th, and 5th columns
+plt.plot(filtered_df['DNC'], filtered_df['column_3'], label='Column 3')
+plt.plot(filtered_df['DNC'], filtered_df['column_4'], label='Column 4')
+plt.plot(filtered_df['DNC'], filtered_df['column_5'], label='Column 5')
+
+# Add labels and legend
+plt.xlabel('DNC')
+plt.ylabel('Values')
+plt.title('Plot of Columns 3, 4, and 5')
+plt.legend()
+
+# Show the plot
+plt.show()
+```
