@@ -3913,3 +3913,40 @@ def plot_second_column(csv_file):
 csv_file = 'scan_all_data.csv'  # Replace with the path to your CSV file
 plot_second_column(csv_file)
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV file, skipping the first row (header) and any bad lines
+file_path = 'scan_all_data.csv'
+try:
+    df = pd.read_csv(file_path, skiprows=1, on_bad_lines='skip')
+except Exception as e:
+    print(f"Error reading the CSV file: {e}")
+
+# Filter rows where the first column has the value of 0 and the 2nd, 3rd, and 4th columns have non-missing values
+filtered_df = df[(df[df.columns[0]] == 0) & (df[df.columns[1]].notna()) & (df[df.columns[2]].notna()) & (df[df.columns[3]].notna())]
+
+# Extract the relevant columns
+x = filtered_df.iloc[:, 0]
+y1 = filtered_df.iloc[:, 1]
+y2 = filtered_df.iloc[:, 2]
+y3 = filtered_df.iloc[:, 3]
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+# Plot each y column without markers
+plt.plot(x, y1, label='Column 2')
+plt.plot(x, y2, label='Column 3')
+plt.plot(x, y3, label='Column 4')
+
+# Adding labels and title
+plt.xlabel('X-axis (Column 1)')
+plt.ylabel('Y-axis (Columns 2, 3, 4)')
+plt.title('Plot of Columns 2, 3, and 4 vs Column 1')
+plt.legend()
+
+# Show plot
+plt.show()
+```
