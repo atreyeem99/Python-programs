@@ -4050,3 +4050,29 @@ plt.ylabel("$r_2$ [$\AA$]")
 plt.savefig('contour_.png')
 plt.show()
 ```
+```
+#!/bin/bash
+
+# Define the root directory where the folders are located
+root_dir="/path/to/root/directory"
+
+# Function to extract numeric value from opt.out file
+extract_numeric_value() {
+    file="$1"
+    numeric_value=$(grep -oP 'MP2/DEF2-SVP//MP2/DEF2-SVP energy=\s*\K-?\d+\.\d+' "$file")
+    if [ -n "$numeric_value" ]; then
+        echo "$numeric_value"
+    fi
+}
+
+# Iterate through folders starting with "Mol"
+for folder in "$root_dir"/Mol*/; do
+    if [ -d "$folder" ]; then
+        opt_out_file="$folder/opt.out"
+        if [ -f "$opt_out_file" ]; then
+            numeric_value=$(extract_numeric_value "$opt_out_file")
+            echo "$numeric_value"
+        fi
+    fi
+done
+```
