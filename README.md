@@ -3977,3 +3977,76 @@ plt.legend()
 # Show the plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+from matplotlib.colors import ListedColormap
+
+hartree2kcm=627.509
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('contour.csv')
+
+# Extract x, y, and z values
+x = data.iloc[:, 0]  
+y = data.iloc[:, 1]  
+z = data.iloc[:, 2]  
+
+z=z-np.min(z)
+z=z*hartree2kcm
+
+
+n = np.size(x)
+
+for i in range(n):
+    if x[i] != y[i]: 
+        x = np.append(x, y[i])
+        y = np.append(y, x[i])
+        z = np.append(z, z[i])
+
+
+cmap = plt.cm.viridis # pellet
+
+#dE = 0.01  # contour difference 
+#numb = int((np.max(z)- np.min(z))/dE) # grid size
+
+#levels = np.linspace(np.min(z),np.max(z),50)
+
+levels = np.linspace(-1,30,30)
+
+
+
+alpha = 0.4  # Adjust the alpha value (0: fully transparent, 1: fully opaque)
+cmap_colors = cmap(np.arange(cmap.N))
+cmap_colors[:, -1] = alpha  # Change the alpha values
+cmap_alpha = ListedColormap(cmap_colors)
+
+
+
+xi = np.linspace(x.min(), x.max(), 1024)
+yi = np.linspace(y.min(), y.max(), 1024)
+
+
+xi, yi = np.meshgrid(xi, yi)
+zi = griddata((x, y), z, (xi, yi), method='cubic')
+
+
+fig, ax = plt.subplots(figsize=(10, 8))
+
+cp = plt.contourf(xi, yi, zi, levels=levels, cmap='terrain')
+plt.colorbar(cp) # Makrking countour line values
+
+
+contour = plt.contour(xi, yi, zi,  levels=levels, colors='black', linewidths=0.5)
+# plt.clabel(contour, inline=True, fontsize=8) # Makrking countour line values
+
+
+plt.title('Contour Plot for Mol 22')
+plt.xlabel("$r_1$ [$\AA$]")
+plt.ylabel("$r_2$ [$\AA$]")
+plt.savefig('contour_.png')
+plt.show()
+```
