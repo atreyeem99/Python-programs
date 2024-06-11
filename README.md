@@ -4076,3 +4076,33 @@ for folder in "$root_dir"/Mol*/; do
     fi
 done
 ```
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Function to read the CSV file and plot the first column
+def plot_first_column(csv_file):
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    
+    # Extract the first column
+    first_column = df.iloc[:, 0]
+    
+    # Generate x-axis values from -0.5 to 0.5 with 101 points
+    x = np.linspace(-0.5, 0.5, 101)
+    
+    # Plot the data
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, first_column, label='First Column')
+    plt.xlabel('X-axis')
+    plt.ylabel('First Column Values')
+    plt.title('Scan Plot with Double Well Structure')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Example usage
+csv_file_path = 'path_to_your_file.csv'
+plot_first_column(csv_file_path)
+```
