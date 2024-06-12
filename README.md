@@ -4106,3 +4106,18 @@ def plot_first_column(csv_file):
 csv_file_path = 'path_to_your_file.csv'
 plot_first_column(csv_file_path)
 ```
+```
+for f in Mol*; do
+  adc2_tzvp_S1S0=$( grep -A10 'Excited state' "$f/all.out" | grep -A10 singlet | grep 'Excitation energy' | awk '{printf "%.3f\n", $3}' | head -1 )
+  adc2_tzvp_fosc=$( grep -A10 'Excited state' "$f/all.out" | grep -A10 singlet | grep 'Osc. strength' | awk '{printf "%.3f\n", $3}' | head -1 )
+  adc2_tzvp_T1S0=$( grep -A10 'Excited state' "$f/all.out" | grep -A10 triplet | grep 'Excitation energy' | awk '{printf "%.3f\n", $3}' | head -1 )
+  adc2_tzvp_T2S0=$( grep -A10 'Excited state' "$f/all.out" | grep -A10 triplet | grep 'Excitation energy' | awk '{printf "%.3f\n", $3}' | head -2 | tail -1 )
+
+  echo "Folder: $f"
+  echo "S1S0: $adc2_tzvp_S1S0"
+  echo "Oscillator Strength: $adc2_tzvp_fosc"
+  echo "T1S0: $adc2_tzvp_T1S0"
+  echo "T2S0: $adc2_tzvp_T2S0"
+  echo "-----------------------------------"
+done
+```
