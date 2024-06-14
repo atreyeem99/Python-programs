@@ -4186,3 +4186,28 @@ plt.colorbar(cp) # Makrking countour line values
 contour = plt.contour(xi, yi, zi,  levels=levels, colors='black', linewidths=0.5)
 # plt.clabel(contour, inline=True, fontsize=8) # Makrking countour line values
 ```
+```
+for f in $( cat dirlist.txt ); do
+
+  # ADC2 results
+  adc2_svp_S1S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 singlet | grep 'Excitation energy' | awk '{print $3}' | head -1 )
+  adc2_svp_fosc=$( grep -A10 'Excited state' $f/all.out | grep -A10 singlet | grep 'Osc. strength' | awk '{print $3}' | head -1 )
+  adc2_svp_T1S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 triplet | grep 'Excitation energy' | awk '{print $3}' | head -1 )
+  adc2_svp_T2S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 triplet | grep 'Excitation energy' | awk '{print $3}' | head -2 | tail -1 )
+  adc2_svp_S1T1=$( echo $adc2_svp_S1S0 $adc2_svp_T1S0 | awk '{ print $1-$2 }' )
+  adc2_svp_T21S1=$( echo $adc2_svp_T1S0 $adc2_svp_S1S0 | awk '{ print 2*$1-$2 }' )
+  adc2_svp_T21T2=$( echo $adc2_svp_T1S0 $adc2_svp_T2S0 | awk '{ print 2*$1-$2 }' )
+  echo $f,$adc2_svp_S1S0,$adc2_svp_fosc,$adc2_svp_T1S0,$adc2_svp_T2S0,$adc2_svp_S1T1,$adc2_svp_T21S1,$adc2_svp_T21T2 >> adc2_svp.csv
+
+ # adc2_tzvp_S1S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 singlet | grep 'Excitation energy' | awk '{print $3}' | head -1 )
+ # adc2_tzvp_fosc=$( grep -A10 'Excited state' $f/all.out | grep -A10 singlet | grep 'Osc. strength' | awk '{print $3}' | head -1 )
+ # adc2_tzvp_T1S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 triplet | grep 'Excitation energy' | awk '{print $3}' | head -1 )
+ # adc2_tzvp_T2S0=$( grep -A10 'Excited state' $f/all.out | grep -A10 triplet | grep 'Excitation energy' | awk '{print $3}' | head -2 | tail -1 )
+ # adc2_tzvp_S1T1=$( echo $adc2_tzvp_S1S0 $adc2_tzvp_T1S0 | awk '{ print $1-$2 }' )
+ # adc2_tzvp_T21S1=$( echo $adc2_tzvp_T1S0 $adc2_tzvp_S1S0 | awk '{ print 2*$1-$2 }' )
+ # adc2_tzvp_T21T2=$( echo $adc2_tzvp_T1S0 $adc2_tzvp_T2S0 | awk '{ print 2*$1-$2 }' )
+ # echo $f,$adc2_tzvp_S1S0,$adc2_tzvp_fosc,$adc2_tzvp_T1S0,$adc2_tzvp_T2S0,$adc2_tzvp_S1T1,$adc2_tzvp_T21S1,$adc2_tzvp_T21T2 >> adc2_tzvp.csv
+
+done
+
+```
