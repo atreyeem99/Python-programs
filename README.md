@@ -4211,3 +4211,14 @@ for f in $( cat dirlist.txt ); do
 done
 
 ```
+```
+file=$1
+
+
+Nat=$(grep 'NAtoms= ' $file | awk '{print $2}' | head -1)
+
+echo $Nat
+echo $file
+grep -A$(( $Nat+4 )) '        Standard orientation: ' $file | tail -$(( $Nat )) | column -t | awk ' {print " " $2 "  " $4 " " $5 " " $6 }' | sed -e "s/ 1 /H/g" | sed -e "s/ 6 /C/g" | sed -e "s/ 7 /N/g"
+
+```
