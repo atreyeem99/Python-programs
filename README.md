@@ -4222,3 +4222,19 @@ echo $file
 grep -A$(( $Nat+4 )) '        Standard orientation: ' $file | tail -$(( $Nat )) | column -t | awk ' {print " " $2 "  " $4 " " $5 " " $6 }' | sed -e "s/ 1 /H/g" | sed -e "s/ 6 /C/g" | sed -e "s/ 7 /N/g"
 
 ```
+```
+dirs=$(cat dirlist.txt)
+
+for dir in $dirs; do
+
+  mkdir $dir
+
+  cat template/all1.com  > all.com
+  Nat=$( grep -A2 'Current geometry (xyz format, in Angstrom)' ../Contourplot_MP2/$dir/opt.out |  tail -1 | awk '{print $1}' )
+  grep -A$(( $Nat+3 )) 'Current geometry (xyz format, in Angstrom)' ../Contourplot_MP2/$dir/opt.out | tail -$Nat >> all.com
+  cat template/all2.com >> all.com
+
+  mv all.com $dir
+
+done
+```
