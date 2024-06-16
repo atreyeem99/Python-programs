@@ -4239,6 +4239,7 @@ for dir in $dirs; do
 
 done
 ```
+# scan normal mode 
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -4286,3 +4287,4 @@ plt.savefig('ScanP')
 # Show plot
 plt.show()
 ```
+# 
