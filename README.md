@@ -4288,3 +4288,29 @@ plt.savefig('ScanP')
 plt.show()
 ```
 # 
+```
+import csv
+
+# Read from a.csv and extract the 1st column
+with open('scf.csv', 'r') as file_a:
+    reader_a = csv.reader(file_a)
+    column_a = [row[0] for row in reader_a]
+
+# Read from b.csv and append the extracted column from a.csv as the 3rd column
+with open('var_values.csv', 'r') as file_b:
+    reader_b = csv.reader(file_b)
+    rows_b = list(reader_b)
+
+    # Add the extracted column from a.csv as the 3rd column
+    for i, row in enumerate(rows_b):
+        if i < len(column_a):
+            row.insert(2, column_a[i])
+        else:
+            # If there are more rows in b.csv than in a.csv, add empty values
+            row.insert(2, "")
+
+# Write the combined data to c.csv
+with open('contour.csv', 'w', newline='') as file_c:
+    writer = csv.writer(file_c)
+    writer.writerows(rows_b)
+```
