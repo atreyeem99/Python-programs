@@ -4314,6 +4314,7 @@ with open('contour.csv', 'w', newline='') as file_c:
     writer = csv.writer(file_c)
     writer.writerows(rows_b)
 ```
+# print numbers with fixed interval
 ```
 # Define the start, stop, and interval
 start = -5
