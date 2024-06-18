@@ -4314,3 +4314,15 @@ with open('contour.csv', 'w', newline='') as file_c:
     writer = csv.writer(file_c)
     writer.writerows(rows_b)
 ```
+```
+# Define the start, stop, and interval
+start = -5
+stop = 5
+interval = 0.05
+
+# Use a loop to generate the numbers and print each one
+current = start
+while current <= stop:
+    print(f"{current:.2f}")
+    current += interval
+```
