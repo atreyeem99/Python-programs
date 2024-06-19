@@ -4327,3 +4327,16 @@ while current <= stop:
     print(f"{current:.2f}")
     current += interval
 ```
+#
+```
+au2kjm=2625.499618335386
+
+
+xx=$(grep 'CCSD/cc-pVTZ//CCSD/cc-pVTZ energy=' a/opt.out | awk '{print $3}' )
+yy=$(grep 'CCSD/cc-pVTZ//CCSD/cc-pVTZ energy=' abc/opt.out | awk '{print $3}' )
+
+echo "CCSD/VTZ"
+echo $xx
+echo $yy
+awk -v xxx="$xx" -v xxx="$xx" -v conv="$au2kjm" 'BEGIN {printf "%5.1f\n", (xx - yy) * conv}'
+```
