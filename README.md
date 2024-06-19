@@ -4327,7 +4327,7 @@ while current <= stop:
     print(f"{current:.2f}")
     current += interval
 ```
-#
+# extract del E
 ```
 au2kjm=2625.499618335386
 
