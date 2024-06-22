@@ -4449,3 +4449,48 @@ def plot_single_csv(csv_file):
 csv_file = 'Mol.csv'  # Replace with the path to your CSV file
 plot_single_csv(csv_file)
 ```
+
+```
+import csv
+
+# Read lines from input file
+with open('scan_wB97XD3_energy.out', 'r') as file:
+    lines = file.readlines()
+
+# List to store the values under the "DNC" column
+values = []
+
+# Flags to track when we are within the desired block
+in_block = False
+
+# Extract values under "DNC" column from lines within the block
+for line in lines:
+    line = line.strip()
+    
+    # Check if the block starts
+    if line.startswith('------------------------------------------------------------'):
+        in_block = not in_block  # Toggle the in_block flag
+        continue
+    
+    # If we are in the block and the line has the correct format
+    if in_block:
+        parts = line.split()
+        if len(parts) == 4 and parts[0].isdigit():
+            try:
+                # Try to convert the second part to a float to ensure it's a numeric value
+                dnc_value = float(parts[1])
+                values.append(dnc_value)
+            except ValueError:
+                continue  # Skip lines that cannot be converted to float
+
+# Ensure we only take the first 41 values (41 trajectory steps)
+values = values[:41]
+
+# Write values to a CSV file
+with open('values.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Value'])  # Write header
+    writer.writerows(map(lambda x: [x], values))
+
+print("Values saved to values.csv")
+```
