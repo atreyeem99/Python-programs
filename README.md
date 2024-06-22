@@ -4411,3 +4411,41 @@ with open(csv_file_path, 'w', newline='') as csv_file:
 
 print(f"CSV file has been created at {csv_file_path}.")
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+hartree2kcalmol = 627.509
+
+def plot_single_csv(csv_file):
+    # Read the CSV file into a DataFrame, skipping the header row if it exists
+    df = pd.read_csv(csv_file, header=0)
+
+    # Number of columns in the DataFrame
+    num_columns = df.shape[1]
+    x = np.linspace(-0.2, 0.2, 41)  # Assuming 41 points
+
+    # Plot each column
+    for col_index in range(num_columns):
+        try:
+            column = df.iloc[:, col_index].astype(float).to_numpy()
+            column = column - np.min(column)  # Adjust values relative to minimum
+            column = column * hartree2kcalmol  # Convert to kcal/mol
+            plt.plot(x, column, label=f'Column {col_index+1}')
+        except ValueError:
+            print(f"Skipping non-numeric column: {df.columns[col_index]} in file {csv_file}")
+
+    plt.xlabel('Index, mode 6')
+    plt.ylabel('E [kcal/mol]')
+    plt.title('Scan Plot')
+    plt.legend()
+    plt.grid(True)
+    # Save the plot as a PDF
+    plt.savefig('scan.pdf')
+    plt.show()
+
+# Usage example
+csv_file = 'Mol.csv'  # Replace with the path to your CSV file
+plot_single_csv(csv_file)
+```
