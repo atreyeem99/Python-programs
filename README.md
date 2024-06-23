@@ -4494,3 +4494,25 @@ with open('values.csv', 'w', newline='') as csvfile:
 
 print("Values saved to values.csv")
 ```
+```
+x = np.linspace(-0.2, 0.2, 41)
+# Plot each column
+for col_index in range(num_columns):
+    try:
+        column = df.iloc[:, col_index].astype(float).to_numpy()
+        column = column - np.min(column)
+        column = column * hartree2kcalmol
+        plt.plot(x, column, label='k')
+    except ValueError:
+        print(f"Skipping non-numeric column: {df.columns[col_index]} in file {csv_file}")
+
+plt.xlabel('Index, mode 6')
+plt.ylabel('E [kcal/mol]')
+plt.title('Scan Plot')
+plt.legend()
+#plt.ylim(0, 10)
+#plt.xlim(15, 25)
+# Save the plot as a PDF
+plt.savefig('scan.pdf')
+plt.show()
+```
