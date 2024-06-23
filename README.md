@@ -4494,6 +4494,7 @@ with open('values.csv', 'w', newline='') as csvfile:
 
 print("Values saved to values.csv")
 ```
+# normal mode scan
 ```
 x = np.linspace(-0.2, 0.2, 41)
 # Plot each column
