@@ -4517,6 +4517,7 @@ plt.legend()
 plt.savefig('scan.pdf')
 plt.show()
 ```
+# plot horizontal lines
 ```
 import matplotlib.pyplot as plt
 
