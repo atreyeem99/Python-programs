@@ -4541,7 +4541,7 @@ plt.grid(True)
 # Display the plot
 plt.show()
 ```
-# 
+# calculate atomization energies and plot histogram
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
