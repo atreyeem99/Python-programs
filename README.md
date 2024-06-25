@@ -4541,3 +4541,40 @@ plt.grid(True)
 # Display the plot
 plt.show()
 ```
+# 
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define the constants
+x = -0.777
+y = -3.88
+z = -6.99
+
+# Path to the CSV file
+csv_file_path = 'data.csv'
+
+# Read the CSV file without headers
+df = pd.read_csv(csv_file_path, header=None)
+
+# Ensure the DataFrame has exactly 4 columns
+if df.shape[1] != 4:
+    raise ValueError("CSV file must have exactly 4 columns")
+
+# Perform the calculation: (1st_column * x + 2nd_column * y + 3rd_column * z) - 4th_column
+df['calculation'] = (df[0] * x + df[1] * y + df[2] * z) - df[3]
+
+# Plot the histogram of the calculated values
+plt.figure(figsize=(10, 6))
+plt.hist(df['calculation'], bins=30, edgecolor='black')
+plt.title('Histogram of Calculated Values')
+plt.xlabel('Calculated Value')
+plt.ylabel('Frequency')
+plt.grid(True)
+
+# Save the figure as a PDF
+plt.savefig('histogram.pdf', format='pdf')
+
+# Show the plot
+plt.show()
+```
