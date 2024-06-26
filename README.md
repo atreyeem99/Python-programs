@@ -4578,7 +4578,7 @@ plt.savefig('histogram.pdf', format='pdf')
 # Show the plot
 plt.show()
 ```
-#
+# colorcoding histogram
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
