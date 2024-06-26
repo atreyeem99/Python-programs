@@ -4578,3 +4578,57 @@ plt.savefig('histogram.pdf', format='pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define the constants
+x = -0.502112655155
+y = -37.844964184283
+z = -54.589569458889
+
+# Path to the CSV file
+csv_file_path = 'data.csv'
+
+# Read the CSV file without headers
+df = pd.read_csv(csv_file_path, header=None)
+
+# Ensure the DataFrame has exactly 4 columns
+if df.shape[1] != 4:
+    raise ValueError("CSV file must have exactly 4 columns")
+
+# Perform the calculation: (1st_column * x + 2nd_column * y + 3rd_column * z) - 4th_column
+df['calculation'] = (df[0] * x + df[1] * y + df[2] * z) - df[3]
+
+# Define row indices for each color
+red_rows = [0]  # 0-based index for row 1
+green_rows = [3, 21, 88]  # 0-based indices for rows 4, 22, 89
+blue_rows = [1, 2, 7, 8, 9, 13, 14, 17, 45, 46, 47, 51, 55, 56, 53]  # 0-based indices for specified rows
+
+# Separate the calculations by color groups
+red_values = df['calculation'].iloc[red_rows]
+green_values = df['calculation'].iloc[green_rows]
+blue_values = df['calculation'].iloc[blue_rows]
+orange_values = df['calculation'].drop(red_rows + green_rows + blue_rows)
+
+# Plot the histogram with different colors
+plt.figure(figsize=(10, 6))
+plt.hist(red_values, bins=30, color='red', edgecolor='black', alpha=0.5, label='Red Rows')
+plt.hist(green_values, bins=30, color='darkgreen', edgecolor='black', alpha=0.5, label='Green Rows')
+plt.hist(blue_values, bins=30, color='blue', edgecolor='black', alpha=0.5, label='Blue Rows')
+plt.hist(orange_values, bins=30, color='orange', edgecolor='black', alpha=0.2, label='Orange Rows')
+
+# Add title and labels
+plt.title('Histogram of Calculated Values with Different Colors')
+plt.xlabel('Calculated Value')
+plt.ylabel('Frequency')
+plt.legend()
+plt.grid(True)
+
+# Save the figure as a PDF
+plt.savefig('histogram.pdf', format='pdf')
+
+# Show the plot
+plt.show()
+```
