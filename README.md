@@ -4632,3 +4632,14 @@ plt.savefig('histogram.pdf', format='pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+for d in Mol_*; do
+  f=$d/geom_S0.xyz
+  NH=$( grep '^H ' $f  | wc -l )
+  NC=$( grep '^C ' $f  | wc -l )
+  NN=$( grep '^N ' $f  | wc -l )
+  energy=$( bzgrep 'FINAL SINGLE POINT ENERGY' $d/opt.out.bz2| tail -1 | awk '{print $5}' )
+  echo $NH,$NC,$NN,$energy
+done
+```
