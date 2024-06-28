@@ -4643,3 +4643,37 @@ for d in Mol_*; do
   echo $NH,$NC,$NN,$energy
 done
 ```
+#
+```
+echo "s1 s2 s3 s4 s5 s6 t1 t2 t3 t4 t5 t6 S0" > tda.csv
+
+# Loop through all folders starting with "traj_"
+for i in $(seq -w 1 41); do
+    folder='traj_'$i
+    echo "Processing folder: $folder"
+    if [ -d "$folder" ]; then
+        cd "$folder" || exit
+        # Execute the extraction commands in the current folder
+        bzgrep 'STATE  1:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t1.txt
+        bzgrep 'STATE  2:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t2.txt
+        bzgrep 'STATE  3:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t3.txt
+        bzgrep 'STATE  4:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t4.txt
+        bzgrep 'STATE  5:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t5.txt
+        bzgrep 'STATE  6:  E' tda.out.bz2 | grep '2.000000' | awk '{print $6}' > t6.txt
+        bzgrep 'STATE  1:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s1.txt
+        bzgrep 'STATE  2:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s2.txt
+        bzgrep 'STATE  3:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s3.txt
+        bzgrep 'STATE  4:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s4.txt
+        bzgrep 'STATE  5:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s5.txt
+        bzgrep 'STATE  6:  E' tda.out.bz2 | grep '0.000000' | awk '{print $6}' > s6.txt
+        bzgrep 'Total Energy       : ' tda.out.bz2 | awk '{print $6+14952.75064}' > S0.txt
+        # Paste the extracted data into a temporary file
+        paste -d ' ' s1.txt s2.txt s3.txt s4.txt s5.txt s6.txt t1.txt t2.txt t3.txt t4.txt t5.txt t6.txt S0.txt >> ../tda.csv
+        # Clean up temporary files
+        rm -f s*.txt t*.txt S0.txt
+        cd ..
+    fi
+done
+
+echo "Extraction completed. Results saved in tda.csv"
+```
