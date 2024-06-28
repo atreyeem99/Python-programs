@@ -4643,7 +4643,7 @@ for d in Mol_*; do
   echo $NH,$NC,$NN,$energy
 done
 ```
-#
+# extract trajectories
 ```
 echo "s1 s2 s3 s4 s5 s6 t1 t2 t3 t4 t5 t6 S0" > tda.csv
 
