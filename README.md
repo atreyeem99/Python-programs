@@ -4677,7 +4677,7 @@ done
 
 echo "Extraction completed. Results saved in tda.csv"
 ```
-#
+# print the folders names the values
 ```
 import os
 import csv
