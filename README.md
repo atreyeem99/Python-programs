@@ -4677,3 +4677,44 @@ done
 
 echo "Extraction completed. Results saved in tda.csv"
 ```
+#
+```
+import os
+import csv
+
+# Define the base path where the Mol directories are located
+base_path = '/home/atreyee/folder'  # Change to the actual path where Mol directories are located
+
+# Define the output CSV file path
+csv_file_path = os.path.join(base_path, 'var_values.csv')
+
+# Prepare a list to store the rows of the CSV
+csv_rows = []
+
+# Scan the base directory for folders starting with 'Mol_'
+for folder_name in os.listdir(base_path):
+    if folder_name.startswith('Mol_'):
+        try:
+            # Extract var1 and var2 from the folder name
+            _, var1, var2 = folder_name.split('_')
+            var1 = float(var1)
+            var2 = float(var2)
+
+            # Append the values to the csv_rows list
+            csv_rows.append([var1, var2])
+        except ValueError:
+            print(f"Skipping folder with unexpected name format: {folder_name}")
+
+# Sort the rows first by var1 and then by var2
+csv_rows.sort()
+
+# Write the rows to the CSV file
+with open(csv_file_path, 'w', newline='') as csv_file:
+    csv_writer = csv.writer(csv_file)
+    # Write the header
+    csv_writer.writerow(['var1', 'var2'])
+    # Write the rows
+    csv_writer.writerows(csv_rows)
+
+print(f"CSV file has been created at {csv_file_path}.")
+```
