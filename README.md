@@ -4718,3 +4718,28 @@ with open(csv_file_path, 'w', newline='') as csv_file:
 
 print(f"CSV file has been created at {csv_file_path}.")
 ```
+#
+```
+#t directory where the folders are located
+root_dir="/home/atreyee/Project_SOJT_Azaphenalenes/cc_basis/1AP_D3h_001/Contourplot_CCSDT_at_MP2"
+
+# Function to extract numeric value from opt.out file
+extract_numeric_value() {
+    file="$1"
+    numeric_value=$(grep -oP 'CCSD(T)/cc-pVDZ//CCSD(T)/cc-pVDZ energy=\s*\K-?\d+\.\d+' "$file")
+    if [ -n "$numeric_value" ]; then
+        echo "$numeric_value"
+    fi
+}
+
+# Iterate through folders starting with "Mol"
+for folder in "$root_dir"/Mol*/; do
+    if [ -d "$folder" ]; then
+        opt_out_file="$folder/opt.out"
+        if [ -f "$opt_out_file" ]; then
+            numeric_value=$(extract_numeric_value "$opt_out_file")
+            echo "$numeric_value"
+        fi
+    fi
+done
+```
