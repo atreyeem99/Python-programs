@@ -4743,7 +4743,7 @@ for folder in "$root_dir"/Mol*/; do
     fi
 done
 ```
-#
+# adc2 input
 ```
 dirs=$(cat dirlist.txt)
 
