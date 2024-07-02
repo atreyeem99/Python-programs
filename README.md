@@ -4760,3 +4760,32 @@ for dir in $dirs; do
 
 done
 ```
+```
+
+
+# Words to fill in the brackets
+groups = ['','F','C','N','O','C(C)(C)(C)','N(C)(C)','O(C)'] 
+
+Ngrps=len(groups)
+
+file1=open('a_sub.smi','w')
+
+for i in range(Ngrps):
+    for j in range(Ngrps):
+        for k in range(Ngrps):
+            groupi=groups[i]
+            groupj=groups[j]
+            groupk=groups[k]
+            if len(groupi) != 0:
+                groupi='('+groupi+')'
+            if len(groupj) != 0:
+                groupj='('+groupj+')'
+            if len(groupk) != 0:
+                groupk='('+groupk+')' 
+            mol='C1'+groupi+'=NC2=NC'+groupj+'=NC3=NC'+groupk+'=NC(=N1)N23'
+            name='Mol_'+str(i)+'_'+str(j)+'_'+str(k)
+            file1.write(mol+' '+name+'\n')
+    
+
+file1.close()
+```
