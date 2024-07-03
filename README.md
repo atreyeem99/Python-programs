@@ -4790,7 +4790,7 @@ for i in range(Ngrps):
 
 file1.close()
 ```
-#
+# extract energy
 ```
 numeric_value=$(grep -oP 'CCSD(T)/cc-pVDZ energy=\s*-?\d+\.\d+' "$file" | grep -oP '-?\d+\.\d+')
 ```
