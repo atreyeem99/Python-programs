@@ -4794,7 +4794,7 @@ file1.close()
 ```
 numeric_value=$(grep -oP 'CCSD(T)/cc-pVDZ energy=\s*-?\d+\.\d+' "$file" | grep -oP '-?\d+\.\d+')
 ```
-#
+# adc2 inp and folder creation with fortran instead of python
 ```
 !gfortran prepinp_adc2.f90 -o prepinp_adc2.x
 !./prepinp_adc2.x 
