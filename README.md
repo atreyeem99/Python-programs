@@ -4794,3 +4794,70 @@ file1.close()
 ```
 numeric_value=$(grep -oP 'CCSD(T)/cc-pVDZ energy=\s*-?\d+\.\d+' "$file" | grep -oP '-?\d+\.\d+')
 ```
+#
+```
+!gfortran prepinp_adc2.f90 -o prepinp_adc2.x
+!./prepinp_adc2.x 
+program main
+
+  implicit none
+
+  integer, parameter            :: Nmol = 120
+  character(len=500)            :: cmd, filedir
+  character(len=100)            :: line, filename, smi, title
+  integer                       :: Nat, iat, imol, tmp, iq, im
+  character(len=1), allocatable :: sym(:)
+  double precision              :: beta, dipole
+  double precision, allocatable :: R(:,:)
+
+  open(unit=100, file='geom_DFT_S0_all.xyz')
+
+  do imol = 1, Nmol
+
+    read(100,*) Nat
+    read(100,*) title
+    allocate(sym(1:Nat), R(1:Nat,1:3))
+    do iat = 1, Nat
+      read(100,*) sym(iat), R(iat,1:3)
+    enddo
+
+    open(unit=101, file='all.com')
+    write(101,'(a)')'$molecule'
+    write(101,'(2i3)')0, 1
+    do iat = 1, Nat
+        write(101,'(a,3f15.8)') sym(iat), R(iat,1:3)
+    enddo
+    write(101,'(a)')'$end'
+    write(101,'(a)')''
+    write(101,'(a)')'$rem                                 '
+    write(101,'(a)')'jobtype             sp               '
+    write(101,'(a)')'method              adc(2)           '
+    write(101,'(a)')'basis               cc-pVTZ        '
+    write(101,'(a)')'aux_basis           rimp2-cc-pVTZ  '
+    write(101,'(a)')'mem_total           64000            '
+    write(101,'(a)')'mem_static          1000             '
+    write(101,'(a)')'maxscf              1000             '
+    write(101,'(a)')'cc_symmetry         false            '
+    write(101,'(a)')'ee_singlets         3                '
+    write(101,'(a)')'ee_triplets         3                '
+    write(101,'(a)')'sym_ignore          true             '
+    write(101,'(a)')'ADC_DAVIDSON_MAXITER 300'
+    write(101,'(a)')'ADC_DAVIDSON_CONV 5'
+    write(101,'(a)')'$end                                 '
+    close(101)
+
+    deallocate(sym, R)                                                                                                                                                          1,1           Top
+
+ write(cmd,'(a,i5.5)')'mkdir Mol_', imol
+    call system(trim(cmd))
+
+    write(cmd,'(a,i5.5)')'mv all.com Mol_', imol
+    call system(trim(cmd))
+
+  enddo
+
+  close(100)
+
+end program main
+
+```
