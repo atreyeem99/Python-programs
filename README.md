@@ -4861,3 +4861,86 @@ program main
 end program main
 
 ```
+# 
+```
+import re
+import bz2
+from math import sqrt
+from rdkit import Chem
+
+# Function to extract the bz2 file
+def extract_bz2_file(bz2_filename, extracted_filename):
+    with bz2.BZ2File(bz2_filename, 'rb') as file:
+        content = file.read()
+    with open(extracted_filename, 'wb') as file:
+        file.write(content)
+
+# Function to parse the ORCA output file
+def parse_orca_output(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    
+    # Find the Cartesian coordinates section
+    start = end = 0
+    for i, line in enumerate(lines):
+        if 'CARTESIAN COORDINATES (ANGSTROEM)' in line:
+            start = i + 2  # coordinates usually start two lines below this line
+            break
+    
+    for i in range(start, len(lines)):
+        if lines[i].strip() == '' or lines[i].startswith('-----'):
+            end = i
+            break
+    
+    coordinates = []
+    for line in lines[start:end]:
+        parts = re.split(r'\s+', line.strip())
+        atom = parts[0]
+        x, y, z = map(float, parts[1:])
+        coordinates.append((atom, x, y, z))
+    
+    return coordinates
+
+# Function to calculate distance between two atoms
+def calculate_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1:]
+    x2, y2, z2 = atom2[1:]
+    return sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+
+# File names
+bz2_filename = 'opt.out.bz2'
+extracted_filename = 'opt.out'
+
+# Extract the bz2 file
+extract_bz2_file(bz2_filename, extracted_filename)
+
+# Parse the extracted ORCA output file
+coordinates = parse_orca_output(extracted_filename)
+
+# Interpret SMILES string with RDKit
+smiles = 'C1=NC2=NC=NC3=NC=NC(=N1)N23'
+mol = Chem.MolFromSmiles(smiles)
+
+# Get the atomic indices in the correct order
+atom_indices = {atom.GetIdx(): atom.GetSymbol() for atom in mol.GetAtoms()}
+
+# Map indices to coordinates
+atom_coords = {idx: coordinates[idx] for idx in atom_indices}
+
+# Define atom pairs for distances
+pairs = {
+    'r1': (0, 8),  # atom 1 (index 0) to atom 9a (index 8)
+    'r2': (2, 9),  # atom 3 (index 2) to atom 3a (index 9)
+    'r3': (9, 3),  # atom 3a (index 9) to atom 4 (index 3)
+    'r4': (5, 10), # atom 6 (index 5) to atom 6a (index 10)
+    'r5': (10, 6), # atom 6a (index 10) to atom 7 (index 6)
+    'r6': (8, 7),  # atom 9 (index 8) to atom 9a (index 7)
+}
+
+# Calculate distances
+distances = {key: calculate_distance(atom_coords[pair[0]], atom_coords[pair[1]]) for key, pair in pairs.items()}
+
+# Print distances
+for key, dist in distances.items():
+    print(f'{key} distance: {dist:.4f} Å')
+```
