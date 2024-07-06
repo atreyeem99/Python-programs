@@ -5027,3 +5027,7 @@ distances = {key: calculate_distance(atom_coords[pair[0]], atom_coords[pair[1]])
 for key, dist in distances.items():
     print(f'{key} distance: {dist:.4f} Å')
 ```
+```
+for f in */*wB97XD*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
+for f in */*B3LYP*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
+```
