@@ -5031,3 +5031,11 @@ for key, dist in distances.items():
 for f in */*wB97XD*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
 for f in */*B3LYP*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
 ```
+```
+# <span style="color:blue">Heading 1</span>
+## <span style="color:green">Heading 2</span>
+### <span style="color:red">Heading 3</span>
+#### <span style="color:purple">Heading 4</span>
+##### <span style="color:orange">Heading 5</span>
+###### <span style="color:brown">Heading 6</span>
+```
