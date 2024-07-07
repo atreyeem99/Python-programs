@@ -5031,6 +5031,7 @@ for key, dist in distances.items():
 for f in */*wB97XD*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
 for f in */*B3LYP*/opt.log; do echo $f; grep -A8 'Diagonal vibrational polarizability' $f | tail -2; echo "===================================="; done
 ```
+# heading in jupyter notebook
 ```
 # <span style="color:blue">Heading 1</span>
 ## <span style="color:green">Heading 2</span>
