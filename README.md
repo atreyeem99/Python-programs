@@ -5068,3 +5068,19 @@ N_smallest=5
 entries_dft=df.iloc[diff_dft.abs().nsmallest(N_smallest).index]
 entries_adc2=df.iloc[diff_adc2.abs().nsmallest(N_smallest).index]
 ```
+#
+```
+import pymoldis
+
+df=pymoldis.get_data('bigqm7w_S1T1')
+
+lower_bound=3.0
+upper_bound=4.0
+
+filtered_df=df[(df['S1_ADC2(eV)'] >= lower_bound) & (df['S1_ADC2(eV)'] <= upper_bound) & 
+                 (df['T1_ADC2(eV)'] >= lower_bound) & (df['T1_ADC2(eV)'] <= upper_bound)]
+
+filtered_df=filtered_df[['SMI','S1_ADC2(eV)','T1_ADC2(eV)','f01_ADC2(au)']]
+
+print(filtered_df.describe())
+```
