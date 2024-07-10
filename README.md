@@ -5084,3 +5084,20 @@ filtered_df=filtered_df[['SMI','S1_ADC2(eV)','T1_ADC2(eV)','f01_ADC2(au)']]
 
 print(filtered_df.describe())
 ```
+#
+```
+def svg_from_smiles(SMI):
+    
+    from rdkit import Chem
+    from rdkit.Chem import Draw
+    from rdkit.Chem.Draw import rdMolDraw2D
+    from io import StringIO
+
+    mol=Chem.MolFromSmiles(SMI)
+    drawer=rdMolDraw2D.MolDraw2DSVG(300, 300)
+    drawer.DrawMolecule(mol)
+    drawer.FinishDrawing()
+    svg=drawer.GetDrawingText()
+
+    return svg
+```
