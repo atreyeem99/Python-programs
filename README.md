@@ -5101,3 +5101,28 @@ def svg_from_smiles(SMI):
 
     return svg
 ```
+#
+```
+#t directory where the folders are located
+root_dir="/home/atreyee/Project_SOJT_Azaphenalenes/cc_basis/5AP_C2v_056/Contourplot_MP2"
+
+# Function to extract numeric value from opt.out file
+extract_numeric_value() {
+    file="$1"
+    numeric_value=$(grep -oP 'MP2/cc-pVDZ//MP2/cc-pVDZ energy=\s*\K-?\d+\.\d+' "$file")
+    if [ -n "$numeric_value" ]; then
+        echo "$numeric_value"
+    fi
+}
+
+# Iterate through folders starting with "Mol"
+for folder in "$root_dir"/Mol*/; do
+    if [ -d "$folder" ]; then
+        opt_out_file="$folder/opt.out"
+        if [ -f "$opt_out_file" ]; then
+            numeric_value=$(extract_numeric_value "$opt_out_file")
+            echo "$numeric_value"
+        fi
+    fi
+done
+```
