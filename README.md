@@ -5101,7 +5101,7 @@ def svg_from_smiles(SMI):
 
     return svg
 ```
-#
+# extract all energies
 ```
 #t directory where the folders are located
 root_dir="/home/atreyee/Project_SOJT_Azaphenalenes/cc_basis/5AP_C2v_056/Contourplot_MP2"
