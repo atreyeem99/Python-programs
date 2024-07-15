@@ -5268,3 +5268,35 @@ print("{:<15} {:<15} {:<15} {:<15}".format("Parameter", "p", "q", "r", "s"))
 for key in a_values:
     print("{:<15} {:<15.8f} {:<15.8f} {:<15.8f} {:<15.8f}".format(key, p_values[key], q_values[key], r_values[key], s_values[key]))
 ```
+#
+```
+import os
+import shutil
+
+# List of method names
+methods = [
+    'B3LYP', 'BHandHLYP', 'CAM-B3LYP', 'M06', 'M062X', 'M06HF', 'M11L',
+    'BP86', 'TPSSTPSS', 'WB97XD', 'B97D', 'PBEPBE', 'PBE1PBE', 'HSEH1PBE', 'LC-BLYP', 'LC-wHPBE'
+]
+
+# Create folders and copy template file
+template_file = 'tddft.com'
+for method in methods:
+    # Create folder if it doesn't exist
+    folder_name = method
+    os.makedirs(folder_name, exist_ok=True)
+
+    # Copy template file to folder
+    shutil.copy(template_file, folder_name)
+
+    # Replace placeholder in template file
+    with open(os.path.join(folder_name, template_file), 'r+') as file:
+        content = file.read()
+        updated_content = content.replace('xxxx', method)
+        file.seek(0)
+        file.write(updated_content)
+        file.truncate()
+
+print("Folders created and template files copied and updated successfully.")
+
+```
