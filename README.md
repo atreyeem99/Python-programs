@@ -5300,3 +5300,53 @@ for method in methods:
 print("Folders created and template files copied and updated successfully.")
 
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import string
+
+# Constants
+hc_e_conversion_factor = 1.239841984e-4
+
+# Load the CSV file
+csv_file = 'your_file.csv'  # Replace with your file path
+data = pd.read_csv(csv_file)
+
+# Extract the columns and convert from cm⁻¹ to eV
+labels = data.iloc[:, 0]    # First column (labels)
+y_cm = data.iloc[:, 1]      # Second column
+x_cm = data.iloc[:, 2]      # Third column
+
+y_eV = y_cm * hc_e_conversion_factor
+x_eV = x_cm * hc_e_conversion_factor
+
+# Get the column names for labels
+y_label = data.columns[1] + ' (eV)'
+x_label = data.columns[2] + ' (eV)'
+
+# Generate markers (a, b, c, ...)
+markers = list(string.ascii_lowercase[:len(labels)])
+
+# Create the scatter plot
+plt.scatter(x_eV, y_eV)
+
+# Annotate each point with the corresponding letter marker
+for i, marker in enumerate(markers):
+    plt.annotate(marker, (x_eV[i], y_eV[i]), textcoords="offset points", xytext=(0, -10), ha='center')
+
+# Set the aspect ratio to be equal and the limits for the axes
+plt.gca().set_aspect('equal', adjustable='box')
+plt.xlim(-1000, 1000)
+plt.ylim(-1000, 1000)
+
+plt.xlabel(x_label)
+plt.ylabel(y_label)
+plt.title('Scatter Plot of Third Column vs Second Column (in eV)')
+plt.show()
+
+# Print the index relating markers to the original labels
+print("Index:")
+for marker, label in zip(markers, labels):
+    print(f"{marker}: {label}")
+```
