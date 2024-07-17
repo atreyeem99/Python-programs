@@ -5350,3 +5350,38 @@ print("Index:")
 for marker, label in zip(markers, labels):
     print(f"{marker}: {label}")
 ```
+#
+```
+#!/bin/bash
+
+ev2cmi=8065.544645854528
+
+# Function to process logs in a given directory
+process_logs() {
+    local dir=$1
+    for f in "$dir"/*.log; do
+        T1=$(grep 'Excited State ' "$f" | grep Triplet | head -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        T2=$(grep 'Excited State ' "$f" | grep Triplet | head -2 | tail -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        S1=$(grep 'Excited State ' "$f" | grep Singlet | head -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        S2=$(grep 'Excited State ' "$f" | grep Singlet | head -2 | tail -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        S3=$(grep 'Excited State ' "$f" | grep Singlet | head -3 | tail -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        S4=$(grep 'Excited State ' "$f" | grep Singlet | head -4 | tail -1 | awk -v SF="$ev2cmi" '{print $5*SF}')
+        S2_2T1=$(echo $S2 $T1 | awk '{print $1-2*$2}')
+        S2_2T2=$(echo $S2 $T2 | awk '{print $1-2*$2}')
+        S3_2T1=$(echo $S3 $T1 | awk '{print $1-2*$2}')
+        echo "$dir $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2 $S3_2T1"
+    done
+}
+
+# Process all relevant folders
+for folder in */; do
+    for method in CAMB3LYP Lc-wHPBE; do
+        if [ -d "$folder/$method/tddft" ]; then
+            process_logs "$folder/$method/tddft"
+        fi
+        if [ -d "$folder/$method/tda" ]; then
+            process_logs "$folder/$method/tda"
+        fi
+    done
+done
+```
