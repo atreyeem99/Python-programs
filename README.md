@@ -5300,7 +5300,7 @@ for method in methods:
 print("Folders created and template files copied and updated successfully.")
 
 ```
-#
+# to extract values from named foldes. It will extract S and T from tddft.log finally
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
