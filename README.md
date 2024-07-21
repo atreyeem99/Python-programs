@@ -5476,3 +5476,17 @@ file_path = 'a.txt'
 # Call the function to create folders
 create_folders_from_file(file_path)
 ```
+#
+```
+<svg width="400" height="180">
+  <style>
+    .column { width: 50px; height: 100px; }
+    #col1 { fill: blue; }
+    #col2 { fill: green; x: 60px; }
+    #col3 { fill: red; x: 120px; }
+  </style>
+  <rect id="col1" class="column" x="0" y="10" />
+  <rect id="col2" class="column" y="10" />
+  <rect id="col3" class="column" y="10" />
+</svg>
+```
