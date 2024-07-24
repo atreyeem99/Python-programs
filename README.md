@@ -5568,3 +5568,37 @@ for f in tda/*/tddft.log; do
    echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
 done
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_histograms(csv_file, output_pdf):
+    # Read CSV file with header
+    df = pd.read_csv(csv_file)
+    
+    # Check if there are at least 4 columns
+    if df.shape[1] < 4:
+        raise ValueError("CSV file must have at least 4 columns.")
+
+    # Create a 2x2 grid of histograms
+    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
+    
+    # Plot histograms for the first 4 columns
+    columns = df.columns[:4]
+    for i, col in enumerate(columns):
+        ax = axs[i // 2, i % 2]
+        ax.hist(df[col], bins=20, edgecolor='black')
+        ax.set_title(f'Histogram of {col}')
+        ax.set_xlabel(col)
+        ax.set_ylabel('Frequency')
+    
+    # Adjust layout and save figure as PDF
+    plt.tight_layout()
+    plt.savefig(output_pdf)
+
+# Example usage
+csv_file = 'data.csv'
+output_pdf = 'histograms.pdf'
+plot_histograms(csv_file, output_pdf)
+```
