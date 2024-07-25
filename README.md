@@ -5602,3 +5602,32 @@ csv_file = 'data.csv'
 output_pdf = 'histograms.pdf'
 plot_histograms(csv_file, output_pdf)
 ```
+#
+```
+import csv
+
+def sum_columns(csv_file_path):
+    # Initialize a list to store the sum of each column
+    column_sums = [0] * 17
+    
+    # Read the CSV file
+    with open(csv_file_path, mode='r') as file:
+        reader = csv.reader(file)
+        
+        # Skip the header row
+        header = next(reader)
+        
+        # Iterate over each row in the CSV file
+        for row in reader:
+            # Add the value of each column to the corresponding column sum
+            for i in range(17):
+                column_sums[i] += float(row[i])
+    
+    # Print the sum of each column
+    for i, sum_value in enumerate(column_sums):
+        print(f"Sum of column {i+1} ({header[i]}): {sum_value}")
+
+# Example usage
+csv_file_path = 'your_csv_file.csv'  # Replace with the path to your CSV file
+sum_columns(csv_file_path)
+```
