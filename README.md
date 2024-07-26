@@ -5631,3 +5631,24 @@ def sum_columns(csv_file_path):
 csv_file_path = 'your_csv_file.csv'  # Replace with the path to your CSV file
 sum_columns(csv_file_path)
 ```
+#
+```
+import pandas as pd
+
+# Load the CSV file
+file_path = 'input.csv'
+data = pd.read_csv(file_path)
+
+# Separate rows based on the 'stability' column
+stable_rows = data[data['stability'] == 0]
+unstable_rows = data[data['stability'] == 1]
+
+# Save the separated rows into different CSV files
+stable_file_path = 's.csv'
+unstable_file_path = 'us.csv'
+stable_rows.to_csv(stable_file_path, index=False)
+unstable_rows.to_csv(unstable_file_path, index=False)
+
+print(f"Stable rows saved to {stable_file_path}")
+print(f"Unstable rows saved to {unstable_file_path}")
+```
