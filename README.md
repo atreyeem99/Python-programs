@@ -5680,3 +5680,27 @@ input_csv_file = 'tda_results.csv'
 output_csv_file = 'score_tda.csv'
 process_csv(input_csv_file, output_csv_file)
 ```
+```
+import csv
+
+def process_csv(input_file, output_file):
+    with open(input_file, 'r') as infile:
+        reader = csv.reader(infile)
+        scores = []
+
+        for row in reader:
+            col3 = float(row[2])
+            col9 = float(row[8])
+            result = col3 - (2 * col9)
+            score = 0 if result < 0 else 1
+            scores.append([score])
+
+    with open(output_file, 'w', newline='utf-8') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerows(scores)
+
+# Example usage:
+input_csv_file = 'input.csv'
+output_csv_file = 'output.csv'
+process_csv(input_csv_file, output_csv_file)
+```
