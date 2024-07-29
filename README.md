@@ -5731,3 +5731,53 @@ input_csv_file = 'tda_results.csv'
 output_csv_file = 'score_tda.csv'
 process_csv(input_csv_file, output_csv_file)
 ```
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+from matplotlib.colors import ListedColormap
+
+hartree2kcm = 627.509
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('your_new_data_file.csv')
+
+# Extract x and z values
+x = data.iloc[:, 0]
+z = data.iloc[:, 1]
+
+# Convert energy values
+z = z - np.min(z)
+z = z * hartree2kcm
+
+# Create a grid for x and y
+grid_x, grid_y = np.meshgrid(np.linspace(x.min(), x.max(), 100), np.linspace(x.min(), x.max(), 100))
+
+# Interpolating the data to fit the grid
+grid_z = griddata((x, x), z, (grid_x, grid_y), method='cubic', fill_value=np.nan)
+
+# Create a colormap with transparency
+cmap = plt.cm.viridis
+alpha = 0.4
+cmap_colors = cmap(np.arange(cmap.N))
+cmap_colors[:, -1] = alpha
+cmap_alpha = ListedColormap(cmap_colors)
+
+# Define contour levels
+levels = np.linspace(-1, 30, 30)
+
+# Plotting
+fig, ax = plt.subplots(figsize=(10, 8))
+
+cp = plt.contourf(grid_x, grid_y, grid_z, levels=levels, cmap=cmap_alpha)
+plt.colorbar(cp)
+
+contour = plt.contour(grid_x, grid_y, grid_z, levels=levels, colors='black', linewidths=0.5)
+
+plt.title('Contour Plot')
+plt.xlabel("Values")
+plt.ylabel("Values")
+plt.savefig('contour_plot.png')
+plt.show()
+```
