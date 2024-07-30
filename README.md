@@ -5781,3 +5781,33 @@ plt.ylabel("Values")
 plt.savefig('contour_plot.png')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+hartree2kcm = 627.509
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('contour_data_MP2_new.csv')
+
+# Extract x and z values
+x = data.iloc[:, 0]
+z = data.iloc[:, 1]
+
+# Convert energy values
+z = z - np.min(z)
+z = z * hartree2kcm
+
+# Plotting
+fig, ax = plt.subplots(figsize=(10, 8))
+
+plt.plot(x, z, label='Energy')
+plt.title('Energy Plot')
+plt.xlabel("Values")
+plt.ylabel("Energy [$\Delta E$ in kcal/mol]")
+plt.legend()
+plt.savefig('energy_plot_new.png')
+plt.show()
+```
