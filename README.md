@@ -5811,3 +5811,26 @@ plt.legend()
 plt.savefig('energy_plot_new.png')
 plt.show()
 ```
+#
+```
+import os
+
+def find_folders_with_mol(root_directory, output_file):
+    # Open the output file in write mode
+    with open(output_file, 'w') as file:
+        # Walk through the directory
+        for root, dirs, _ in os.walk(root_directory):
+            # Iterate through the directories
+            for dir_name in dirs:
+                # Check if "Mol" is in the folder name
+                if "Mol" in dir_name:
+                    # Write the folder name to the output file
+                    file.write(f"{dir_name}\n")
+
+# Set the root directory to search and the output file path
+root_directory = "your_directory_path_here"
+output_file = "folders_with_mol.txt"
+
+# Call the function
+find_folders_with_mol(root_directory, output_file)
+```
