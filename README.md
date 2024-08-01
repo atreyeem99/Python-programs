@@ -5834,3 +5834,47 @@ output_file = "folders_with_mol.txt"
 # Call the function
 find_folders_with_mol(root_directory, output_file)
 ```
+#
+```
+import os
+
+# Define the template folder and file
+template_folder = '/home/atreyee/Project_SOJT_Azaphenalenes/1APD3h_Mol_001/Contourplot_MP2/template'  # Change to your actual template folder path
+template_file = 'opt.com'
+output_base_folder = '/home/atreyee/Project_SOJT_Azaphenalenes/1APD3h_Mol_001/Contourplot_MP2'  # Change to your desired output folder path
+
+# Define the range and increment for var1
+var1_start = 1.3
+var1_end = 1.5
+var1_increment = 0.01
+
+# Read the template file
+with open(os.path.join(template_folder, template_file), 'r') as file:
+    template_content = file.read()
+
+# Create values for var1
+var1_values = [round(var1_start + i * var1_increment, 2) for i in range(int((var1_end - var1_start) / var1_increment) + 1)]
+var1_values.append(var1_end)  # Ensure the end value is included
+
+# Remove duplicates and sort the values
+var1_values = sorted(set(var1_values))
+
+# Generate directories and files for each value of var1
+for var1 in var1_values:
+    # Create the directory name
+    folder_name = f'Mol_{var1:.2f}'
+    folder_path = os.path.join(output_base_folder, folder_name)
+
+    # Create the directory if it does not exist
+    os.makedirs(folder_path, exist_ok=True)
+
+    # Replace the variable with the actual value
+    modified_content = template_content.replace('var1', str(var1))
+
+    # Write the modified content to a new opt.com file in the new directory
+    new_file_path = os.path.join(folder_path, template_file)
+    with open(new_file_path, 'w') as new_file:
+        new_file.write(modified_content)
+
+print("All combinations have been created.")
+```
