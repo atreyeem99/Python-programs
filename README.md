@@ -5878,3 +5878,30 @@ for var1 in var1_values:
 
 print("All combinations have been created.")
 ```
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Constants
+HARTREE_TO_KCAL_MOL = 627.509
+
+# Load the CSV file with header
+file_path = 'your_file.csv'  # Replace with your CSV file path
+data = pd.read_csv(file_path)
+
+# Extract columns using header names
+x = data.iloc[:, 0]  # First column
+y_hartree = data.iloc[:, 1]  # Second column
+
+# Convert from Hartree to kcal/mol
+y_kcal_mol = y_hartree * HARTREE_TO_KCAL_MOL
+
+# Plot the data
+plt.plot(x, y_kcal_mol, label='Energy (kcal/mol)')
+plt.xlabel(data.columns[0])  # Use the header of the first column as label
+plt.ylabel('Energy (kcal/mol)')
+plt.title('Energy Plot')
+plt.legend()
+plt.gca().set_aspect('equal', adjustable='box')  # Set square aspect ratio
+plt.show()
+```
