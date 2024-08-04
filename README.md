@@ -5937,3 +5937,26 @@ ax.legend()
 plt.savefig('energy_plot.png')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Replace 'your_file.csv' with the path to your CSV file
+file_path = 'your_file.csv'
+
+# Read the CSV file without a header
+df = pd.read_csv(file_path, header=None)
+
+# Plot the specified columns with respect to the 1st column
+plt.plot(df[0], df[1], label='Column 2', color='blue')
+plt.plot(df[0], df[3], label='Column 4', color='green')
+plt.plot(df[0], df[5], label='Column 6', color='red')
+
+plt.title('Plot of Columns 2, 4, 6 vs 1st Column')
+plt.xlabel('1st Column')
+plt.ylabel('Values')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
