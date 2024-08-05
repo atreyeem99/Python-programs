@@ -5905,7 +5905,7 @@ plt.legend()
 plt.gca().set_aspect('equal', adjustable='box')  # Set square aspect ratio
 plt.show()
 ```
-#
+# plot and conversion 
 ```
 import pandas as pd
 import numpy as np
@@ -5937,7 +5937,7 @@ ax.legend()
 plt.savefig('energy_plot.png')
 plt.show()
 ```
-#
+# plot csv
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
