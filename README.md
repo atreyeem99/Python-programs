@@ -6082,3 +6082,39 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the first CSV file
+file1 = "file1.csv"
+df1 = pd.read_csv(file1)
+
+# Read the second CSV file
+file2 = "file2.csv"
+df2 = pd.read_csv(file2)
+
+# Extract the 6th and 8th columns from both files
+data1 = df1.iloc[:, [5, 7]]  # 6th and 8th columns
+data2 = df2.iloc[:, [5, 7]]  # 6th and 8th columns
+
+# Filter rows where the 8th column has the value "CS"
+cs_data1 = data1[data1.iloc[:, 1] == "CS"]
+cs_data2 = data2[data2.iloc[:, 1] == "CS"]
+
+# Plot scatter plot
+plt.scatter(cs_data1.iloc[:, 0], cs_data1.iloc[:, 1], color='blue', label='File 1 (CS)')
+plt.scatter(cs_data2.iloc[:, 0], cs_data2.iloc[:, 1], color='red', label='File 2 (CS)')
+
+# Add labels and title
+plt.xlabel('6th Column')
+plt.ylabel('8th Column')
+plt.title('Scatter Plot with "CS" Points Highlighted')
+
+# Add legend
+plt.legend()
+
+# Show plot
+plt.show()
+```
