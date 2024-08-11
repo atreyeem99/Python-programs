@@ -6118,3 +6118,44 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+
+# Load the CSV file
+file_path = 'data.csv'  # Replace with your file path
+data = pd.read_csv(file_path)
+
+# Extract the data
+var1 = data['var1'].values
+energies_hartree = data['energies'].values
+
+# Convert energies from hartree to kcal/mol
+hartree2kcm = 627.509
+energies_kcal = energies_hartree * hartree2kcm
+
+# Create grid data for contour plot
+xi = np.linspace(var1.min(), var1.max(), 100)
+yi = np.linspace(energies_kcal.min(), energies_kcal.max(), 100)
+zi = griddata((var1, energies_kcal), energies_kcal, (xi[None, :], yi[:, None]), method='cubic')
+
+# Plotting the contour plot
+plt.figure(figsize=(10, 6))
+contour = plt.contourf(xi, yi, zi, levels=14, cmap='viridis')
+plt.colorbar(contour)
+
+# Adding labels and title
+plt.xlabel('var1')
+plt.ylabel('energies (kcal/mol)')
+plt.title('Contour Plot of Energies (kcal/mol) vs Var1')
+
+# Save the plot as a PDF file
+output_pdf_path = 'contour_plot.pdf'
+plt.savefig(output_pdf_path, format='pdf')
+
+# Show the plot
+plt.show()
+```
