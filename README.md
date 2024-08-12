@@ -6159,3 +6159,60 @@ plt.savefig(output_pdf_path, format='pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+import numpy as np
+import pandas as pd
+
+# Function to calculate errors between two columns
+def calculate_errors(data1, data2):
+    mse = round(np.mean(data1 - data2), 3)
+    mae = round(np.mean(np.abs(data1 - data2)), 3)
+    sde = round(np.std(data1 - data2), 3)
+    min_error = round(np.min(data1 - data2), 3)
+    max_error = round(np.max(data1 - data2), 3)
+    return mse, mae, sde, min_error, max_error
+
+# Read the CSV files
+csv_file1 = 'adc2_ccsdt_vtz.csv'  # Replace with your first CSV file path
+csv_file2 = 'adc2_ccsd_vtz.csv'  # Replace with your second CSV file path
+
+data1 = pd.read_csv(csv_file1)
+data2 = pd.read_csv(csv_file2)
+
+# Print the shape of data frames to debug
+print(f"Shape of data1: {data1.shape}")
+print(f"Shape of data2: {data2.shape}")
+
+# Convert columns to numeric, forcing errors to NaN and then dropping NaNs
+data1 = data1.apply(pd.to_numeric, errors='coerce')
+data2 = data2.apply(pd.to_numeric, errors='coerce')
+
+# Calculate errors for the specified column pairs
+results = []
+for col1, col2 in [(0, 0), (1, 1), (2, 2)]:  # Compare columns 1, 2, 3 (data1) with columns 1, 2, 3 (data2)
+    if col1 < data1.shape[1] and col2 < data2.shape[1]:  # Ensure columns exist
+        # Drop rows with NaN values in the relevant columns
+        valid_indices = ~data1.iloc[:, col1].isna() & ~data2.iloc[:, col2].isna()
+        if valid_indices.sum() > 0:  # Ensure there are valid data points
+            mse, mae, sde, min_error, max_error = calculate_errors(
+                data1.iloc[valid_indices, col1],
+                data2.iloc[valid_indices, col2]
+            )
+            results.append((col1, col2, mse, mae, sde, min_error, max_error))
+        else:
+            print(f"No valid data points for columns {col1+1} (File 1) and {col2+1} (File 2)")
+    else:
+        print(f"Column {col1+1} or Column {col2+1} is out of bounds")
+
+# Print results
+for result in results:
+    col1, col2, mse, mae, sde, min_error, max_error = result
+    print(f"Column {col1+1} (File 1) vs Column {col2+1} (File 2)")  # Adjusted for 0-indexing
+    print(f"Mean Signed Error (MSE): {mse}")
+    print(f"Mean Absolute Error (MAE): {mae}")
+    print(f"Standard Deviation Error (SDE): {sde}")
+    print(f"Min Error: {min_error}")
+    print(f"Max Error: {max_error}")
+    print()
+```
