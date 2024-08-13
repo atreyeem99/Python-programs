@@ -6216,3 +6216,47 @@ for result in results:
     print(f"Max Error: {max_error}")
     print()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_selected_columns(csv_file):
+    try:
+        # Read the CSV file into a DataFrame, assuming the first row is the header
+        # Use the 'on_bad_lines' parameter to skip lines with too many fields
+        df = pd.read_csv(csv_file, header=0, on_bad_lines='skip')
+
+        # Check if the required columns (1st, 3rd, 4th, and 5th) exist
+        if df.shape[1] < 5:
+            raise ValueError("The CSV file must contain at least 5 columns.")
+
+        # Generate x-axis values from the first column
+        x = df.iloc[:, 0].astype(float).to_numpy()
+
+        # Columns to plot: 3rd, 4th, and 5th (index 2, 3, and 4)
+        columns_to_plot = [2, 3, 4]
+        labels = ['col3', 'col4', 'col5']
+
+        for col_index, label in zip(columns_to_plot, labels):
+            try:
+                # Convert the column to numeric values
+                column = df.iloc[:, col_index].astype(float).to_numpy()
+                # Plot the data
+                plt.plot(x, column, label=label)
+            except ValueError:
+                print(f"Skipping non-numeric column: {df.columns[col_index]}")
+
+        plt.xlabel('Displacement [Å]')
+        plt.ylabel('E')
+        plt.title('Plot of Selected Columns from CSV File')
+        plt.legend()
+        plt.show()
+
+    except pd.errors.ParserError as e:
+        print(f"Error parsing the CSV file: {e}")
+
+# Usage example
+csv_file = 'Mol89_energies_wB97XD3_0.05.csv'  # Replace with the path to your CSV file
+plot_selected_columns(csv_file)
+```
