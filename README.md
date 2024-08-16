@@ -6302,3 +6302,19 @@ plt.ylabel('Value')
 plt.grid(True)
 plt.show()
 ```
+# DNC extract
+```
+#!/bin/bash
+
+# Define the output file
+output_file="output.txt"
+
+# Loop through all trajectory blocks in the output file
+for ((i=1; i<=41; i++)); do
+    echo "Trajectory $i:"
+    # Use grep and awk to extract the value under "DNC"
+    value=$(grep -A 5 "Trajectory\s*$i" "$output_file" | awk '/DNC/{getline; print $1}')
+    echo "Value under DNC: $value"
+    echo "---------------------"
+done
+```
