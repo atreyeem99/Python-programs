@@ -6318,3 +6318,53 @@ for ((i=1; i<=41; i++)); do
     echo "---------------------"
 done
 ```
+# Assignment 
+```
+import numpy as np
+import matplotlib.pyplot as plt
+import csv
+
+# Define the time periods
+days_1 = np.arange(1, 29)  # Days 1 to 28
+days_2 = np.arange(29, 57)  # Days 29 to 56
+
+# Define the weight functions
+def W1(t):
+    return 48 + 3.64*t + 0.6363*t**2 + 0.00963*t**3
+
+def W2(t):
+    return -1004 + 65.8*t
+
+# Calculate weights for both periods
+weights_1 = W1(days_1)
+weights_2 = W2(days_2)
+
+# Combine the days and weights into one array
+days_total = np.concatenate((days_1, days_2))
+weights_total = np.concatenate((weights_1, weights_2))
+
+# Plot the weight over the first 56 days
+plt.figure(figsize=(10, 6))
+plt.plot(days_1, weights_1, label='W1(t) for Days 1-28', color='blue')
+plt.plot(days_2, weights_2, label='W2(t) for Days 29-56', color='red')
+plt.xlabel('Days')
+plt.ylabel('Weight (grams)')
+plt.title('Bird Weight Over 56 Days')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Prepare the CSV data
+csv_data = np.column_stack((days_total, weights_total))
+
+# Save the CSV file
+csv_file_path = 'bird_weight_over_56_days.csv'
+header = ['Day', 'Weight']
+
+with open(csv_file_path, 'w', newline='') as csv_file:
+    writer = csv.writer(csv_file)
+    writer.writerow(header)
+    writer.writerows(csv_data)
+
+print(f"CSV file saved as {csv_file_path}")
+```
