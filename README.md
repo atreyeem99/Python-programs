@@ -6368,3 +6368,25 @@ with open(csv_file_path, 'w', newline='') as csv_file:
 
 print(f"CSV file saved as {csv_file_path}")
 ```
+#
+```
+import math
+
+def calculate_expression(k1, k2, k3, E12, E13, kB, T):
+    numerator = k1 + k2 * math.exp(E12 / (kB * T)) + k3 * math.exp(E13 / (kB * T))
+    denominator = 1 + math.exp(E12 / (kB * T)) + math.exp(E13 / (kB * T))
+    result = numerator / denominator
+    return result
+
+# Example usage:
+k1 = 1
+k2 = 2
+k3 = 3
+E12 = 10
+E13 = 20
+kB = 1.38e-23  # Boltzmann constant in Joules per Kelvin
+T = 300        # Temperature in Kelvin
+
+result = calculate_expression(k1, k2, k3, E12, E13, kB, T)
+print("Result:", result)
+```
