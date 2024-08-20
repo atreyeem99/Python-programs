@@ -6417,3 +6417,36 @@ if __name__ == "__main__":
     input_file = 'original.csv'  # Specify the CSV file
     print_sorted_differences(input_file)
 ```
+#
+```
+import csv
+
+def sort_by_difference(input_file):
+    # Read the contents of the CSV file
+    with open(input_file, 'r', newline='') as f:
+        reader = csv.reader(f)
+        header = next(reader)  # Read the header
+        data = list(reader)
+
+    # Calculate the difference between column 6 and column 5 and store it along with the corresponding row
+    diff_data = []
+    for row in data:
+        col_5 = float(row[5])
+        col_6 = float(row[6])
+        difference = col_6 - col_5
+        diff_data.append((difference, row))
+
+    # Sort the data based on the calculated difference
+    sorted_diff_data = sorted(diff_data, key=lambda x: x[0])
+
+    # Write the sorted data to a new CSV file
+    with open('sorted_result.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)  # Write the header
+        for _, row in sorted_diff_data:
+            writer.writerow(row)
+
+if __name__ == "__main__":
+    input_file = 'original.csv'  # Specify the CSV file
+    sort_by_difference(input_file)
+```
