@@ -6450,3 +6450,22 @@ if __name__ == "__main__":
     input_file = 'original.csv'  # Specify the CSV file
     sort_by_difference(input_file)
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Replace 'your_file.csv' with the path to your CSV file
+file_path = 'your_file.csv'
+
+# Read the CSV file without a header
+df = pd.read_csv(file_path, header=None)
+
+# Plot the 2nd column (index 1)
+plt.plot(df[1])
+plt.title('Plot of the 2nd Column')
+plt.xlabel('Index')
+plt.ylabel('Value')
+plt.grid(True)
+plt.show()
+```
