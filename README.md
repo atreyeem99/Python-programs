@@ -6469,3 +6469,28 @@ plt.ylabel('Value')
 plt.grid(True)
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Read the CSV file into a pandas DataFrame
+df = pd.read_csv('your_file.csv')
+
+# Group rows based on the values in the 5th column
+grouped_data = df.groupby(df.iloc[:, 4])
+
+# Initialize an empty dictionary to store grouped rows
+grouped_rows = {}
+
+# Iterate over each group
+for group_name, group_data in grouped_data:
+    # Store the rows of each group in the dictionary
+    grouped_rows[group_name] = group_data.values.tolist()
+
+# Print the grouped rows
+for key, value in grouped_rows.items():
+    print(f"Rows with value {key} in the 5th column:")
+    for row in value:
+        print(row)
+    print()
+```
