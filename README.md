@@ -6534,3 +6534,58 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV files without headers
+csv1 = 'tda_results.csv'
+csv2 = 'tddft_results.csv'
+
+df1 = pd.read_csv(csv1, header=None)
+df2 = pd.read_csv(csv2, header=None)
+
+# Filter the rows based on the given ranges
+filtered_df1 = df1[(df1.iloc[:, 8] >= 1.5) & (df1.iloc[:, 8] <= 4.0)]
+filtered_df2 = df2[(df2.iloc[:, 8] >= 0.0) & (df2.iloc[:, 8] <= 2.0)]
+
+# Find common indices in both filtered DataFrames
+common_indices = filtered_df1.index.intersection(filtered_df2.index)
+
+# Filter the DataFrames again to only include common indices
+filtered_df1 = filtered_df1.loc[common_indices]
+filtered_df2 = filtered_df2.loc[common_indices]
+
+# Plot a scatter plot
+plt.figure(figsize=(6, 6))
+plt.scatter(filtered_df1.iloc[:, 8], filtered_df2.iloc[:, 8], c='blue', label='Filtered Data')
+plt.xlabel('tda')
+plt.ylabel('tddft')
+plt.title('Scatter Plot')
+plt.legend()
+plt.grid(True)
+plt.axis('square')
+plt.show()
+
+# Prepare the data for output
+tda_column1 = filtered_df1.iloc[:, 0].reset_index(drop=True)
+tda_column2 = filtered_df1.iloc[:, 1].reset_index(drop=True)
+tda_column8 = filtered_df1.iloc[:, 8].astype(str).reset_index(drop=True)
+tddft_column8 = filtered_df2.iloc[:, 8].astype(str).reset_index(drop=True)
+
+# Combine columns with underscore
+combined_column8 = tda_column8 + '_' + tddft_column8
+
+# Create DataFrame for output
+combined_data = pd.DataFrame({
+    'Column1': tda_column1,
+    'Column2': tda_column2,
+    'CombinedColumn8': combined_column8
+})
+
+# Save to .smi file
+combined_data.to_csv('combined_results.smi', sep='\t', index=False, header=False)
+
+print("Data has been saved to 'combined_results.smi'.")
+```
