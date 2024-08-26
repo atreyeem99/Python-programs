@@ -6611,3 +6611,18 @@ for i in range(max_len):
     e_val = f"{E[i]:<20}" if i < len(E) else " " * 20
     print(f"{a_val} {b_val} {c_val} {d_val} {e_val}")
 ```
+#
+```
+import csv
+
+# Open the input CSV file ('a.csv') and create the output CSV file ('c.csv')
+with open('a.csv', 'r') as input_file, open('c.csv', 'w', newline='') as output_file:
+    # Create CSV reader and writer objects
+    reader = csv.reader(input_file)
+    writer = csv.writer(output_file)
+
+    # Iterate over each row in the input CSV file
+    for row in reader:
+        # Extract the first column from each row and write it to the output CSV file
+        writer.writerow([row[0]])
+```
