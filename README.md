@@ -6672,3 +6672,23 @@ plt.title('Bubble Sort Time Complexity')
 plt.grid(True)
 plt.show()
 ```
+```
+import time
+
+def bubble_sort(arr):
+    
+    start_time = time.time()
+
+    n = len(arr)
+    
+    for i in range(0,n-1):
+        for j in range(i+1,n):
+            if arr[j] < arr[i]:
+                arr[j], arr[i] = arr[i], arr[j]
+    
+    end_time = time.time()
+    
+    elapsed_time = end_time - start_time
+    
+    return arr, elapsed_time
+```
