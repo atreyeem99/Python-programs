@@ -6692,3 +6692,81 @@ def bubble_sort(arr):
     
     return arr, elapsed_time
 ```
+```
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def bubble_sort(arr):
+    start_time = time.time()
+    n = len(arr)
+    for i in range(0, n-1):
+        for j in range(i+1, n):
+            if arr[j] < arr[i]:
+                arr[j], arr[i] = arr[i], arr[j]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    return arr, elapsed_time
+
+def measure_time(N):
+     arr = np.random.rand(N) * 100
+    # Sort the array and measure time taken
+     start_time = time.time()
+     sorted_array = bubble_sort(arr)
+     end_time = time.time()
+     time_bubble = end_time - start_time
+     return time_bubble
+
+def measure_time2(N):
+     arr = np.random.rand(N) * 100
+     start_time = time.time()
+     sorted_array = np.sort(arr, kind='quicksort')
+     end_time = time.time()
+     time_quicksort = end_time - start_time
+     return  time_quicksort
+
+def measure_time3(N):
+     arr = np.random.rand(N) * 100
+     start_time = time.time()
+     sorted_array = np.sort(arr, kind='mergesort')
+     end_time = time.time()
+     time_mergesort = end_time - start_time
+     return time_mergesort
+
+def measure_time4(N):
+     arr = np.random.rand(N) * 100
+     start_time = time.time()
+     sorted_array = np.sort(arr, kind='heapsort')
+     end_time = time.time()
+     time_heapsort = end_time - start_time
+     return time_heapsort
+
+# Array sizes from 2^0 to 2^12
+array_sizes = [2**i for i in range(13)]
+times = []
+
+# Time taken for each array size
+print("bubblesort")
+for N in array_sizes:
+    t = measure_time(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+
+print("quicksort")
+for N in array_sizes:
+    t = measure_time2(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+
+print("mergesort")
+for N in array_sizes:
+    t = measure_time3(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+
+print("heapsort")
+for N in array_sizes:
+    t = measure_time4(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+```
