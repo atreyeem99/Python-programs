@@ -6770,3 +6770,45 @@ for N in array_sizes:
     times.append(t)
     print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
 ```
+#
+```
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def bubble_sort(arr):
+    start_time = time.time()
+    n = len(arr)
+    for i in range(0, n-1):
+        for j in range(i+1, n):
+            if arr[j] < arr[i]:
+                arr[j], arr[i] = arr[i], arr[j]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    return arr, elapsed_time
+
+def measure_time(N):
+    arr = np.random.rand(N) * 100
+    # Sort the array and measure time taken
+    _, elapsed_time = bubble_sort(arr)
+    return elapsed_time
+
+# Array sizes from 2^0 to 2^12
+array_sizes = [2**i for i in range(13)]
+times = []
+
+# Time taken for each array size
+for N in array_sizes:
+    t = measure_time(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+
+# Plotting the results
+plt.figure(figsize=(10, 6))
+plt.plot(array_sizes, times, marker='o', linestyle='--', color='b')
+plt.xlabel('Array Size (N)')
+plt.ylabel('Time (seconds)')
+plt.title('Bubble Sort Time Complexity')
+plt.grid(True)
+plt.show()
+```
