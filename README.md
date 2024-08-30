@@ -6886,3 +6886,49 @@ plt.grid(True)
 plt.xscale('log', base=2)
 plt.show()
 ```
+#
+```
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def bubble_sort(arr):
+    start_time = time.time()
+    n = len(arr)
+    for i in range(0, n-1):
+        for j in range(i+1, n):
+            if arr[j] < arr[i]:
+                arr[j], arr[i] = arr[i], arr[j]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    return arr, elapsed_time
+
+def measure_time(N):
+    # Generate a random array of size N with values between 0 and 100
+    arr = np.random.rand(N) * 100
+    # Sort the array and measure time taken
+    _, elapsed_time = bubble_sort(arr)
+    return elapsed_time
+
+# Array sizes to test
+array_sizes = [10, 100, 1000, 10000]
+times = []
+
+# Measure the time taken for each array size
+for N in array_sizes:
+    t = measure_time(N)
+    times.append(t)
+    print(f"Time taken to sort array of size {N}: {t:.5f} seconds")
+
+# Plotting the results
+plt.figure(figsize=(10, 6))
+plt.plot(array_sizes, times, marker='o', linestyle='--', color='b')
+plt.xlabel('Array Size (N)')
+plt.ylabel('Time Taken (seconds)')
+plt.title('Bubble Sort Time Complexity')
+plt.grid(True)
+plt.show()
+
+# Comment on the shape of the function
+print("The shape of the function is expected to be quadratic since bubble sort has a time complexity of O(N^2). As N increases, the time taken grows significantly.")
+```
