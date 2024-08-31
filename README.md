@@ -6932,3 +6932,37 @@ plt.show()
 # Comment on the shape of the function
 print("The shape of the function is expected to be quadratic since bubble sort has a time complexity of O(N^2). As N increases, the time taken grows significantly.")
 ```
+#csv file modification
+```
+import csv
+
+# Define the input and output CSV file paths
+input_file = 'input.csv'
+output_file = 'output.csv'
+
+# Open the input CSV file for reading
+with open(input_file, 'r') as infile:
+    reader = csv.reader(infile)
+    
+    # Open the output CSV file for writing
+    with open(output_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        
+        # Skip the header in the input file
+        header = next(reader)
+        
+        # Write the header for the new column
+        writer.writerow(['New Column'])
+        
+        # Process each row
+        for row in reader:
+            # Check the value of the 3rd column (index 2)
+            value = float(row[2])
+            if value < 0.8:
+                new_value = 1
+            else:
+                new_value = 0
+            
+            # Write the new value as a single-column row in the output file
+            writer.writerow([new_value])
+```
