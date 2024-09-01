@@ -6966,3 +6966,27 @@ with open(input_file, 'r') as infile:
             # Write the new value as a single-column row in the output file
             writer.writerow([new_value])
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the function for Cv as a function of y = kBT/hv
+def Cv(y):
+    return 3 * y**2 * np.exp(1/y) / (np.exp(1/y) - 1)**2
+
+# Generate values for y
+y_values = np.linspace(0.01, 10, 500)
+Cv_values = Cv(y_values)
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(y_values, Cv_values, label=r"$C_V$ as a function of $\frac{k_B T}{h \nu}$")
+plt.xlabel(r"$\frac{k_B T}{h \nu}$", fontsize=14)
+plt.ylabel(r"$C_V/Nk_B$", fontsize=14)
+plt.title(r"Einstein's Heat Capacity Model", fontsize=16)
+plt.axhline(y=3, color='red', linestyle='--', label="Dulong-Petit Law")
+plt.legend()
+plt.grid(True)
+plt.show()
+```
