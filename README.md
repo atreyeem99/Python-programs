@@ -7106,3 +7106,28 @@ plt.title('Bubble Sort Time Complexity')
 plt.grid(True)
 plt.show()
 ```
+#
+```import pandas as pd
+
+def process_csv(input_file, output_file):
+    # Read the CSV file without headers
+    df = pd.read_csv(input_file, header=None)
+
+    # Perform the calculation: column 3 - (2 * column 9)
+    df['score'] = df[2] - (2 * df[8])
+
+    # Assign 0 or 1 based on the result
+    df['score'] = df['score'].apply(lambda x: 0 if x < 0 else 1)
+
+    # Print the 2nd column (index 1) of rows with score 1
+    for value in df[df['score'] == 1][1]:
+        print(value)
+
+    # Write only the 'score' column to the output CSV file
+    df[['score']].to_csv(output_file, header=False, index=False)
+
+# Example usage:
+input_csv_file = 'tda_results.csv'
+output_csv_file = 'score_tda.csv'
+process_csv(input_csv_file, output_csv_file)
+```
