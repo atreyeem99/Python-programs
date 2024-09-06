@@ -7157,3 +7157,38 @@ for folder in "$root_dir"/Mol*/; do
     fi
 done
 ```
+#
+```
+import os
+import re
+
+# Define the directory where the folders are located
+root_dir = '/path/to/root/directory'
+
+# Define the regex pattern to extract the numeric value after "="
+pattern = re.compile(r'MP2/DEF2-SVP//MP2/DEF2-SVP energy=\s*(-?\d+\.\d+)')
+
+# Function to extract numeric value from opt.out file
+def extract_numeric_value(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            match = pattern.search(line)
+            if match:
+                numeric_value = float(match.group(1))
+                return numeric_value
+    return None
+
+# Iterate through folders starting with "Mol"
+for folder_name in os.listdir(root_dir):
+    if folder_name.startswith("Mol") and os.path.isdir(os.path.join(root_dir, folder_name)):
+        folder_path = os.path.join(root_dir, folder_name)
+        opt_out_path = os.path.join(folder_path, "opt.out")
+        if os.path.exists(opt_out_path):
+            numeric_value = extract_numeric_value(opt_out_path)
+            if numeric_value is not None:
+                print(f"Folder: {folder_name}, Numeric value: {numeric_value}")
+            else:
+                print(f"No numeric value found in opt.out file of folder {folder_name}")
+        else:
+            print(f"opt.out file not found in folder {folder_name}")
+```
