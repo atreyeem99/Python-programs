@@ -7192,3 +7192,44 @@ for folder_name in os.listdir(root_dir):
         else:
             print(f"opt.out file not found in folder {folder_name}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# List of CSV file paths
+csv_files = ['data_MP2.csv', 'data_wB97XD3.csv', 'data_B3LYP.csv', 'data_PBE0.csv', 'data_PBE.csv']
+labels = ['a', 'b', 'c', 'd', 'e']
+
+# Initialize a plot
+plt.figure(figsize=(10, 6))
+
+# Store all the data in a list to determine a common zoom range
+all_data = []
+
+# Loop through each file and plot the density of the 6th column
+for file, label in zip(csv_files, labels):
+    df = pd.read_csv(file)
+    if df.shape[1] > 5:  # Ensure the file has at least 6 columns
+        data = df.iloc[:, 5]  # Extract the 6th column
+        all_data.append(data)
+        data.plot(kind='density', label=label)
+
+# Combine all data to find the zoom range
+combined_data = pd.concat(all_data)
+
+# Manually set x-axis limits for zooming in (adjust these values based on your data)
+plt.xlim(left=combined_data.min() - 1, right=combined_data.max() + 1)
+
+# Customize the plot
+plt.title('Density Plots of the 6th Column from Each CSV File')
+plt.xlabel('Values')
+plt.ylabel('Density')
+plt.legend()
+
+# Save the plot as a PDF
+plt.savefig('density_plot.pdf')
+
+# Show the plot
+plt.show()
+```
