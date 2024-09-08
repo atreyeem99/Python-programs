@@ -7233,3 +7233,50 @@ plt.savefig('density_plot.pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# List of CSV file paths
+csv_files = ['data_MP2.csv', 'data_wB97XD3.csv', 'data_B3LYP.csv', 'data_PBE0.csv', 'data_PBE.csv']
+
+# Initialize a plot
+plt.figure(figsize=(10, 6))
+
+# Store all the data in a list to determine a common zoom range
+all_data = []
+
+# Loop through each file and plot the density of the 6th column
+for file in csv_files:
+    df = pd.read_csv(file)
+    if df.shape[1] > 5:  # Ensure the file has at least 6 columns
+        data = df.iloc[:, 5]  # Extract the 6th column
+        all_data.append(data)
+        data.plot(kind='density', label=file)
+
+# Combine all data to find the zoom range
+combined_data = pd.concat(all_data)
+
+# Calculate zoom range around the median and interquartile range
+median = combined_data.median()
+q1 = combined_data.quantile(0.25)
+q3 = combined_data.quantile(0.75)
+iqr = q3 - q1
+zoom_range = (median - 1.5 * iqr, median + 1.5 * iqr)
+
+# Customize the plot
+plt.title('Density Plots of the 6th Column from Each CSV File')
+plt.xlabel('Values')
+plt.ylabel('Density')
+plt.legend()
+
+# Set x-axis limits to zoom in
+plt.xlim(zoom_range)
+
+# Save the plot as a PDF
+plt.savefig('density_plot.pdf')
+
+# Show the plot
+plt.show()
+```
