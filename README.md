@@ -7280,3 +7280,35 @@ plt.savefig('density_plot.pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+import csv
+import numpy as np
+
+def calculate_errors(data):
+    # Extracting columns
+    second_column = data[:, 1].astype(float)
+    third_column = data[:, 2].astype(float)
+    
+    # Calculating errors
+    mae_third = np.mean(np.abs(second_column - third_column))
+    mse_third = np.mean((second_column - third_column)**2)
+    std_third = np.std(second_column - third_column)
+    
+    return mae_third, mse_third, std_third
+
+def main(csv_file):
+    with open(csv_file, 'r') as file:
+        reader = csv.reader(file)
+        data = np.array(list(reader))
+    
+    mae_third, mse_third, std_third = calculate_errors(data)
+    
+    print(f"MAE of the third column: {mae_third}")
+    print(f"MSE of the third column: {mse_third}")
+    print(f"Standard Deviation of the third column: {std_third}")
+
+if __name__ == "__main__":
+    csv_file_path = "data.csv"  # Replace with your CSV file path
+    main(csv_file_path)
+```
