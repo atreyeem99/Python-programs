@@ -7312,3 +7312,75 @@ if __name__ == "__main__":
     csv_file_path = "data.csv"  # Replace with your CSV file path
     main(csv_file_path)
 ```
+#
+```
+import re
+
+def read_indices(file_path):
+    """Reads indices from a file."""
+    with open(file_path, 'r') as f:
+        return f.read().splitlines()
+
+def backup_file(input_file, backup_file):
+    """Creates a backup of the input file."""
+    with open(input_file, 'r') as f:
+        content = f.read()
+    with open(backup_file, 'w') as f:
+        f.write(content)
+
+def replace_carbon_with_nitrogen(content, carbon_idx, hydrogen_atom=None):
+    """Replaces carbon atom with nitrogen and removes associated hydrogen if applicable."""
+    nitrogen_atom = f'N{carbon_idx[1:]}'  # Replace 'C' with 'N' but keep the index
+
+    # Replace the carbon with nitrogen in the Z-matrix
+    content = re.sub(rf'\b{carbon_idx}\b', nitrogen_atom, content)
+
+    # If a hydrogen atom is associated, remove its lines
+    if hydrogen_atom:
+        content = re.sub(rf'\n.*{hydrogen_atom}.*', '', content)
+
+    return content
+
+def main():
+    input_file = '1AP_c2v.com'
+    output_file = 'opt.com'
+    indices_file = 'indscr.txt'
+    hydrogen_mapping = {
+        'C6': 'H15',
+        'C7': 'H16',
+        'C8': 'H17',
+        'C9': 'H18',
+        'C10': 'H19',
+        'C11': 'H20',
+        'C12': 'H21',
+        'C13': 'H22',
+        'C14': 'H23'
+    }
+
+    # Read indices and original input file
+    indices = read_indices(indices_file)
+    
+    # Read the original geometry from the input file
+    with open(input_file, 'r') as f:
+        content = f.read()
+
+    # Process each index (replace carbon with nitrogen and remove associated hydrogen)
+    for index in indices:
+        carbon_atom = f'C{index}'
+        hydrogen_atom = hydrogen_mapping.get(carbon_atom)
+
+        # Create a backup before making changes
+        backup_file(input_file, 'backup_inp_scr.com')
+
+        # Replace carbon with nitrogen and remove hydrogens
+        content = replace_carbon_with_nitrogen(content, carbon_atom, hydrogen_atom)
+
+    # Write the modified content to the output file
+    with open(output_file, 'w') as f:
+        f.write(content)
+
+    print(f'Processed file saved as {output_file}')
+
+if __name__ == '__main__':
+    main()
+```
