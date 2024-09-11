@@ -7384,3 +7384,41 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+#
+```
+#!/bin/bash
+
+# Define directories to process
+directories=("1_2_3_4_5_6_7_9_octaaza_C2v" 
+             "1_2_3_4_6_7_9_heptaaza_C2v" 
+             "1_2_3_6_7_pentaaza_C2v" 
+             "1_2_5_6_8_pentaaza_C2v" 
+             "1_3_4_6_8_pentaaza_C2v" 
+             "1_3_6_7_tetraaza_C2v" 
+             "1_6_biaza_C2v")
+
+# Loop over directories
+for dir in "${directories[@]}"
+do
+    echo "Processing folder: $dir"
+
+    # Copy template file to the directory
+    cp 1AP_c2v.com $dir/1AP_c2v.com
+
+    # Move to the directory
+    cd $dir
+
+    # Run the Python script to generate the input file
+    python3 ../make_inp.py
+
+    # Rename the generated opt.com file for clarity
+    mv opt.com "${dir}_opt.com"
+
+    # Go back to the parent directory
+    cd ..
+
+    echo "Processed folder: $dir"
+done
+
+echo "All folders processed!"
+```
