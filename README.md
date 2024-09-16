@@ -7535,3 +7535,35 @@ def bubble_sort(arr):
             if arr[j] < arr[i]:
                 arr[j
 ```
+#
+```
+#!/bin/bash
+
+# Ensure the script is executable
+chmod +x make_inp.py
+
+# Read the number of molecules from indices.txt
+Nmols=$(wc -l < indices.txt)
+
+for imol in $(seq $Nmols); do
+  # Get the folder name from folders.txt
+  folder=$(sed -n "${imol}p" folders.txt)
+  
+  # Extract the current index from indices.txt
+  sed -n "${imol}p" indices.txt > indscr.txt
+  
+  # Create the folder if it doesn't exist
+  mkdir -p "../$folder"
+  
+  # Copy the template file and run the Python script
+  cp 1AP_c2v.com inp_scr.com
+  python3 make_inp.py
+
+  # Move the generated opt.com to the new folder
+  mv opt.com "../$folder"
+
+  echo "Processed folder: $folder"
+done
+
+echo "All folders processed!"
+```
