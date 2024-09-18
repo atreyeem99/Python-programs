@@ -7641,3 +7641,76 @@ plt.grid(True)
 plt.xscale('log', base=2)
 plt.show()
 ```
+#
+```
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def bubble_sort(arr):
+    n = len(arr)
+    start_time = time.time()
+    for i in range(n-1):
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    return elapsed_time
+
+# Define the size range
+sizes = range(20, 213)
+
+# Initialize lists to store times
+times_bubble = []
+times_quicksort = []
+times_mergesort = []
+times_heapsort = []
+
+for size in sizes:
+    array = np.random.rand(size)
+    
+    # Bubble Sort
+    times_bubble.append(bubble_sort(array.copy()))
+    
+    # Quick Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='quicksort')
+    end_time = time.time()
+    times_quicksort.append(end_time - start_time)
+    
+    # Merge Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='mergesort')
+    end_time = time.time()
+    times_mergesort.append(end_time - start_time)
+    
+    # Heap Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='heapsort')
+    end_time = time.time()
+    times_heapsort.append(end_time - start_time)
+
+# Plotting the results
+plt.figure(figsize=(10, 6))
+
+# Plot the CPU times
+plt.plot(sizes, times_bubble, label='Bubble Sort', marker='o')
+plt.plot(sizes, times_quicksort, label='Quick Sort', marker='o')
+plt.plot(sizes, times_mergesort, label='Merge Sort', marker='o')
+plt.plot(sizes, times_heapsort, label='Heap Sort', marker='o')
+
+# Plot aN^2 and bNlog(N)
+a = 1e-7  # Adjustable constant
+b = 1e-6  # Adjustable constant
+plt.plot(sizes, [a*(n**2) for n in sizes], label='$aN^2$', linestyle='--')
+plt.plot(sizes, [b*n*np.log(n) for n in sizes], label='$bN\log(N)$', linestyle='--')
+
+# Labeling the plot
+plt.xlabel('Array Size (N)')
+plt.ylabel('CPU Time (s)')
+plt.title('CPU Time for Various Sorting Algorithms')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
