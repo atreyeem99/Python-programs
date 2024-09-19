@@ -7714,3 +7714,44 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
+#
+```for f in tddft/*/tddft.log; do
+   T1=$(grep 'Excited State '  $f | grep Triplet | head -1 | awk '{printf "%7.4f\n", $5}' )
+   T2=$(grep 'Excited State '  $f | grep Triplet | head -2 | tail -1 | awk '{printf "%7.4f\n", $5}' )
+   S1=$(grep 'Excited State '  $f | grep Singlet | head -1 | awk '{printf "%7.4f\n", $5}' )
+   S2=$(grep 'Excited State '  $f | grep Singlet | head -2 | tail -1 | awk '{printf "%7.4f\n", $5}' )
+   S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+   S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+   echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
+done
+
+f=SCS-PBE-QIDH/TDDFT/tddft.out.bz2
+S1=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f | tail -12 | head -1 | awk '{printf "%7.4f\n", $2}' )
+S2=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f | tail -12 | head -2 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+T1=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f | tail -12 | head -7 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+T2=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f | tail -12 | head -8 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+
+S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
+echo "--------------"
+for f in tda/*/tddft.log; do
+   T1=$(grep 'Excited State '  $f | grep Triplet | head -1 | awk '{printf "%7.4f\n", $5}' )
+   T2=$(grep 'Excited State '  $f | grep Triplet | head -2 | tail -1 | awk '{printf "%7.4f\n", $5}' )
+   S1=$(grep 'Excited State '  $f | grep Singlet | head -1 | awk '{printf "%7.4f\n", $5}' )
+   S2=$(grep 'Excited State '  $f | grep Singlet | head -2 | tail -1 | awk '{printf "%7.4f\n", $5}' )
+   S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+   S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+   echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
+done
+
+f=SCS-PBE-QIDH/TDA/tddft.out.bz2
+S1=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f  | tail -12 | head -1 | awk '{printf "%7.4f\n", $2}' )
+S2=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f  | tail -12 | head -2 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+T1=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f  | tail -12 | head -7 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+T2=$(bzgrep -A16  '        ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' $f  | tail -12 | head -8 | tail -1 | awk '{printf "%7.4f\n", $2}' )
+
+S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
+echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
+```
