@@ -7755,3 +7755,37 @@ S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
 ```
+#
+```
+import csv
+
+# Define the input and output CSV file paths
+input_file = 'input.csv'
+output_file = 'output.csv'
+
+# Open the input CSV file for reading
+with open(input_file, 'r') as infile:
+    reader = csv.reader(infile)
+    
+    # Open the output CSV file for writing
+    with open(output_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        
+        # Skip the header in the input file
+        header = next(reader)
+        
+        # Write the header for the new column
+        writer.writerow(['New Column'])
+        
+        # Process each row
+        for row in reader:
+            # Check the value of the 3rd column (index 2)
+            value = float(row[2])
+            if value < 0.8:
+                new_value = 1
+            else:
+                new_value = 0
+            
+            # Write the new value as a single-column row in the output file
+            writer.writerow([new_value])
+```
