@@ -7836,3 +7836,28 @@ for imol in range(Nmol):
 
 geom_file.close()
 ```
+#
+```import subprocess
+
+def convert_gbw_to_molden(gbw_file):
+    # Construct the command to convert the .gbw file to .molden.input
+    command = f"/home/Lib/ORCA_600/orca_2mkl {gbw_file} -molden"
+    
+    try:
+        # Run the command using subprocess
+        process = subprocess.run(command, shell=True, check=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        
+        # Output the result of the conversion
+        print("Conversion successful!")
+        print("Output:\n", process.stdout)
+        
+    except subprocess.CalledProcessError as e:
+        # Handle the error and print out what went wrong
+        print(f"Error during conversion:\n{e.stderr}")
+
+if __name__ == "__main__":
+    # Replace 'tda' with the actual name of your .gbw file (without the .gbw extension)
+    gbw_file = "tda"
+    convert_gbw_to_molden(gbw_file)
+```
