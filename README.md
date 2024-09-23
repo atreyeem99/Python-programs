@@ -7861,3 +7861,44 @@ if __name__ == "__main__":
     gbw_file = "tda"
     convert_gbw_to_molden(gbw_file)
 ```
+#
+```
+import subprocess
+import time
+
+def run_multiwfn():
+    # Open Multiwfn with the specified input file
+    process = subprocess.Popen(['Multiwfn', 'tda.molden.input'], 
+                               stdin=subprocess.PIPE, 
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               text=True)
+    
+    # Define the sequence of inputs to Multiwfn
+    inputs = [
+        "18\n",                                  # Select option 18
+        "14\n",                                  # Select option 14
+        "/home/atreyee/project/azulene/NTO/tda.out\n",  # Provide the path to the file
+        "3\n",                                   # Select option 3
+        "1-6\n",                                 # Specify states 1-6
+        "q\n"                                    # Exit
+    ]
+    
+    # Send inputs to Multiwfn, with a slight delay between each
+    for input_command in inputs:
+        process.stdin.write(input_command)
+        process.stdin.flush()
+        time.sleep(0.5)  # Adjust the delay as necessary depending on your system's speed
+
+    # Wait for the process to finish
+    stdout, stderr = process.communicate()
+    
+    # Output the result for debugging
+    if stdout:
+        print("Multiwfn Output:\n", stdout)
+    if stderr:
+        print("Multiwfn Errors:\n", stderr)
+
+if __name__ == "__main__":
+    run_multiwfn()
+```
