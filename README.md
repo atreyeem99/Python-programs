@@ -7902,3 +7902,40 @@ def run_multiwfn():
 if __name__ == "__main__":
     run_multiwfn()
 ```
+#
+```
+import numpy as np
+
+# Define the function f(a)
+def f(a):
+    return a**2 - 4  # Example function, modify as needed
+
+# Bisection method parameters
+thv = 1e-6  # Tolerance value
+dx = 999  # Initial difference
+a = 1  # Lower bound
+b = 6  # Upper bound
+xmid_old = b
+steps = 0  # Step counter
+
+# Bisection method loop
+while dx > thv:
+    xmid = (a + b) / 2  # Midpoint
+    dx = np.abs(xmid - xmid_old)  # Update difference
+    
+    fa = f(a)
+    fb = f(b)
+    fmid = f(xmid)
+
+    if fmid * fb > 0:
+        b = xmid
+    else:
+        a = xmid
+    
+    xmid_old = xmid  # Update the old midpoint
+    steps += 1  # Increment step counter
+
+# Output the root found and the number of steps
+print(f"Root is approximately: {xmid}")
+print(f"Number of steps: {steps}")
+```
