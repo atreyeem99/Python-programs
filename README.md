@@ -8007,3 +8007,28 @@ while dx > thv:
 # Output the root found
 print(f"Root is approximately: {xmid}")
 ```
+#
+```
+from itertools import product
+
+def multi_dim_sum(dimensions):
+    # dimensions is a list like [N1, N2, ..., Nm]
+    
+    # Generate all possible combinations of indices using itertools.product
+    all_combinations = product(*(range(N + 1) for N in dimensions))
+    
+    total_sum = 0
+    
+    # Iterate over each combination and sum the values
+    for combination in all_combinations:
+        total_sum += sum(combination)
+    
+    return total_sum
+
+# Example usage:
+N1 = 3
+N2 = 4
+N3 = 2
+print(multi_dim_sum([N1, N2]))    # 2D summation
+print(multi_dim_sum([N1, N2, N3])) # 3D summation
+```
