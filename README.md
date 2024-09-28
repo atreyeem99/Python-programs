@@ -8064,3 +8064,43 @@ done
 
 echo "All folders processed!"
 ```
+#
+```
+#!/bin/bash
+
+# Get the number of molecules
+Nmols=$(wc -l < indices.txt)
+
+# Loop over each molecule index
+for imol in $(seq 1 $Nmols); do
+
+  # Extract the folder name and indices for the current molecule
+  folder=$(sed -n "${imol}p" folders.txt)
+  sed -n "${imol}p" indices.txt > indscr.txt
+  
+  # Create the directory if it doesn't exist
+  mkdir -p "../$folder"
+
+  echo "Processing folder: $folder"
+
+  # Copy the template file to the folder
+  cp 1AP_c2v.com "$folder/1AP_c2v.com"
+
+  # Move to the directory
+  cd "$folder"
+
+  # Run the Python script to generate the input file
+  python3 ../make_inp.py
+
+  # Move the generated opt.com file to the parent directory
+  mv opt.com "../$folder/${folder}_opt.com"
+
+  # Go back to the parent directory
+  cd ..
+
+  echo "Processed folder: $folder"
+
+done
+
+echo "All folders processed!"
+```
