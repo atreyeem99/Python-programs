@@ -8104,3 +8104,38 @@ done
 
 echo "All folders processed!"
 ```
+#
+```
+import numpy as np
+
+# Define the function f(a)
+def f(a):
+    return a**2 - 4  # Example function, modify as needed
+
+# Bisection method parameters
+thv = 1e-6  # Tolerance value
+dx = 999  # Initial difference
+a = 1  # Lower bound
+b = 6  # Upper bound
+xmid_old = b
+
+# Bisection method loop
+while dx > thv:
+    xmid = (a + b) / 2  # Midpoint
+    dx = np.abs(xmid - xmid_old)  # Update difference
+    
+    fa = f(a)
+    fb = f(b)
+    fmid = f(xmid)
+
+    if fmid * fb > 0:
+        b = xmid
+    else:
+        a = xmid
+    
+    xmid_old = xmid  # Update the old midpoint
+
+# Output the root found
+print(f"Root is approximately: {xmid}")
+
+``
