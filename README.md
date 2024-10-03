@@ -8261,3 +8261,49 @@ S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
 ```
+#
+folders
+
+dist_file=dist.csv
+angle_file=angle.csv
+
+# Loop over folders starting with 1 in CCSD_VDZ, CCSD_VTZ, and CCSDT_VDZ directories
+for folder in ../${CCSDT_VDZ_dir}/1*; do
+  mol=$(basename "$folder")
+
+  # Create corresponding folder directly in the existing extrapolate directory
+  mkdir -p ${mol}
+
+  # Get the number of coordinates from the CCSDT_VDZ folder
+  Ncoord=$(grep 'Number of displacements for' ../${CCSDT_VDZ_dir}/${mol}/opt.log | head -1 | awk '{print $7/2}')
+
+  # Extract optimized variables from the respective opt.out files
+  grep -$Ncoord ' Optimized variables' ../$CCSD_VDZ_dir/${mol}/opt.out | tail -$Ncoord > ${mol}/CCSD_VDZ.txt
+  grep -$Ncoord ' Optimized variables' ../$CCSD_VTZ_dir/${mol}/opt.out | tail -$Ncoord > ${mol}/CCSD_VTZ.txt
+  grep -$Ncoord ' Optimized variables' ../$CCSDT_VDZ_dir/${mol}/opt.out | tail -$Ncoord > ${mol}/CCSDT_VDZ.txt
+
+  # Create distance and angle files
+  paste -d ' ' ${mol}/CCSDT_VDZ.txt ${mol}/CCSD_VTZ.txt ${mol}/CCSD_VDZ.txt | column -t | grep ANG | awk '{print $2+$5-$8","$11}' > ${mol}/$dist_file
+  paste -d ' ' ${mol}/CCSDT_VDZ.txt ${mol}/CCSD_VTZ.txt ${mol}/CCSD_VDZ.txt | column -t | grep DEGREE | awk '{print $2+$5-$8","$11}' > ${mol}/$angle_file
+
+  # Create test.com from opt.com inside the subfolder
+  cp ../$CCSDT_VDZ_dir/${mol}/opt.com ${mol}/test.com
+
+  # Modify test.com
+  sed -i '/ANG/d' ${mol}/test.com
+  sed -i '/DEGREE/d' ${mol}/test.com
+  sed -i '/basis/d' ${mol}/test.com
+  sed -i '/hf/d' ${mol}/test.com
+  sed -i '/ccsd/d' ${mol}/test.com
+  sed -i '/opt/d' ${mol}/test.com
+
+  # Add necessary data to test.com
+  paste -d ' ' ${mol}/CCSDT_VDZ.txt ${mol}/CCSD_VTZ.txt ${mol}/CCSD_VDZ.txt | column -t | awk '{print $1,$2+$5-$8,$3}' | column -t >> ${mol}/test.com
+
+  # Add additional commands to the input file
+  echo "" >> ${mol}/test.com
+  echo "basis=STO-3G" >> ${mol}/test.com
+  echo "hf" >> ${mol}/test.com
+  echo "put,XYZ,test.xyz" >> ${mol}/test.com
+done
+
