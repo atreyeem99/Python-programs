@@ -8307,3 +8307,65 @@ for folder in ../${CCSDT_VDZ_dir}/1*; do
   echo "put,XYZ,test.xyz" >> ${mol}/test.com
 done
 
+```
+#
+```import os
+import shutil
+
+# Define the paths
+extrapolate_folder = './extrapolate'
+adc2_folder = './adc2'
+
+# Create the adc2 folder if it doesn't exist
+if not os.path.exists(adc2_folder):
+    os.makedirs(adc2_folder)
+
+# Loop through each folder inside extrapolate
+for folder_name in os.listdir(extrapolate_folder):
+    folder_path = os.path.join(extrapolate_folder, folder_name)
+    
+    # Check if it is a directory
+    if os.path.isdir(folder_path):
+        xyz_file = os.path.join(folder_path, 'test.xyz')
+        
+        # Read the test.xyz file, skipping the first two lines
+        with open(xyz_file, 'r') as xyz:
+            lines = xyz.readlines()[2:]
+        
+        # Prepare the Q-Chem input template
+        qchem_input = '''$molecule
+  0  1
+
+'''
+        # Add coordinates
+        qchem_input += ''.join(lines)
+        qchem_input += '''$end
+
+$rem
+jobtype             sp
+method              adc(2)
+basis               cc-pVTZ
+aux_basis           rimp2-cc-pVTZ
+mem_total           64000
+mem_static          1000
+maxscf              1000
+cc_symmetry         false
+ee_singlets         3
+ee_triplets         3
+sym_ignore          true
+ADC_DAVIDSON_MAXITER 300
+ADC_DAVIDSON_CONV 5
+$end
+'''
+        
+        # Create the corresponding folder inside adc2
+        new_folder = os.path.join(adc2_folder, folder_name)
+        os.makedirs(new_folder, exist_ok=True)
+        
+        # Write the all.com file inside the new folder
+        allcom_file = os.path.join(new_folder, 'all.com')
+        with open(allcom_file, 'w') as allcom:
+            allcom.write(qchem_input)
+
+print("Files created successfully!")
+```
