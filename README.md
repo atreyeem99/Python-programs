@@ -8411,3 +8411,51 @@ S2_2T1=$( echo $S2 $T1 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 S2_2T2=$( echo $S2 $T2 | awk '{printf "%7.4f\n", $1-2*$2 }' )
 echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
 ```
+#
+```
+import os
+
+Nmol = 2285
+geomfile = '33059_bnpah_TPSSh_def2SVP.xyz'
+
+filedir = os.getcwd()
+
+geom_file = open(geomfile, 'r')
+
+for imol in range(Nmol):
+    line = geom_file.readline().strip()
+    
+    if line:
+        Nat = int(line)
+        title = geom_file.readline().strip()
+
+        mol = "Mol_{:05d}".format(imol+1)
+        print(mol)
+
+        # Create directory for each molecule
+        mol_dir = os.path.join(filedir, mol)
+        os.mkdir(mol_dir)
+
+        # Read coordinates and write the sp.com file
+        sp_file = os.path.join(mol_dir, 'sp.com')
+        with open(sp_file, 'w') as inputfile:
+            # Write Gaussian header
+            inputfile.write('%mem=8GB\n')
+            inputfile.write('%nprocs=2\n')
+            inputfile.write('#RHF/cc-pvdz stable\n\n')
+            inputfile.write(f'{mol}\n\n')
+            inputfile.write('0 1\n')  # Charge and multiplicity
+            
+            # Write coordinates, skipping the first 2 lines
+            for iat in range(1, Nat + 1):
+                line = geom_file.readline().split()
+                sym = line[0]
+                R = [float(line[1]), float(line[2]), float(line[3])]
+                inputfile.write(f'{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n')
+
+            # Gaussian footer
+            inputfile.write('\n\n')
+
+geom_file.close()
+```
+
