@@ -8730,3 +8730,51 @@ combined_data.to_csv('combined_results.smi', sep='\t', index=False, header=False
 
 print("Data has been saved to 'combined_results.smi'.")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV file
+file_path = 'scan_all_data.csv'
+try:
+    df = pd.read_csv(file_path, on_bad_lines='skip')
+except Exception as e:
+    print(f"Error reading the CSV file: {e}")
+
+# Conversion factor from Hartree to eV
+conversion_factor = 27.2114
+
+# Define the specific values for the first column
+x_values = [-2.5, -2, -1.8, -1.5, -1, -0.5, 0, 0, 0.5, 1, 1.5, 1.8, 2, 2.5]
+
+# Filter rows where the first column has the specified values and the 3rd, 4th, and 5th columns have non-missing values
+filtered_df = df[df[df.columns[0]].isin(x_values)].dropna(subset=[df.columns[1], df.columns[2], df.columns[3]])
+
+# Extract the relevant columns
+x = filtered_df.iloc[:, 0]
+y1 = filtered_df.iloc[:, 1]
+y2 = filtered_df.iloc[:, 2]
+y3 = filtered_df.iloc[:, 3]
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+# Plot each y column
+plt.plot(x, y1 * conversion_factor, label='S$_1$', marker='o')
+plt.plot(x, y2 * conversion_factor, label='T$_1$', marker='o')
+plt.plot(x, y3 * conversion_factor, label='STG', marker='o')
+
+# Setting the x-axis limits
+plt.xlim(-2.5, 2.5)
+# plt.ylim(-1, 2.0)
+
+# Adding labels and title
+plt.xlabel('DNC')
+plt.ylabel('Energy (eV)')
+plt.title('Scan plot of the excited states and STG')
+plt.legend()
+
+# Show plot
+plt.show()
+```
