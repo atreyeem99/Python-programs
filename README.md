@@ -8826,3 +8826,17 @@ plt.legend()
 # Show plot
 plt.show()
 ```
+#
+```
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+def bubble_sort(arr):
+    start_time = time.time()
+    n = len(arr)
+    for i in range(0, n-1):
+        for j in range(i+1, n):
+            if arr[j] < arr[i]:
+                arr[j
+```
