@@ -8840,3 +8840,34 @@ def bubble_sort(arr):
             if arr[j] < arr[i]:
                 arr[j
 ```
+#
+```
+import os
+
+def create_folders_from_file(file_path):
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        print(f"The file {file_path} does not exist.")
+        return
+
+    # Open and read the file
+    with open(file_path, 'r') as file:
+        folder_names = file.readlines()
+
+    # Create folders for each name in the file
+    for folder_name in folder_names:
+        folder_name = folder_name.strip()  # Remove any leading/trailing whitespace
+        if folder_name:  # Ensure the folder name is not empty
+            sanitized_folder_name = folder_name.replace(',', '_').replace('-', '_')
+            try:
+                os.makedirs(sanitized_folder_name, exist_ok=True)
+                print(f"Created folder: {sanitized_folder_name}")
+            except OSError as e:
+                print(f"Error creating folder {sanitized_folder_name}: {e}")
+
+# Specify the path to your text file
+file_path = 'a.txt'
+
+# Call the function to create folders
+create_folders_from_file(file_path)
+```
