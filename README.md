@@ -8676,6 +8676,22 @@ echo $f $S1 $S2 $T1 $T2 $S2_2T1 $S2_2T2
 
 ```
 #
+```# Define the data for sets a, b, c, d
+a = {"Set": "a", "R1": 0.00042267, "R2": 0.00027884, "A11": 0.00470327, "R3": 0.00111791, "R41": 0.00022695, "A21": -0.01103988}
+b = {"Set": "b", "R1": -0.00081553, "R2": -0.0011027, "A11": 0.00124591, "R3": -0.00094836, "R41": -0.00093005, "A21": 0.00786545}
+c = {"Set": "c", "R1": -0.00496753, "R2": -0.00557967, "A11": 0.04678181, "R3": -0.01093188, "R41": -0.00427303, "A21": 0.03141856}
+d = {"Set": "d", "R1": -0.00516753, "R2": -0.00527967, "A11": 0.04528181, "R3": -0.00953188, "R41": -0.00357303, "A21": -0.01168144}
+
+# Define parameters and sets
+parameters = ["R1 (ANG)", "R2 (ANG)", "A11 (DEGREE)", "R3 (ANG)", "R41 (ANG)", "A21 (DEGREE)"]
+sets = [a, b, c, d]
+
+# Print the values in separate columns
+for param in parameters:
+    print("{:<12} {:<12.8f} {:<12.8f} {:<12.8f} {:<12.8f}".format(
+        param, a[param.split()[0]], b[param.split()[0]], c[param.split()[0]], d[param.split()[0]]))
+```
+#
 ```
 import pandas as pd
 import matplotlib.pyplot as plt
