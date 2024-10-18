@@ -8887,3 +8887,27 @@ file_path = 'a.txt'
 # Call the function to create folders
 create_folders_from_file(file_path)
 ```
+#
+```
+from tabulate import tabulate
+
+# Define the data for sets a, b, c, d
+a = {"Set": "a", "R1": 0.00042267, "R2": 0.00027884, "A11": 0.00470327, "R3": 0.00111791, "R41": 0.00022695, "A21": -0.01103988}
+b = {"Set": "b", "R1": -0.00081553, "R2": -0.0011027, "A11": 0.00124591, "R3": -0.00094836, "R41": -0.00093005, "A21": 0.00786545}
+c = {"Set": "c", "R1": -0.00496753, "R2": -0.00557967, "A11": 0.04678181, "R3": -0.01093188, "R41": -0.00427303, "A21": 0.03141856}
+d = {"Set": "d", "R1": -0.00516753, "R2": -0.00527967, "A11": 0.04528181, "R3": -0.00953188, "R41": -0.00357303, "A21": -0.01168144}
+
+# Extract headers and data
+headers = ["Parameter", "a", "b", "c", "d"]
+data = [
+    ["R1 (ANG)", a["R1"], b["R1"], c["R1"], d["R1"]],
+    ["R2 (ANG)", a["R2"], b["R2"], c["R2"], d["R2"]],
+    ["A11 (DEGREE)", a["A11"], b["A11"], c["A11"], d["A11"]],
+    ["R3 (ANG)", a["R3"], b["R3"], c["R3"], d["R3"]],
+    ["R41 (ANG)", a["R41"], b["R41"], c["R41"], d["R41"]],
+    ["A21 (DEGREE)", a["A21"], b["A21"], c["A21"], d["A21"]]
+]
+
+# Print the table
+print(tabulate(data, headers=headers, tablefmt="grid"))
+```
