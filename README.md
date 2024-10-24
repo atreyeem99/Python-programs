@@ -9086,3 +9086,49 @@ with open('aligned_output.txt', 'w') as f:
 print("CSV files have been merged, sorted, and written to 'all.csv'.")
 print("An aligned output has been written to 'aligned_output.txt'.")
 ```
+#
+```
+import matplotlib.pyplot as plt
+
+# Energies to plot
+energies = [
+    -385.691580683,
+    -770.860688368 / 2,
+    -771.336917778 / 2,
+    -771.380824354 / 2,
+    -771.382283738 / 2,
+    -771.382816488 / 2
+]
+
+# Labels for each point
+labels = [
+    'Point 1',
+    'Point 2',
+    'Point 3',
+    'Point 4',
+    'Point 5',
+    'Point 6'
+]
+
+# X-axis values (indices)
+x_values = list(range(1, len(energies) + 1))
+
+# Plot the energies
+plt.figure(figsize=(10, 6))
+plt.plot(x_values, energies, marker='o', linestyle='-', color='b')
+
+# Add labels to each point
+for i, (x, y) in enumerate(zip(x_values, energies)):
+    plt.text(x, y, f'{labels[i]} ({y:.6f})', fontsize=10, ha='right')
+
+# Add title and labels
+plt.title('Energy Plot')
+plt.xlabel('Index')
+plt.ylabel('Energy')
+
+# Save the figure as a PDF
+plt.savefig('energies_plot.pdf')
+
+# Show the plot
+plt.show()
+```
