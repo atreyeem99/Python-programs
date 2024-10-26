@@ -9212,3 +9212,83 @@ for var1 in var1_values:
 
 print("All combinations have been created.")
 ```
+#
+```
+import os
+import re
+
+# Define the template folder and file
+output_base_folder = '/home/atreyee/Project_AP1XY/all_aza/C3h_from_D3h/contour_plot_CCSDT_at_MP2'
+template_folder = output_base_folder + '/template'
+template_file = 'opt.com'
+output_MP2 = '/home/atreyee/Project_AP1XY/all_aza/C3h_from_D3h/contour_plot_at_MP2'
+
+# Define the ranges and increments for var1 and var2
+var1_start = 1.3
+var1_end = 1.5
+var1_increment = 0.01
+var2_start = 1.3
+var2_end = 1.5
+var2_increment = 0.01
+
+# Create combinations of var1 and var2
+var1_values = [round(var1_start + i * var1_increment, 2) for i in range(int((var1_end - var1_start) / var1_increment) + 1)]
+var1_values.append(var1_end)  # Ensure the end value is included
+
+var2_values = [round(var2_start + i * var2_increment, 2) for i in range(int((var2_end - var2_start) / var2_increment) + 1)]
+var2_values.append(var2_end)  # Ensure the end value is included
+
+# Remove duplicates and sort the values
+var1_values = sorted(set(var1_values))
+var2_values = sorted(set(var2_values))
+
+# Generate directories and files for each combination
+for var1 in var1_values:
+    for var2 in var2_values:
+        if float(var1) >= float(var2):
+            # Create the directory name
+            folder_name = f'Mol_{var1:.2f}_{var2:.2f}'
+            folder_path = os.path.join(output_base_folder, folder_name)
+
+            # Create the directory if it does not exist
+            os.makedirs(folder_path, exist_ok=True)
+
+            # Read the template file
+            template_subfolder = template_folder + ('_diag' if var1 == var2 else '_offdiag')
+            with open(os.path.join(template_subfolder, template_file), 'r') as file:
+                template_content = file.read()
+
+            # Replace variables with actual values
+            modified_content = template_content.replace('var1', str(var1)).replace('var2', str(var2))
+            
+            # Write the modified content to a new opt.com file in the new directory
+            new_file_path = os.path.join(folder_path, template_file)
+            with open(new_file_path, 'w') as new_file:
+                new_file.write(modified_content)
+
+            # Read and format optimized variables from opt.out
+            opt_out_path = os.path.join(output_MP2, folder_name, "opt.out")
+            with open(opt_out_path, 'r') as opt_out_file:
+                lines = opt_out_file.readlines()
+
+            # Extract optimized variables with controlled precision
+            optimized_vars = []
+            capture = False
+            for line in lines:
+                if 'Optimized variables' in line:
+                    capture = True
+                    continue
+                if capture:
+                    if re.search(r'^\s*\*', line):  # Stops at the star line if found
+                        break
+                    # Format each variable to 6 decimal places to avoid overflow stars
+                    formatted_line = re.sub(r'(\d+\.\d+)', lambda m: f"{float(m.group(0)):.6f}", line)
+                    optimized_vars.append(formatted_line.strip())
+
+            # Append formatted optimized variables and method details
+            with open(new_file_path, 'a') as new_file:
+                new_file.write('\n'.join(optimized_vars) + '\n')
+                new_file.write("\n\nbasis=cc-pVDZ\nhf\nccsd(t)\n")
+
+print("All combinations have been created.")
+```
