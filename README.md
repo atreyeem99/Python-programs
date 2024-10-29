@@ -9412,3 +9412,55 @@ with open('aligned_output.txt', 'w') as f:
 print("CSV files have been merged, sorted, and written to 'all.csv'.")
 print("An aligned output has been written to 'aligned_output.txt'.")
 ```
+# 
+```
+import glob
+
+# Define the folder where the CSV files are located
+folder_path = './'  # Adjust this path if needed
+
+# Get all CSV files in the folder
+csv_files = glob.glob(f'{folder_path}/*.csv')
+
+# Prepare a list to hold the formatted rows
+formatted_rows = []
+
+# Process each CSV file
+for file in csv_files:
+    # Read the CSV file without headers
+    with open(file, 'r') as f:
+        # Skip the first line (header)
+        next(f)
+        # Read each line and append to the list
+        for line in f:
+            # Remove any leading/trailing whitespace and split by whitespace
+            row = line.strip().split()
+            # Join the row elements with commas and add to formatted_rows
+            formatted_rows.append(row)  # Store as lists for sorting
+
+# Sort rows based on the first column (convert to float for sorting)
+formatted_rows.sort(key=lambda x: float(x[0]))
+
+# Write the sorted rows to a new CSV file with commas
+with open('all.csv', 'w') as f:
+    for row in formatted_rows:
+        f.write(','.join(map(str, row)) + '\n')
+
+# Calculate the maximum width of each column for alignment
+max_lengths = [max(len(str(item)) for item in col) for col in zip(*formatted_rows)]
+
+# Create a list to hold the aligned output
+aligned_output = []
+for row in formatted_rows:
+    # Format each row with proper spacing based on max_lengths
+    aligned_row = '   '.join(f'{str(item):<{max_lengths[i]}}' for i, item in enumerate(row))
+    aligned_output.append(aligned_row)
+
+# Write the aligned output to a text file
+with open('aligned_output.txt', 'w') as f:
+    for row in aligned_output:
+        f.write(row + '\n')
+
+print("CSV files have been merged, sorted, and written to 'all.csv'.")
+print("An aligned output has been written to 'aligned_output.txt'.")
+```
