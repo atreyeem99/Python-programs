@@ -9495,3 +9495,36 @@ file_path = 'a.txt'
 # Call the function to create folders
 create_folders_from_file(file_path)
 ```
+# 
+```
+CCSD_VDZ_dir=CCSD_VDZ
+CCSD_VTZ_dir=CCSD_VTZ
+CCSDT_VDZ_dir=CCSDT_VDZ
+
+dist_file=dist_1AP_D3h.csv
+angle_file=angle_1AP_D3h.csv
+
+# Get the number of coordinates from the CCSDT_VDZ folder
+Ncoord=$(grep 'Number of displacements for' ../${CCSDT_VDZ_dir}/opt.log | awk '{print $7/2}' | head -1)
+
+# Extract optimized variables from the respective opt.out files
+grep -$Ncoord ' Optimized variables' ../$CCSD_VDZ_dir/opt.out | tail -$Ncoord > CCSD_VDZ.txt
+grep -$Ncoord ' Optimized variables' ../$CCSD_VTZ_dir/opt.out | tail -$Ncoord > CCSD_VTZ.txt
+grep -$Ncoord ' Optimized variables' ../$CCSDT_VDZ_dir/opt.out | tail -$Ncoord > CCSDT_VDZ.txt
+
+# Create distance and angle files
+paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | grep ANG | awk '{print $2+$5-$8","$11}' > $dist_file
+paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | grep DEGREE | awk '{print $2+$5-$8","$11}' > $angle_file
+
+# Create test.com from opt.com
+cp opt.com test.com
+
+# Add the necessary data to test.com
+paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | awk '{print $1,$2+$5-$8,$3}' | column -t >> test.com
+
+# Add additional commands to the input file
+echo "" >> test.com
+echo "basis=STO-3G" >> test.com
+echo "hf"  >> test.com
+echo "put,XYZ,test.xyz" >> test.com
+```
