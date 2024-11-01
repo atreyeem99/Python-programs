@@ -9497,34 +9497,76 @@ create_folders_from_file(file_path)
 ```
 # 
 ```
-CCSD_VDZ_dir=CCSD_VDZ
-CCSD_VTZ_dir=CCSD_VTZ
-CCSDT_VDZ_dir=CCSDT_VDZ
+import numpy as np
+import time
+import matplotlib.pyplot as plt
 
-dist_file=dist_1AP_D3h.csv
-angle_file=angle_1AP_D3h.csv
+def bubble_sort(arr):
+    n = len(arr)
+    start_time = time.time()
+    for i in range(n-1):
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    return elapsed_time
 
-# Get the number of coordinates from the CCSDT_VDZ folder
-Ncoord=$(grep 'Number of displacements for' ../${CCSDT_VDZ_dir}/opt.log | awk '{print $7/2}' | head -1)
+# Define the size range as powers of 2 from 2^0 to 2^13
+sizes = [2**i for i in range(14)]
 
-# Extract optimized variables from the respective opt.out files
-grep -$Ncoord ' Optimized variables' ../$CCSD_VDZ_dir/opt.out | tail -$Ncoord > CCSD_VDZ.txt
-grep -$Ncoord ' Optimized variables' ../$CCSD_VTZ_dir/opt.out | tail -$Ncoord > CCSD_VTZ.txt
-grep -$Ncoord ' Optimized variables' ../$CCSDT_VDZ_dir/opt.out | tail -$Ncoord > CCSDT_VDZ.txt
+# Initialize lists to store times
+times_bubble = []
+times_quicksort = []
+times_mergesort = []
+times_heapsort = []
 
-# Create distance and angle files
-paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | grep ANG | awk '{print $2+$5-$8","$11}' > $dist_file
-paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | grep DEGREE | awk '{print $2+$5-$8","$11}' > $angle_file
+for size in sizes:
+    array = np.random.rand(size)
+    
+    # Bubble Sort
+    times_bubble.append(bubble_sort(array.copy()))
+    
+    # Quick Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='quicksort')
+    end_time = time.time()
+    times_quicksort.append(end_time - start_time)
+    
+    # Merge Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='mergesort')
+    end_time = time.time()
+    times_mergesort.append(end_time - start_time)
+    
+    # Heap Sort
+    start_time = time.time()
+    np.sort(array.copy(), kind='heapsort')
+    end_time = time.time()
+    times_heapsort.append(end_time - start_time)
 
-# Create test.com from opt.com
-cp opt.com test.com
+# Plotting the results
+plt.figure(figsize=(10, 6))
 
-# Add the necessary data to test.com
-paste -d ' ' CCSDT_VDZ.txt CCSD_VTZ.txt CCSD_VDZ.txt | column -t | awk '{print $1,$2+$5-$8,$3}' | column -t >> test.com
+# Plot the CPU times
+plt.plot(sizes, times_bubble, label='Bubble Sort', marker='o')
+plt.plot(sizes, times_quicksort, label='Quick Sort', marker='o')
+plt.plot(sizes, times_mergesort, label='Merge Sort', marker='o')
+plt.plot(sizes, times_heapsort, label='Heap Sort', marker='o')
 
-# Add additional commands to the input file
-echo "" >> test.com
-echo "basis=STO-3G" >> test.com
-echo "hf"  >> test.com
-echo "put,XYZ,test.xyz" >> test.com
+# Plot aN^2 and bNlog(N)
+a = 1e-7  # Adjustable constant
+b = 1e-6  # Adjustable constant
+plt.plot(sizes, [a*(n**2) for n in sizes], label='$aN^2$', linestyle='--')
+plt.plot(sizes, [b*n*np.log(n) for n in sizes], label='$bN\log(N)$', linestyle='--')
+
+# Labeling the plot
+plt.xlabel('Array Size (N)')
+plt.ylabel('CPU Time (s)')
+plt.title('CPU Time for Various Sorting Algorithms')
+plt.legend()
+plt.grid(True)
+plt.xscale('log', base=2)
+plt.show()
+
 ```
