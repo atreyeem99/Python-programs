@@ -9838,3 +9838,23 @@ for minimum in known_minima:
     value = himmelblau(minimum)
     print(f"Known minimum {minimum} has function value {value}.")
 ```
+#
+```
+import numpy as np
+from scipy.optimize import minimize
+
+# Define the function
+def new_function(v):
+    x, y, z, w = v
+    return (x + 10*y)**2 + 5*(z - w)**2 + (y - 2*z)**4 + 100*(x - w)**4
+
+# Initial guess for the variables
+initial_guess = np.array([1, 1, 1, 1])
+
+# Optimization using the 'BFGS' algorithm to find the minimum and count iterations
+result = minimize(new_function, initial_guess, method='BFGS', options={'disp': True})
+
+# Display the result
+print("Minimum found at:", result.x)
+print("Number of iterations:", result.nit)
+```
