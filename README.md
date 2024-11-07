@@ -9858,3 +9858,28 @@ result = minimize(new_function, initial_guess, method='BFGS', options={'disp': T
 print("Minimum found at:", result.x)
 print("Number of iterations:", result.nit)
 ```
+#
+```
+import numpy as np
+from scipy.optimize import minimize
+
+# Define the Himmelblau function
+def himmelblau(v):
+    x, y = v
+    return (x**2 + y - 11)**2 + (x + y**2 - 7)**2
+
+# Initial guesses
+initial_guesses = [np.array([1, 1]), np.array([1, -1]), np.array([-1, 1]), np.array([-1, -1])]
+
+# Store results
+results = []
+
+for initial_guess in initial_guesses:
+    # Optimize using BFGS
+    result = minimize(himmelblau, initial_guess, method='BFGS', options={'disp': True})
+    results.append((result.x, result.fun, result.nit))
+
+# Display the results
+for i, (x, fun_val, iterations) in enumerate(results):
+    print(f"Initial guess {initial_guesses[i]}: Minimum found at {x} with function value {fun_val} in {iterations} iterations.")
+```
