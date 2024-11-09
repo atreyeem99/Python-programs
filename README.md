@@ -9965,3 +9965,76 @@ for filename in os.listdir('.'):
         else:
             print("Comparison not possible due to missing data.")
 ```
+#
+```
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+from matplotlib.colors import ListedColormap
+
+hartree2kcm = 627.509
+kcal2ev = 0.0433641  # Conversion factor from kcal/mol to eV
+alpha = 0.4  # Transparency for the colormap
+cmap = plt.cm.viridis
+cmap_colors = cmap(np.arange(cmap.N))
+cmap_colors[:, -1] = alpha
+cmap_alpha = ListedColormap(cmap_colors)
+levels = np.linspace(-1, 30, 30)
+
+# Loop over all CSV files in the current directory
+for filename in os.listdir('.'):
+    if filename.endswith('.csv'):
+        # Read the CSV file
+        data = pd.read_csv(filename)
+        
+        # Extract x, y, and z values
+        x = data.iloc[:, 0]
+        y = data.iloc[:, 1]
+        z = data.iloc[:, 2]
+        
+        # Normalize energy data and convert to kcal/mol
+        z = z - np.min(z)
+        z = z * hartree2kcm
+        
+        # Convert z from kcal/mol to eV
+        z_ev = z * kcal2ev
+        
+        # Extend the grid to cover the range of data
+        xi = np.linspace(x.min(), x.max(), 1050)
+        yi = np.linspace(y.min(), y.max(), 1050)
+        xi, yi = np.meshgrid(xi, yi)
+        
+        # Use `method='linear'` if `cubic` is causing issues with edges
+        zi = griddata((x, y), z, (xi, yi), method='linear')
+        
+        fig, ax = plt.subplots(figsize=(10, 8))
+        cp = plt.contourf(xi, yi, zi, levels=levels, cmap='terrain', extend='both')
+        plt.colorbar(cp)
+        plt.contour(xi, yi, zi, levels=levels, colors='black', linewidths=0.5)
+        
+        plt.xlabel("$r_1$ [$\AA$]")
+        plt.ylabel("$r_2$ [$\AA$]")
+        plt.title(f'Contour Plot for {filename}')
+        plt.show()
+        
+        # Find minimum energy for var1 == var2
+        min_equal_energy_ev = z_ev[(x == y)].min()
+        
+        # Find minimum energy for var1 != var2
+        min_unequal_energy_ev = z_ev[(x != y)].min()
+        
+        # Print minimum energy values
+        print(f'File: {filename}')
+        print(f'Minimum energy (var1 == var2): {min_equal_energy_ev:.4f} eV')
+        print(f'Minimum energy (var1 != var2): {min_unequal_energy_ev:.4f} eV')
+        
+        # Check absolute difference in eV
+        abs_diff_ev = abs(min_equal_energy_ev - min_unequal_energy_ev)
+        if abs_diff_ev >= 0.1:
+            print('Distortion')
+        else:
+            print('No distortion')
+        print('-' * 50)
+```
