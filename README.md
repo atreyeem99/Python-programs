@@ -10356,3 +10356,27 @@ $end
 
 print("Files created successfully!")
 ```
+#
+```import pandas as pd
+import os
+
+# Specify the folder containing the CSV files
+folder_path = 'path_to_your_folder'
+
+# List all CSV files in the folder
+csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+# Read all CSV files into a list of DataFrames (with headers)
+dataframes = [pd.read_csv(os.path.join(folder_path, file)) for file in csv_files]
+
+# Concatenate all DataFrames
+merged_df = pd.concat(dataframes, ignore_index=True)
+
+# Sort the merged DataFrame based on the first column
+merged_df = merged_df.sort_values(by=merged_df.columns[0], ascending=True)
+
+# Save the merged and sorted DataFrame to a new CSV file
+merged_df.to_csv(os.path.join(folder_path, 'merged_sorted.csv'), index=False)
+
+print("CSV files from the folder merged and sorted successfully.")
+```
