@@ -10380,3 +10380,37 @@ merged_df.to_csv(os.path.join(folder_path, 'merged_sorted.csv'), index=False)
 
 print("CSV files from the folder merged and sorted successfully.")
 ```
+#
+```
+import csv
+
+# Read b.csv into a dictionary for easy lookup, skipping the header
+b_data = {}
+with open('b.csv', 'r') as b_file:
+    b_reader = csv.reader(b_file)
+    next(b_reader)  # Skip the header
+    for row in b_reader:
+        if row:
+            b_data[row[0].strip()] = row[1:4]  # Store the 2nd, 3rd, and 4th columns for each molecule name
+
+# Process a.csv, skipping the header, and merge the data from b.csv
+merged_rows = []
+with open('a.csv', 'r') as a_file:
+    a_reader = csv.reader(a_file)
+    header = next(a_reader)  # Read the header
+    merged_header = header + ["Column7", "Column8", "Column9"]  # Add new column headers
+    merged_rows.append(merged_header)
+
+    for row in a_reader:
+        if row:
+            mol_name = row[3].strip()  # Get the molecule name from the 4th column
+            b_values = b_data.get(mol_name, ["", "", ""])  # Get corresponding values or empty if not found
+            merged_rows.append(row + b_values)  # Add the values as the 7th, 8th, and 9th columns
+
+# Write the merged data to a new CSV file
+with open('merged.csv', 'w', newline='') as merged_file:
+    merged_writer = csv.writer(merged_file)
+    merged_writer.writerows(merged_rows)
+
+print("Merging completed! Check the merged.csv file.")
+```
