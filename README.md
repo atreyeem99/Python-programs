@@ -10414,3 +10414,38 @@ with open('merged.csv', 'w', newline='') as merged_file:
 
 print("Merging completed! Check the merged.csv file.")
 ```
+#
+```
+import pandas as pd
+import os
+
+# Specify the folder containing the CSV files
+folder_path = 'path_to_your_folder'
+
+# List all CSV files in the folder
+csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+# Iterate through each file and check for non-numeric values in the first column
+non_numeric_info = []
+
+for file in csv_files:
+    file_path = os.path.join(folder_path, file)
+    df = pd.read_csv(file_path)
+    
+    # Check if the first column has non-numeric values
+    non_numeric_rows = df[~df[df.columns[0]].apply(lambda x: pd.to_numeric(x, errors='coerce')).notna()]
+    
+    if not non_numeric_rows.empty:
+        # Record the file name and the rows with non-numeric values
+        non_numeric_info.append((file, non_numeric_rows))
+
+# Print the non-numeric information
+if non_numeric_info:
+    print("Non-numeric values found in the following CSV files:")
+    for file, rows in non_numeric_info:
+        print(f"\nFile: {file}")
+        print("Rows with non-numeric values in the first column:")
+        print(rows)
+else:
+    print("All values in the first column of each CSV file are numeric.")
+```
