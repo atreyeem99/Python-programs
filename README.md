@@ -10449,3 +10449,19 @@ if non_numeric_info:
 else:
     print("All values in the first column of each CSV file are numeric.")
 ```
+#
+```
+import pandas as pd
+
+# Load your DataFrame
+merged_df = pd.read_csv("your_file.csv")
+
+# Try to convert the first column to numeric, setting errors='coerce' to convert non-numeric values to NaN
+merged_df[merged_df.columns[0]] = pd.to_numeric(merged_df[merged_df.columns[0]], errors='coerce')
+
+# Sort the DataFrame by the first column, excluding NaN values
+merged_df = merged_df.sort_values(by=merged_df.columns[0], ascending=True).dropna()
+
+# Save the sorted DataFrame or continue processing
+merged_df.to_csv("sorted_file.csv", index=False)
+```
