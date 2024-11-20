@@ -10526,3 +10526,44 @@ for i in range(len(gap_values)):
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Read the CSV file (assuming no headers; update header=None if needed)
+file_path = "your_file.csv"  # Replace with your actual file path
+csv_data = pd.read_csv(file_path, header=None)
+
+# Extract columns based on the mapping
+table_data = pd.DataFrame({
+    "Col1": csv_data.iloc[:, 3],
+    "Col2": csv_data.iloc[:, 4],
+    "Col3": csv_data.iloc[:, 1],
+    "Col4": csv_data.iloc[:, 2],
+    "Col5": csv_data.iloc[:, 0].str.replace("_", ","),  # Replace underscores in molecule names
+    "Col6": csv_data.iloc[:, 6],
+    "Col7": csv_data.iloc[:, 7],
+    "Col8": csv_data.iloc[:, 8]
+})
+
+# Assign headers from the original CSV
+headers = [
+    str(csv_data.columns[3]),
+    str(csv_data.columns[4]),
+    str(csv_data.columns[1]),
+    str(csv_data.columns[2]),
+    str(csv_data.columns[0]),
+    str(csv_data.columns[6]),
+    str(csv_data.columns[7]),
+    str(csv_data.columns[8])
+]
+
+# Generate the table in LaTeX format
+latex_table = " & ".join(headers) + " \\\\\n"  # Add header row
+latex_table += "\\hline\n"  # Add a horizontal line
+for _, row in table_data.iterrows():
+    latex_table += " & ".join(map(str, row)) + " \\\\\n"
+
+# Print the result
+print(latex_table)
+```
