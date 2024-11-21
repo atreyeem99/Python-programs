@@ -10567,3 +10567,56 @@ for _, row in table_data.iterrows():
 # Print the result
 print(latex_table)
 ```
+#
+```
+import os
+import shutil
+
+def copy_and_create_folders(extrapolate_path, opt_path):
+    # Check if the extrapolate folder exists
+    if not os.path.exists(extrapolate_path):
+        print(f"Extrapolate folder '{extrapolate_path}' does not exist.")
+        return
+    
+    # Ensure opt folder exists
+    if not os.path.exists(opt_path):
+        print(f"Opt folder '{opt_path}' does not exist.")
+        return
+    
+    opt_com_path = os.path.join(opt_path, 'opt.com')
+    
+    # Check if opt.com exists
+    if not os.path.isfile(opt_com_path):
+        print(f"'opt.com' file not found in the opt folder.")
+        return
+    
+    # Iterate through each folder in the extrapolate folder
+    for folder in os.listdir(extrapolate_path):
+        extrapolate_subfolder = os.path.join(extrapolate_path, folder)
+        if os.path.isdir(extrapolate_subfolder):  # Ensure it is a folder
+            test_xyz_path = os.path.join(extrapolate_subfolder, 'test.xyz')
+            
+            # Check if test.xyz exists
+            if os.path.isfile(test_xyz_path):
+                # Create a corresponding folder in the opt folder
+                opt_subfolder = os.path.join(opt_path, folder)
+                os.makedirs(opt_subfolder, exist_ok=True)
+                
+                # Copy test.xyz to the new folder
+                shutil.copy(test_xyz_path, opt_subfolder)
+                print(f"Copied '{test_xyz_path}' to '{opt_subfolder}'.")
+                
+                # Copy opt.com to the new folder
+                shutil.copy(opt_com_path, opt_subfolder)
+                print(f"Copied '{opt_com_path}' to '{opt_subfolder}'.")
+            else:
+                print(f"'test.xyz' not found in '{extrapolate_subfolder}'.")
+    print("Process completed.")
+
+# Define paths
+extrapolate_folder = 'path/to/extrapolate'  # Replace with the path to the extrapolate folder
+opt_folder = 'path/to/opt'  # Replace with the path to the opt folder
+
+# Call the function
+copy_and_create_folders(extrapolate_folder, opt_folder)
+```
