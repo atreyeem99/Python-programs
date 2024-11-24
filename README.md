@@ -10734,3 +10734,72 @@ plt.tight_layout()
 # Show the plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file
+file_path = '/home/atreyee/project/Project_AP1XY/ADC2_CC2_data/STG_trends/gaps.csv'  # Adjust to your file path
+data = pd.read_csv(file_path)
+
+# Extract necessary columns
+gap_values = data.iloc[:, 0]  # First column for gap values
+molecule_names = data.iloc[:, 3].str.replace('_', ',')  # Fourth column, replace underscores with commas
+
+# Define the x positions based on the sets
+total_rows = len(gap_values)
+x_positions = []
+group_counts = [1, 1, 4, 4, 4, 1, 1]  # Adjust the groupings as needed
+
+if sum(group_counts) != total_rows:
+    raise ValueError("The sum of group_counts must equal the number of rows in the data.")
+
+x = 1  # Starting x position
+for count in group_counts:
+    x_positions.extend([x] * count)
+    x += 1
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(12, 8))  # Adjust figure size for better aesthetics
+ax.set_xlim(0.5, max(x_positions) + 0.5)
+ax.set_ylim(-0.35, 0.1)  # Adjust y-axis range for more space
+ax.set_ylabel('Gap Value (eV)', fontsize=12)
+ax.set_xlabel('Sets of Molecules', fontsize=12)
+ax.set_title('Energy Gaps of Molecules', fontsize=14, fontweight='bold')
+
+# Customize the plot's appearance
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.axhline(0, color='black', linewidth=0.8, linestyle='-')
+
+# Plot the lines for each gap value at the corresponding x position
+for i in range(len(gap_values)):
+    # Draw a horizontal line for each gap value
+    ax.hlines(y=gap_values[i], xmin=x_positions[i] - 0.1, xmax=x_positions[i] + 0.1, color='black', linewidth=1)
+    
+    # Adjust label position to avoid overlap
+    label_offset = 0
+    if i > 0 and abs(gap_values[i] - gap_values[i - 1]) < 0.02:
+        # Move labels further apart if values are very close
+        if gap_values[i] > gap_values[i - 1]:
+            label_offset = 0.03  # Upward adjustment for current label
+        else:
+            label_offset = -0.03  # Downward adjustment for current label
+
+    # Annotate the gap value on the left side of the line
+    ax.text(x_positions[i] - 0.15, gap_values[i] + label_offset, f'{gap_values[i]}', ha='right', fontsize=9, color='darkred')
+    
+    # Annotate the molecule name on the right side of the line
+    ax.text(x_positions[i] + 0.15, gap_values[i] + label_offset, molecule_names[i], ha='left', fontsize=9, color='darkblue')
+
+# Remove the gridlines
+ax.grid(False)
+
+# Save the plot as a PDF
+plt.tight_layout()
+plt.savefig('/home/atreyee/project/Project_AP1XY/ADC2_CC2_data/STG_trends/gaps_plot.pdf', format='pdf')
+
+# Display the plot
+plt.show()
+```
