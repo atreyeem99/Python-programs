@@ -10856,3 +10856,56 @@ opt_folder = 'path/to/opt'  # Replace with the path to the opt folder
 # Call the function
 copy_and_create_folders(extrapolate_folder, opt_folder)
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file
+file_path = '/mnt/data/gaps.csv'  # Update this to your file path
+data = pd.read_csv(file_path)
+
+# Extract necessary columns
+gap_values = data.iloc[:, 0]  # First column for gap values
+molecule_names = data.iloc[:, 3]  # Fourth column for molecule names
+
+# Setup the x positions for each line
+x_positions = []
+x = 1  # Start x position
+group_count = 0
+
+for index in range(len(gap_values)):
+    if group_count == 0:
+        x_positions.append(x)
+        x += 1
+        group_count += 1
+    elif group_count < 4:
+        x_positions.append(x)
+        x += 0.5  # Adjust spacing
+        group_count += 1
+    else:
+        x_positions.append(x)
+        x += 1
+        group_count = 0
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.set_xlim(0, max(x_positions) + 1)
+ax.set_ylim(-0.3, 0.05)
+ax.set_ylabel('Gap Value (eV)')
+ax.set_xlabel('Molecule Index')
+
+# Plot the lines
+for i in range(len(gap_values)):
+    ax.hlines(y=gap_values[i], xmin=x_positions[i] - 0.1, xmax=x_positions[i] + 0.1, color='black')
+    ax.text(x_positions[i], gap_values[i] + 0.01, f'{gap_values[i]:.2f}', ha='center', fontsize=8)
+    ax.text(x_positions[i], -0.35, molecule_names[i], ha='center', fontsize=8, rotation=90)
+
+# Add gridlines and adjust layout
+ax.grid(visible=True, which='both', linestyle='--', linewidth=0.5)
+ax.axhline(0, color='black', linewidth=0.8)
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+```
