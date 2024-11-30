@@ -11072,3 +11072,55 @@ for _, row in table_data.iterrows():
 # Print the result
 print(latex_table)
 ```
+#
+```
+import matplotlib.pyplot as plt
+import matplotlib.patches as FancyArrowPatch, Rectangle
+
+# Set up the figure
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.axis('off')
+
+# Function to draw energy levels
+def draw_energy_level(y, label=None):
+    ax.plot([0.1, 0.9], [y, y], 'k', lw=2)
+    if label:
+        ax.text(0.92, y, label, va='center', fontsize=10)
+
+# Function to draw vertical arrows
+def draw_arrow(x, y_start, y_end, label=None, color='black', style='solid'):
+    arrow = FancyArrowPatch((x, y_start), (x, y_end), arrowstyle='->', 
+                            color=color, lw=1.5, linestyle=style)
+    ax.add_patch(arrow)
+    if label:
+        ax.text(x + 0.02, (y_start + y_end) / 2, label, va='center', fontsize=8, rotation=90)
+
+# Draw energy levels for S0, S1, S2, T1, T2, T3
+draw_energy_level(1, 'S0')
+draw_energy_level(2.5, 'S1')
+draw_energy_level(4, 'S2')
+draw_energy_level(1.5, 'T1')
+draw_energy_level(3, 'T2')
+draw_energy_level(4.5, 'T3')
+
+# Draw arrows and labels
+draw_arrow(0.2, 1, 2.5, 'k_A\nAbsorption')
+draw_arrow(0.25, 2.5, 1, 'k_F\nFluorescence', color='green')
+draw_arrow(0.3, 2.5, 1.5, 'k_ISC\nIntersystem crossing', style='dashed')
+draw_arrow(0.35, 1.5, 1, 'k_Ph\nPhosphorescence', color='purple')
+
+# Additional components like vibrational relaxation and non-radiative relaxation
+ax.text(0.1, 3.25, 'Vibrational relaxation', fontsize=8)
+ax.text(0.1, 1.75, 'Non-radiative relaxation', fontsize=8)
+
+# Draw T-T absorption arrows
+draw_arrow(0.4, 1.5, 3, 'T-T\nAbsorption', color='gray', style='dashed')
+
+# Set limits
+ax.set_xlim(0, 1)
+ax.set_ylim(0.5, 5)
+
+# Show the diagram
+plt.tight_layout()
+plt.show()
+```
