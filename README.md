@@ -11124,3 +11124,21 @@ ax.set_ylim(0.5, 5)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Load the CSV files
+csv_16_columns = pd.read_csv('csv_16_columns.csv', header=None)
+csv_1_column = pd.read_csv('csv_1_column.csv', header=None)
+
+# Ensure the single column DataFrame has the same number of rows as the 16 columns DataFrame
+if len(csv_16_columns) != len(csv_1_column):
+    raise ValueError("The number of rows in the two CSV files does not match.")
+
+# Add the single column from the second CSV to the first CSV
+csv_merged = pd.concat([csv_16_columns, csv_1_column], axis=1)
+
+# Save the merged DataFrame to a new CSV file
+csv_merged.to_csv('csv_merged.csv', index=False, header=False)
+```
