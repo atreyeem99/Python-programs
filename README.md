@@ -11193,3 +11193,102 @@ ax.legend()
 plt.savefig('energy_plot.png')
 plt.show()
 ```
+#
+```
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import griddata
+from matplotlib.backends.backend_pdf import PdfPages
+
+# Updated constant for unit conversion
+hartree2kJmol = 2625.5  # Conversion from Hartree to kJ/mol
+
+# Loop over all CSV files in the current directory
+for filename in os.listdir('.'):
+    if filename.endswith('.csv'):
+        print(f"\nProcessing file: {filename}")
+        
+        # Read the CSV file into a pandas DataFrame
+        data = pd.read_csv(filename)
+
+        # Extract columns and rename for clarity
+        var1 = data.iloc[:, 0].values
+        var2 = data.iloc[:, 1].values
+        energy = data.iloc[:, 2].values
+
+        # Convert all energy values from Hartree to kJ/mol
+        energy_kjmol = energy * hartree2kJmol
+
+        # Normalize energy values in kJ/mol
+        energy_kjmol = energy_kjmol - np.min(energy_kjmol)
+
+        # Contour plot preparation
+        var1_extended = np.append(var1, var2)
+        var2_extended = np.append(var2, var1)
+        energy_extended = np.append(energy_kjmol, energy_kjmol)
+
+        # Create grid for interpolation
+        xi = np.linspace(var1_extended.min(), var1_extended.max(), 1050)
+        yi = np.linspace(var2_extended.min(), var2_extended.max(), 1050)
+        xi, yi = np.meshgrid(xi, yi)
+        zi = griddata((var1_extended, var2_extended), energy_extended, (xi, yi), method='cubic')
+
+        # Open a PDF file to save results
+        pdf_filename = f"{filename.replace('.csv', '')}_results.pdf"
+        with PdfPages(pdf_filename) as pdf:
+            # Plot contour
+            fig, ax = plt.subplots(figsize=(10, 8))
+            levels = np.linspace(0, np.max(energy_kjmol), 50)
+            cp = ax.contourf(xi, yi, zi, levels=levels, cmap='terrain', extend='both')
+            plt.colorbar(cp)
+            ax.contour(xi, yi, zi, levels=levels, colors='black', linewidths=0.5)
+            ax.set_xlabel("$r_1$ [$\AA$]")
+            ax.set_ylabel("$r_2$ [$\AA$]")
+            ax.set_title(f'Contour Plot for {filename}')
+            pdf.savefig(fig)  # Save the figure to the PDF
+            plt.close(fig)
+
+            # Calculate minimum energy for cases where var1 == var2 and var1 != var2
+            same_condition = (var1 == var2)
+            diff_condition = (var1 != var2)
+
+            # Save analysis results
+            with open(pdf_filename.replace(".pdf", "_summary.txt"), 'w') as summary_file:
+                if np.any(same_condition):
+                    min_energy_same = np.min(energy_kjmol[same_condition])
+                    min_index_same = np.where(same_condition & (energy_kjmol == min_energy_same))[0][0]
+                    summary_file.write(
+                        f"Minimum energy (var1 == var2): {min_energy_same:.4f} kJ/mol at (var1, var2) = ({var1[min_index_same]:.4f}, {var2[min_index_same]:.4f})\n"
+                    )
+                else:
+                    min_energy_same = None
+                    summary_file.write("No cases found where var1 == var2.\n")
+
+                if np.any(diff_condition):
+                    min_energy_diff = np.min(energy_kjmol[diff_condition])
+                    min_index_diff = np.where(diff_condition & (energy_kjmol == min_energy_diff))[0][0]
+                    var1_diff = var1[min_index_diff]
+                    var2_diff = var2[min_index_diff]
+                    diff_var1_var2 = abs(var1_diff - var2_diff)
+                    summary_file.write(
+                        f"Minimum energy (var1 != var2): {min_energy_diff:.4f} kJ/mol at (var1, var2) = ({var1_diff:.4f}, {var2_diff:.4f})\n"
+                        f"Difference between var1 and var2 at min energy: {diff_var1_var2:.4f}\n"
+                    )
+                else:
+                    min_energy_diff = None
+                    diff_var1_var2 = None
+                    summary_file.write("No cases found where var1 != var2.\n")
+
+                # Compare absolute energy difference and apply the second condition
+                if min_energy_same is not None and min_energy_diff is not None:
+                    energy_difference = abs(min_energy_diff - min_energy_same)
+                    summary_file.write(f"Energy difference: {energy_difference:.4f} kJ/mol\n")
+                    if energy_difference >= 0.1 and (diff_var1_var2 is not None and diff_var1_var2 > 0.03):
+                        summary_file.write("Result: distortion\n")
+                    else:
+                        summary_file.write("Result: no distortion\n")
+                else:
+                    summary_file.write("Comparison not possible due to missing data.\n")
+```
