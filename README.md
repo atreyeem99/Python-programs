@@ -11355,3 +11355,34 @@ with open('merged.csv', 'w', newline='') as merged_file:
 
 print("Merging completed! Check the merged.csv file.")
 ```
+#
+```import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Conversion factor from Hartree to kcal/mol
+hartree2kcm = 627.509
+
+# Read the CSV file into a pandas DataFrame
+data = pd.read_csv('contour_data_MP2.csv', header=None)
+
+# Extract x and z values
+x = data.iloc[:, 0]
+z = data.iloc[:, 1]
+
+# Convert energy values
+z = z - np.min(z)  # Subtract the minimum value from z
+z = z * hartree2kcm  # Convert to kcal/mol
+
+# Plotting
+fig, ax = plt.subplots(figsize=(10, 8))
+ax.plot(x, z, label='Energy')
+ax.set_title('Energy Plot')
+ax.set_xlabel("Values")
+ax.set_ylabel("Energy [$\\Delta E$ in kcal/mol]")
+ax.legend()
+
+# Save and show the plot
+plt.savefig('energy_plot.png')
+plt.show()
+```
