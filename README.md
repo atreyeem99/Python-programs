@@ -11464,3 +11464,33 @@ merged_df.to_csv(output_file, index=False)
 
 print("CSV files merged and sorted successfully.")
 ```
+#
+```
+import pandas as pd
+import os
+
+# Specify the folder containing the CSV files
+folder_path = '/home/atreyee/project/Project_AP1XY/ADC2_CC2_data'
+
+# List all CSV files in the folder
+csv_files = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+# Read all CSV files into a list of DataFrames
+dataframes = [pd.read_csv(os.path.join(folder_path, file)) for file in csv_files]
+
+# Concatenate all DataFrames
+merged_df = pd.concat(dataframes, ignore_index=True)
+
+# Convert the first column to a uniform data type (e.g., string or numeric)
+# Here, we try to convert to numeric and fall back to string if necessary
+merged_df[merged_df.columns[0]] = pd.to_numeric(merged_df[merged_df.columns[0]], errors='coerce')
+
+# Sort the merged DataFrame based on the first column
+merged_df = merged_df.sort_values(by=merged_df.columns[0])
+
+# Save the merged and sorted DataFrame to a new CSV file
+output_file = os.path.join(folder_path, 'merged_sorted.csv')
+merged_df.to_csv(output_file, index=False)
+
+print("CSV files merged and sorted successfully.")
+```
