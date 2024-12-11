@@ -11494,3 +11494,71 @@ merged_df.to_csv(output_file, index=False)
 
 print("CSV files merged and sorted successfully.")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file
+file_path = '/mnt/data/gaps.csv'  # Adjust to your file path
+data = pd.read_csv(file_path)
+
+# Extract necessary columns
+gap_values = data.iloc[:, 0]  # First column for gap values
+molecule_names = data.iloc[:, 3].str.replace('_', ',')  # Fourth column, replace underscores with commas
+
+# Define the x positions based on the sets
+total_rows = len(gap_values)
+x_positions = []
+group_counts = [1, 4, 4, 4, 1, 1]  # Adjust the groupings as needed
+
+if sum(group_counts) != total_rows:
+    raise ValueError("The sum of group_counts must equal the number of rows in the data.")
+
+x = 1  # Starting x position
+for count in group_counts:
+    x_positions.extend([x] * count)
+    x += 1
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(12, 8))  # Adjust figure size for better aesthetics
+ax.set_xlim(0.5, max(x_positions) + 0.5)
+ax.set_ylim(-0.35, 0.1)  # Adjust y-axis range for more space
+ax.set_ylabel('Gap Value (eV)', fontsize=12)
+ax.set_xlabel('Sets of Molecules', fontsize=12)
+ax.set_title('Energy Gaps of Molecules', fontsize=14, fontweight='bold')
+
+# Customize the plot's appearance
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.grid(visible=True, linestyle='--', linewidth=0.6, alpha=0.6)
+ax.axhline(0, color='black', linewidth=0.8, linestyle='-')
+
+# Function to adjust label position to avoid overlap
+def adjust_label_position(index, gap_values, label_offset=0):
+    # Check the distance between the current line and the previous one
+    if index > 0:
+        prev_gap = gap_values[index - 1]
+        current_gap = gap_values[index]
+        if abs(current_gap - prev_gap) < 0.05:  # If the lines are too close (adjust threshold as needed)
+            return label_offset + 0.03  # Shift the label further
+    return label_offset
+
+# Plot the lines for each gap value at the corresponding x position
+for i in range(len(gap_values)):
+    # Draw a horizontal line for each gap value
+    ax.hlines(y=gap_values[i], xmin=x_positions[i] - 0.1, xmax=x_positions[i] + 0.1, color='black', linewidth=1)
+    
+    # Adjust label position to avoid overlap
+    label_offset = adjust_label_position(i, gap_values)
+
+    # Annotate the gap value on the left side of the line
+    ax.text(x_positions[i] - 0.15, gap_values[i] + label_offset, f'{gap_values[i]}', ha='right', fontsize=9, color='darkred')
+    
+    # Annotate the molecule name on the right side of the line
+    ax.text(x_positions[i] + 0.15, gap_values[i] + label_offset, molecule_names[i], ha='left', fontsize=9, color='darkblue')
+
+# Improve the overall aesthetics
+plt.tight_layout()
+plt.show()
+```
