@@ -11661,3 +11661,52 @@ combined_data.to_csv('combined_results.smi', sep='\t', index=False, header=False
 
 print("Data has been saved to 'combined_results.smi'.")
 ```
+#
+```
+import os
+import re
+import csv
+
+# Path to the parent directory where the folders are located
+parent_dir = '/path/to/parent/directory'  # Modify this path accordingly
+
+# Output CSV file
+output_csv = 'fod_values.csv'
+
+# List to hold the folder names and N_FOD values
+data = []
+
+# Regular expression to search for N_FOD values in fod.out files
+fod_pattern = re.compile(r'N_FOD\s*=\s*(\d+\.\d+|\.\d+|\d+\.\d+E[+-]?\d+)')
+
+# Walk through the parent directory
+for folder_name in os.listdir(parent_dir):
+    folder_path = os.path.join(parent_dir, folder_name)
+    
+    # Only consider directories (folders) that start with a number
+    if os.path.isdir(folder_path) and folder_name[0].isdigit():
+        fod_file_path = os.path.join(folder_path, 'fod.out')
+        
+        # Check if fod.out exists in the folder
+        if os.path.exists(fod_file_path):
+            with open(fod_file_path, 'r') as fod_file:
+                # Read the file and search for the N_FOD value
+                content = fod_file.read()
+                match = fod_pattern.search(content)
+                
+                # If N_FOD is found, add the folder name and N_FOD value to data
+                if match:
+                    n_fod_value = match.group(1)
+                    data.append([folder_name, n_fod_value])
+
+# Sort the data by folder names (convert folder names to integers for proper numerical sorting)
+data.sort(key=lambda x: int(x[0]))
+
+# Write the results to a CSV file
+with open(output_csv, 'w', newline='') as csv_file:
+    writer = csv.writer(csv_file)
+    writer.writerow(['Folder Name', 'N_FOD Value'])  # Write header
+    writer.writerows(data)
+
+print(f"CSV file '{output_csv}' has been written with the folder names and N_FOD values.")
+```
