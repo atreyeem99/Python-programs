@@ -11710,3 +11710,46 @@ with open(output_csv, 'w', newline='') as csv_file:
 
 print(f"CSV file '{output_csv}' has been written with the folder names and N_FOD values.")
 ```
+#
+```
+import os
+import pandas as pd
+
+def merge_csv_side_by_side(base_directory, output_file):
+    merged_df = None
+    first_row = None
+    folder_names = []
+
+    # Walk through the base directory to find CSV files
+    for root, dirs, files in os.walk(base_directory):
+        for file in files:
+            if file.endswith(".csv"):
+                folder_name = os.path.basename(root)
+                folder_names.append(folder_name)
+
+                file_path = os.path.join(root, file)
+
+                # Read the CSV file
+                df = pd.read_csv(file_path, header=None)
+
+                if first_row is None:
+                    first_row = df.iloc[0]  # Get the first row (common for all files)
+                    merged_df = pd.DataFrame({ "Common": df.iloc[:, 0] })  # Initialize with the first column
+
+                # Add the second column of the current file as a new column
+                merged_df[folder_name] = df.iloc[:, 1].values
+
+    # Ensure merged_df exists before modifying its headers
+    if merged_df is not None:
+        # Write the merged dataframe to a CSV file
+        merged_df.to_csv(output_file, index=False)
+        print(f"Merged CSV saved to {output_file}")
+    else:
+        print("No CSV files found in the directory.")
+
+# Specify the base directory containing the folders and the output file name
+base_directory = "path_to_your_base_directory"
+output_file = "merged_output.csv"
+
+merge_csv_side_by_side(base_directory, output_file)
+```
