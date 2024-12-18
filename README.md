@@ -11846,3 +11846,38 @@ with open(input_csv, "r") as csvfile:
 
 print("Process completed.")
 ```
+#
+```
+#!/bin/bash
+
+# Output CSV file
+output_csv="results.csv"
+echo "Folder,S1S0,fosc,T1S0,T2S0,S1T1,tT1S1,tT1T2" > $output_csv
+
+# Loop through all directories
+for dir in */; do
+    # Check if tddft.out.bz2 exists in the folder
+    file="$dir/tddft.out.bz2"
+    if [ -f "$file" ]; then
+        # Extract values
+        S1S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $6}' | head -1)
+        ind=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $2}' | head -1)
+        ind=${ind/:/}
+        fosc=$(bzgrep -A10 '         ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' "$file" | grep "  $ind  " | awk '{print $4}')
+
+        T1S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   2' | sort -k6 -n | awk '{print $6}' | head -1)
+        T2S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   2' | sort -k6 -n | awk '{print $6}' | head -2 | tail -1)
+        S1T1=$(echo "$S1S0 $T1S0" | awk '{print $1-$2}')
+        tT1S1=$(echo "$T1S0 $S1S0" | awk '{print 2*$1-$2}')
+        tT1T2=$(echo "$T1S0 $T2S0" | awk '{print 2*$1-$2}')
+
+        # Append results to CSV
+        echo "$dir,$S1S0,$fosc,$T1S0,$T2S0,$S1T1,$tT1S1,$tT1T2" >> $output_csv
+    else
+        echo "$dir,File not found,,,,,," >> $output_csv
+    fi
+done
+
+# Inform the user
+echo "Extraction completed. Results saved in $output_csv."
+```
