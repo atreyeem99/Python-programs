@@ -11881,3 +11881,50 @@ done
 # Inform the user
 echo "Extraction completed. Results saved in $output_csv."
 ```
+#
+```
+import os
+import csv
+import subprocess
+
+def combine_xyz_files(folder_names, output_xyz="combined.xyz"):
+    """Combine all geom_DFT_S0.xyz files into a single XYZ file."""
+    with open(output_xyz, "w") as out_file:
+        for folder in folder_names:
+            xyz_path = os.path.join(folder, "geom_DFT_S0.xyz")
+            if os.path.exists(xyz_path):
+                with open(xyz_path, "r") as file:
+                    out_file.writelines(file.readlines())
+
+    print(f"Combined XYZ file written to {output_xyz}")
+
+def convert_xyz_to_svg(input_xyz, output_svg="output.svg"):
+    """Convert an XYZ file to SVG using the Open Babel CLI."""
+    try:
+        subprocess.run(["obabel", input_xyz, "-O", output_svg], check=True)
+        print(f"SVG file created: {output_svg}")
+    except FileNotFoundError:
+        print("Error: Open Babel (obabel) is not installed or not in PATH.")
+
+def main():
+    # Path to the CSV file
+    csv_file = "a.csv"
+
+    # Read folder names from the first column of the CSV file
+    folder_names = []
+    with open(csv_file, "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            folder_names.append(row[0])
+
+    # Combine XYZ files from the specified folders
+    combined_xyz = "combined.xyz"
+    combine_xyz_files(folder_names, combined_xyz)
+
+    # Convert the combined XYZ file to SVG
+    output_svg = "output.svg"
+    convert_xyz_to_svg(combined_xyz, output_svg)
+
+if __name__ == "__main__":
+    main()
+```
