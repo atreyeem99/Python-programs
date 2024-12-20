@@ -11928,3 +11928,122 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import os
+import bz2
+
+def extract_n_occ(tddft_file):
+    """Extracts the N_occ value from tddft.out.bz2."""
+    with bz2.open(tddft_file, 'rt') as f:
+        for line in f:
+            if 'N(Alpha)           :' in line:
+                # Extract value and ignore decimal places
+                n_occ = float(line.split(":")[1].strip())
+                return int(n_occ)
+    return None
+
+def calculate_n_core(xyz_file):
+    """Calculates N_core from geom_DFT_S0.xyz."""
+    n_atoms = 0
+    n_hydrogen = 0
+    with open(xyz_file, 'r') as f:
+        lines = f.readlines()
+        n_atoms = int(lines[0].strip())  # First line is number of atoms
+        for line in lines[2:]:  # Skip first two lines
+            if 'H' in line.split()[0]:  # If atom is hydrogen
+                n_hydrogen += 1
+    n_core = n_atoms - n_hydrogen
+    return n_core, n_hydrogen
+
+def calculate_n_vir(n_core, n_hydrogen, n_electrons):
+    """Calculates N_FROZEN_VIRTUAL (N_vir)."""
+    n_vir = (14 * n_core + 5 * n_hydrogen) - (3 * n_electrons / 2 - 2 * n_core)
+    return int(n_vir)
+
+def create_adc2_input(folder, n_core, n_vir, xyz_file):
+    """Creates the adc2 input file using geom_DFT_S0.xyz and calculated values."""
+    with open(xyz_file, 'r') as f:
+        coordinates = f.readlines()[2:]  # Skip the first two lines
+
+    # Prepare the input file content
+    input_content = f"""$molecule
+  0  1
+"""
+    input_content += ''.join(coordinates)  # Add atom coordinates
+
+    input_content += f"""
+$end
+
+$rem
+jobtype             sp
+method              adc(2)
+N_FROZEN_CORE       {n_core}
+N_FROZEN_VIRTUAL    {n_vir}
+basis               cc-pVDZ
+aux_basis           rimp2-cc-pVDZ
+mem_total           64000
+mem_static          1000
+maxscf              1000
+cc_symmetry         false
+ee_singlets         3
+ee_triplets         3
+sym_ignore          true
+ADC_DAVIDSON_MAXITER 300
+ADC_DAVIDSON_CONV 5
+$end
+"""
+
+    # Create the FC_FV folder structure
+    fc_fv_folder = os.path.join('BNPAH', 'FC_FV', folder)
+    os.makedirs(fc_fv_folder, exist_ok=True)
+
+    # Write the content to all.com in the respective folder
+    with open(os.path.join(fc_fv_folder, 'all.com'), 'w') as f:
+        f.write(input_content)
+
+def process_folders(base_folder):
+    """Main function to process all subfolders within adc2 folder."""
+    adc2_folder = os.path.join(base_folder, 'adc2')  # The 'adc2' folder
+    if not os.path.isdir(adc2_folder):
+        print("Error: 'adc2' folder not found.")
+        return
+
+    # List of subfolders in adc2
+    subfolders = [f for f in os.listdir(adc2_folder) if os.path.isdir(os.path.join(adc2_folder, f))]
+
+    # Iterate through subfolders in 'adc2' folder
+    for folder in subfolders:
+        folder_path = os.path.join(adc2_folder, folder)
+        if os.path.isdir(folder_path):
+            # Check if the same subfolder exists in BNPAH
+            folder_in_bn = os.path.join(base_folder, folder)
+            if os.path.isdir(folder_in_bn):
+                # Find tddft.out.bz2 and geom_DFT_S0.xyz files in the subfolder in BNPAH
+                tddft_file = os.path.join(folder_in_bn, 'tddft.out.bz2')
+                xyz_file = os.path.join(folder_in_bn, 'geom_DFT_S0.xyz')
+
+                if os.path.exists(tddft_file) and os.path.exists(xyz_file):
+                    # Extract N_occ from tddft.out.bz2
+                    n_occ = extract_n_occ(tddft_file)
+                    if n_occ is None:
+                        print(f"Error: N_occ not found in {tddft_file}. Skipping folder.")
+                        continue
+
+                    # Calculate N_core and N_hydrogen from geom_DFT_S0.xyz
+                    n_core, n_hydrogen = calculate_n_core(xyz_file)
+
+                    # Calculate N_electrons
+                    n_electrons = n_occ - n_core
+
+                    # Calculate N_FROZEN_VIRTUAL (N_vir)
+                    n_vir = calculate_n_vir(n_core, n_hydrogen, n_electrons)
+
+                    # Create the adc2 input file for this folder in the FC_FV folder
+                    create_adc2_input(folder, n_core, n_vir, xyz_file)
+                    print(f"Processed folder: {folder}")
+
+if __name__ == "__main__":
+    base_folder = 'BNPAH'  # The base folder containing 'adc2'
+    process_folders(base_folder)
+```
