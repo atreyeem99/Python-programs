@@ -12047,3 +12047,72 @@ if __name__ == "__main__":
     base_folder = 'BNPAH'  # The base folder containing 'adc2'
     process_folders(base_folder)
 ```
+#
+```
+import os
+import re
+
+# Define the output file name
+output_file = "output_table.txt"
+
+# Initialize the output table
+rows = []
+rows.append(["FC", "FV", "S1", "T1", "STG"])
+
+# Get the list of folders
+folders = [f for f in os.listdir() if os.path.isdir(f) and f.startswith("FC_")]
+
+for folder in folders:
+    # Extract FC and FV values from the folder name
+    match = re.match(r"FC_(\d+)_FV_(\d+)", folder)
+    if not match:
+        continue
+
+    fc, fv = match.groups()
+
+    # Construct the file path
+    file_path = os.path.join(folder, "all1.out")
+
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        continue
+
+    try:
+        # Extract S1 and T1 values from the file
+        with open(file_path, "r") as f:
+            content = f.readlines()
+
+        S1 = None
+        T1 = None
+
+        for i, line in enumerate(content):
+            if "(singlet" in line:
+                for j in range(i + 1, i + 6):
+                    if "Excitation" in content[j]:
+                        S1 = float(content[j].split()[2])
+                        break
+            if "(triplet" in line:
+                for j in range(i + 1, i + 6):
+                    if "Excitation" in content[j]:
+                        T1 = float(content[j].split()[2])
+                        break
+
+            if S1 is not None and T1 is not None:
+                break
+
+        # Calculate STG
+        STG = S1 - T1 if S1 is not None and T1 is not None else None
+
+        # Append the values to the rows list
+        if S1 is not None and T1 is not None:
+            rows.append([fc, fv, f"{S1:.3f}", f"{T1:.3f}", f"{STG:.3f}"])
+    except Exception as e:
+        print(f"Error processing file {file_path}: {e}")
+
+# Write the rows to the output file
+with open(output_file, "w") as f:
+    for row in rows:
+        f.write("\t".join(row) + "\n")
+
+print(f"Table written to {output_file}")
+```
