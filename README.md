@@ -12156,3 +12156,43 @@ with open(geomfile, 'r') as geom_file:
                     R = [float(line[1]), float(line[2]), float(line[3])]
                     inputfile.write(f"{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n")
 ```
+#
+```
+import os
+
+# Total number of molecules to process
+Nmol = 24
+# File containing molecular coordinates
+geomfile = "77.xyz"
+
+# Get current working directory
+filedir = os.getcwd()
+
+# Open the input geometry file
+with open(geomfile, 'r') as geom_file:
+    for imol in range(1, Nmol + 1):
+        # Read the number of atoms and title line
+        line = geom_file.readline().strip()
+        if line:
+            Nat = int(line)  # Number of atoms
+            title = geom_file.readline().strip()  # Title line containing molecule name
+            print(Nat, title)
+
+            # Create a subfolder named PAH_01, PAH_02, ..., PAH_24
+            folder_name = f"PAH_{imol:02d}"
+            os.mkdir(os.path.join(filedir, folder_name))
+
+            # Write the molecule's data into a file in its subfolder
+            output_file = os.path.join(filedir, folder_name, "geom_UFF.xyz")
+            with open(output_file, "w") as inputfile:
+                # Write header lines
+                inputfile.write(f"{Nat}\n")
+                inputfile.write(f"{title}\n")
+
+                # Write atomic coordinates
+                for iat in range(1, Nat + 1):
+                    line = geom_file.readline().split()
+                    sym = line[0]
+                    R = [float(line[1]), float(line[2]), float(line[3])]
+                    inputfile.write(f"{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n")
+```
