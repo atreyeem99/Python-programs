@@ -12305,3 +12305,50 @@ with open(output_file, "w") as f:
 
 print(f"Table written to {output_file}")
 ```
+#
+```
+import os
+import shutil  # Import shutil to copy files
+
+# Total number of molecules to process
+Nmol = 33059
+# File containing molecular coordinates
+geomfile = "77_pah.xyz"
+# Template file to copy to each folder
+template_file = "tddft.com"
+
+# Get current working directory
+filedir = os.getcwd()
+
+# Open the input geometry file
+with open(geomfile, 'r') as geom_file:
+    for imol in range(1, Nmol + 1):
+        # Read the number of atoms and title line
+        line = geom_file.readline().strip()
+        if line:
+            Nat = int(line)  # Number of atoms
+            title = geom_file.readline().strip()  # Title line containing molecule name
+            print(Nat, title)
+
+            # Create a subfolder named Mol_00001, Mol_00002, ..., Mol_33059
+            folder_name = f"Mol_{imol:05d}"
+            folder_path = os.path.join(filedir, folder_name)
+            os.mkdir(folder_path)
+
+            # Write the molecule's data into a file in its subfolder
+            output_file = os.path.join(folder_path, "geom_UFF.xyz")
+            with open(output_file, "w") as inputfile:
+                # Write header lines
+                inputfile.write(f"{Nat}\n")
+                inputfile.write(f"{title}\n")
+
+                # Write atomic coordinates
+                for iat in range(1, Nat + 1):
+                    line = geom_file.readline().split()
+                    sym = line[0]
+                    R = [float(line[1]), float(line[2]), float(line[3])]
+                    inputfile.write(f"{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n")
+
+            # Copy the template file to the folder
+            shutil.copy(template_file, folder_path)
+```
