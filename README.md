@@ -12352,3 +12352,31 @@ with open(geomfile, 'r') as geom_file:
             # Copy the template file to the folder
             shutil.copy(template_file, folder_path)
 ```
+#
+```
+#!/bin/bash
+
+# Ensure ext.sh is executed
+bash ext.sh
+
+# Summarize results
+output_file="S1_T1_STG.txt"
+
+echo "=== Jobs done ==="
+tail -5 "$output_file"
+
+echo "=== Small and Large STG ==="
+sort -k4 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k4 -n "$output_file" | tail -5
+
+echo "=== Small and Large S1 ==="
+sort -k2 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k2 -n "$output_file" | tail -5
+
+echo "=== Small and Large T1 ==="
+sort -k3 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k3 -n "$output_file" | tail -5
+```
