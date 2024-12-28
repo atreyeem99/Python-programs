@@ -12380,3 +12380,50 @@ sort -k3 -n "$output_file" | head -5
 echo "---------------------------"
 sort -k3 -n "$output_file" | tail -5
 ```
+#
+```
+#!/bin/bash
+
+# File to store the results
+output_file="S1_T1_STG.txt"
+> "$output_file"
+
+# Loop through all folders
+for dir in */; do
+    file="${dir%/}/somefile.log"  # Adjust `somefile.log` to the actual file name in each folder
+    if [[ -f "$file" ]]; then
+        # Extract S1S0, T1S0, T2S0, and related values
+        S1S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $6}' | head -1)
+        ind=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $2}' | head -1)
+        ind=${ind/:/}
+        fosc=$(bzgrep -A10 '         ABSORPTION SPECTRUM VIA TRANSITION ELECTRIC DIPOLE MOMENTS' "$file" | grep "  $ind  " | awk '{print $4}')
+        
+        T1S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   2' | sort -k6 -n | awk '{print $6}' | head -1)
+        T2S0=$(bzgrep -A20 'STATE ' "$file" | grep '<S\*\*2> =   2' | sort -k6 -n | awk '{print $6}' | head -2 | tail -1)
+        S1T1=$(echo "$S1S0 $T1S0" | awk '{print $1-$2}')
+        tT1S1=$(echo "$T1S0 $S1S0" | awk '{print 2*$1-$2}')
+        
+        # Append the results to the output file
+        echo "$dir $S1S0 $T1S0 $T2S0 $S1T1 $tT1S1 $fosc" >> "$output_file"
+    fi
+done
+
+# Post-processing
+echo "=== Jobs done ==="
+tail -5 "$output_file"
+
+echo "=== Small and Large STG ==="
+sort -k4 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k4 -n "$output_file" | tail -5
+
+echo "=== Small and Large S1 ==="
+sort -k2 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k2 -n "$output_file" | tail -5
+
+echo "=== Small and Large T1 ==="
+sort -k3 -n "$output_file" | head -5
+echo "---------------------------"
+sort -k3 -n "$output_file" | tail -5
+```
