@@ -12595,3 +12595,50 @@ if __name__ == "__main__":
     print("Genetic Algorithm Optimized Molecule:", best_molecule)
     print("S1-T1 Gap is:", best_gap)
 ```
+#
+```
+import csv
+
+# Assuming molecule_cache, symmetry_maps, apply_symmetry, findSTG, runtddft, createXYZ, and other functions/variables are defined elsewhere
+
+molecule_str = "".join(map(str, molecule))
+if molecule_str in molecule_cache:
+    S1, T1, gap = molecule_cache[molecule_str]
+else:
+    # Read "molecules_gap.csv" to check if molecule is already there
+    molecule_found = False
+    with open("molecules_gap.csv", "r") as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == molecule_str:
+                S1, T1, gap = float(row[1]), float(row[2]), float(row[3])
+                molecule_found = True
+                break
+
+    if not molecule_found:
+        # If molecule is not found, create XYZ and compute the values
+        createXYZ(molecule)
+        runtddft()
+        S1, T1, gap = findSTG()
+
+        molecule_cache[molecule_str] = (S1, T1, gap)
+
+        if S1 < 0 or T1 < 0:
+            gap = float("inf")
+
+        # Write the data to "molecules_gap.csv"
+        with open("molecules_gap.csv", "a", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([molecule_str, S1, T1, gap, f"C{count_C}_B{count_B}_N{count_N}"])
+
+            # Apply symmetry maps and append to the file
+            for symmetry_map in symmetry_maps:
+                transformed_molecule = tuple(apply_symmetry(molecule, symmetry_map))
+                transformed_molecule_str = "".join(map(str, transformed_molecule))
+                writer.writerow([transformed_molecule_str, S1, T1, gap, f"C{count_C}_B{count_B}_N{count_N}"])
+
+# Print and write results to molecules_gap.txt
+print(molecule, S1, T1, gap, f"C{count_C}_B{count_B}_N{count_N}")
+with open("molecules_gap.txt", "a") as results_file:
+    results_file.write(f"{molecule} {S1} {T1} {gap} C{count_C}_B{count_B}_N{count_N}\n")
+```
