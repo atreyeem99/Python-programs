@@ -12642,3 +12642,28 @@ print(molecule, S1, T1, gap, f"C{count_C}_B{count_B}_N{count_N}")
 with open("molecules_gap.txt", "a") as results_file:
     results_file.write(f"{molecule} {S1} {T1} {gap} C{count_C}_B{count_B}_N{count_N}\n")
 ```
+#
+```
+def fitness_function_otf(molecule):
+    molecule_str = "".join(map(str, molecule))
+    result = check_molecule_in_csv(molecule_str)
+    
+    if result is None:
+        print(f"Molecule {molecule_str} not found in CSV.")
+        S1, T1, gap = float('Inf'), float('Inf'), float('Inf')  # Default values for missing molecules
+    else:
+        S1, T1, gap = result
+        if float(S1) < 0 or float(T1) < 0:
+            gap = float('Inf')  # Assign a high fitness value for invalid cases
+    
+    # Count the occurrences of each atom type
+    count_C = molecule.count(0)
+    count_N = molecule.count(1)
+    count_B = molecule.count(-1)
+
+    # Write results to file
+    with open("molecules_gap.txt", "a") as results_file:
+        results_file.write(f"{molecule} {S1} {T1} {gap} C{count_C}_B{count_B}_N{count_N}\n")
+
+    return gap
+```
