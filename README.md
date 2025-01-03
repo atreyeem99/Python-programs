@@ -12781,3 +12781,38 @@ molecules = [
 for molecule in molecules:
     fitness_function_otf(molecule)  # Process each molecule
 ```
+#
+```
+from rdkit import Chem
+
+# Input and output file names
+input_file = "input.smi"
+valid_output_file = "valid_smiles.smi"
+invalid_output_file = "invalid_smiles.txt"
+
+# Open the input file and prepare output files
+with open(input_file, "r") as infile, \
+     open(valid_output_file, "w") as valid_outfile, \
+     open(invalid_output_file, "w") as invalid_outfile:
+    
+    for line in infile:
+        # Remove extra spaces and split by whitespace
+        smiles = line.strip()
+        
+        # Skip empty lines
+        if not smiles:
+            continue
+        
+        # Validate SMILES
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            # Write valid SMILES to the valid output file
+            valid_outfile.write(f"{Chem.MolToSmiles(mol)}\n")
+        else:
+            # Write invalid SMILES to the invalid output file
+            invalid_outfile.write(f"Invalid: {smiles}\n")
+
+print("Validation completed!")
+print(f"Valid SMILES saved in: {valid_output_file}")
+print(f"Invalid SMILES saved in: {invalid_output_file}")
+```
