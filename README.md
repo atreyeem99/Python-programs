@@ -12816,3 +12816,38 @@ print("Validation completed!")
 print(f"Valid SMILES saved in: {valid_output_file}")
 print(f"Invalid SMILES saved in: {invalid_output_file}")
 ```
+#
+```
+import pandas as pd
+
+def create_smi_for_first_23(csv_file, output_smi_file):
+    """
+    Create a .smi file for the first 23 molecules, with the first column as SMILES
+    (second column of b.csv) and the second column as molecule names (first column of b.csv).
+
+    Args:
+        csv_file (str): Path to the CSV file.
+        output_smi_file (str): Path to the output .smi file.
+    """
+    try:
+        # Read the CSV file
+        data = pd.read_csv(csv_file)
+
+        # Get the first 23 rows of data
+        first_23_data = data.head(23)
+
+        # Create the .smi content: first column is SMILES, second column is molecule name
+        smi_content = first_23_data[[data.columns[1], data.columns[0]]]
+
+        # Write to the .smi file
+        smi_content.to_csv(output_smi_file, header=False, index=False, sep='\t')
+
+        print(f".smi file created successfully: {output_smi_file}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Example usage
+csv_file = 'b.csv'  # Replace with the path to the second CSV file
+output_smi_file = 'new.smi'  # Replace with the desired output .smi file path
+create_smi_for_first_23(csv_file, output_smi_file)
+```
