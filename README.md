@@ -12851,3 +12851,38 @@ csv_file = 'b.csv'  # Replace with the path to the second CSV file
 output_smi_file = 'new.smi'  # Replace with the desired output .smi file path
 create_smi_for_first_23(csv_file, output_smi_file)
 ```
+#
+```
+import os
+import shutil
+
+# Paths to the main folders
+source_main_folder = "SCS-PBE-QIDH_VDZ_33059"
+destination_main_folder = "FOD_33059"
+sample_fod_file = os.path.join(destination_main_folder, "fod.com")
+
+# Check if the destination main folder exists, if not, create it
+if not os.path.exists(destination_main_folder):
+    os.makedirs(destination_main_folder)
+
+# Iterate through all subfolders in the source folder
+for root, dirs, files in os.walk(source_main_folder):
+    for dir_name in dirs:
+        source_subfolder = os.path.join(root, dir_name)
+        destination_subfolder = os.path.join(destination_main_folder, dir_name)
+        
+        # Create the same subfolder structure in the destination folder
+        if not os.path.exists(destination_subfolder):
+            os.makedirs(destination_subfolder)
+        
+        # Copy geom_DFT_S0.xyz if it exists
+        geom_file_path = os.path.join(source_subfolder, "geom_DFT_S0.xyz")
+        if os.path.exists(geom_file_path):
+            shutil.copy(geom_file_path, destination_subfolder)
+        
+        # Copy fod.com to the subfolder
+        if os.path.exists(sample_fod_file):
+            shutil.copy(sample_fod_file, destination_subfolder)
+
+print("Files copied successfully!")
+```
