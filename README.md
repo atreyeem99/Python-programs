@@ -12962,5 +12962,25 @@ density plot
 ```
 #
 ```
-import
+#!/bin/bash
+
+output_file="S1_T1_STG.txt"
+rm -f $output_file
+
+for dir in Mol_*; do
+    file="$dir/tddft.out"
+    if [ -f "$file" ]; then
+        S1S0=$(grep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $6}' | head -1)
+        ind=$(grep -A20 'STATE ' "$file" | grep '<S\*\*2> =   0' | sort -k6 -n | awk '{print $2}' | head -1)
+        ind=${ind/:/}
+        fosc=$(grep '0-1A  ->  1-1A' "$file" | head -1 | awk '{print $7}')
+        T1S0=$(grep -A20 'STATE ' "$file" | grep '<S\*\*2> =   2' | sort -k6 -n | awk '{print $6}' | head -1)
+        S1T1=$(echo "$S1S0 $T1S0" | awk '{print $1-$2}')
+
+        if (( $(echo "$S1S0 > 0" | bc -l) )) && (( $(echo "$T1S0 > 0" | bc -l) )); then
+            printf "%-20s %8.3f %8.3f %8.3f %10.5f\n" "$dir" "$S1S0" "$T1S0" "$S1T1" "$fosc" >> $output_file
+        fi
+    fi
+done
+
 ```
