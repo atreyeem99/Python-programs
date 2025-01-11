@@ -12984,3 +12984,80 @@ for dir in Mol_*; do
 done
 
 ```
+#
+```
+import os
+
+# Paths and templates
+top_30_names_file = "top_30_names.txt"
+scs_folder = "SCS-PBE-QIDH_VDZ_33059"
+output_base_folder = "top30_ADC2_VDZ"
+
+adc2_template = """$molecule
+  0  1
+{coordinates}$end
+
+$rem
+jobtype             sp
+method              adc(2)
+basis               cc-pVDZ
+aux_basis           rimp2-cc-pVDZ
+mem_total           64000
+mem_static          1000
+maxscf              1000
+cc_symmetry         false
+ee_singlets         3
+ee_triplets         3
+sym_ignore          true
+ADC_DAVIDSON_MAXITER 300
+ADC_DAVIDSON_CONV 5
+$end
+"""
+
+def read_folder_names(file_path):
+    """Read folder names from the given file."""
+    with open(file_path, 'r') as file:
+        return [line.strip() for line in file.readlines()]
+
+def extract_coordinates(file_path):
+    """Extract coordinates from the XYZ file, skipping the first two lines."""
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        return ''.join(lines[2:])  # Skip the first two lines
+
+def create_adc2_input(coordinates, output_path):
+    """Create the ADC(2) input file."""
+    input_content = adc2_template.format(coordinates=coordinates)
+    os.makedirs(output_path, exist_ok=True)
+    with open(os.path.join(output_path, "all.com"), 'w') as file:
+        file.write(input_content)
+
+def process_molecules(top_30_names, scs_folder, output_base_folder):
+    """Main process to create ADC(2) inputs for all top 30 molecules."""
+    for idx, molecule_name in enumerate(top_30_names):
+        scs_molecule_folder = os.path.join(scs_folder, molecule_name)
+        geom_file = os.path.join(scs_molecule_folder, "geom_DFT_S0.xyz")
+        
+        if os.path.exists(geom_file):
+            try:
+                coordinates = extract_coordinates(geom_file)
+                
+                # Generate sequential folder names: Mol_00001, Mol_00002, ...
+                output_folder_name = f"Mol_{idx+1:05d}"
+                output_folder = os.path.join(output_base_folder, output_folder_name)
+                
+                create_adc2_input(coordinates, output_folder)
+            except Exception as e:
+                print(f"Error processing {molecule_name}: {e}")
+        else:
+            print(f"Warning: geom_DFT_S0.xyz not found for molecule {molecule_name} in {scs_folder}")
+
+if __name__ == "__main__":
+    # Step 1: Read the top 30 molecule names
+    top_30_names = read_folder_names(top_30_names_file)
+    
+    # Step 2: Process each molecule and create respective inputs
+    process_molecules(top_30_names, scs_folder, output_base_folder)
+    
+    print(f"ADC(2) inputs have been created in the folder: {output_base_folder}")
+```
