@@ -13061,3 +13061,31 @@ if __name__ == "__main__":
     
     print(f"ADC(2) inputs have been created in the folder: {output_base_folder}")
 ```
+#
+```
+memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={
+ N         -0.0000000000        0.0000000000        0.0000000000
+ C          1.4025590960        0.0000000000        0.0000000000
+ C         -0.7012795480       -1.2146518075        0.0000000000
+ ...
+}
+
+basis={
+default,vdz
+set,mp2fit
+default,vdz/mp2fit
+set,jkfit
+default,vdz/jkfit }
+
+hf
+
+{lt-df-lcc2                     !ground state CC2
+eom,-6.1,triplet=1              !triplet states
+eomprint,popul=-1,loceom=-1 }   !minimize the output same thing for cc2 inp
+```
