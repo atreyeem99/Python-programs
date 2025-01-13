@@ -13089,3 +13089,21 @@ hf
 eom,-6.1,triplet=1              !triplet states
 eomprint,popul=-1,loceom=-1 }   !minimize the output same thing for cc2 inp
 ```
+#
+```
+# Read the names from both files
+with open('top_30_names.txt', 'r') as f:
+    top_30_names = set(f.read().splitlines())
+
+with open('top82.txt', 'r') as f:
+    top82_names = f.read().splitlines()
+
+# Find names in top82 that are not in top_30_names
+names_not_in_top_30 = [name for name in top82_names if name not in top_30_names]
+
+# Write the 52 names into a new file
+with open('names_not_in_top_30.txt', 'w') as f:
+    f.write("\n".join(names_not_in_top_30))
+
+print("The file 'names_not_in_top_30.txt' has been created with 52 names.")
+```
