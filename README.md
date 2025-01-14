@@ -13107,3 +13107,42 @@ with open('names_not_in_top_30.txt', 'w') as f:
 
 print("The file 'names_not_in_top_30.txt' has been created with 52 names.")
 ```
+#
+```
+import os
+import shutil
+
+# Number of molecules
+num_molecules = 82
+
+# Open the top82.xyz file once to read all lines
+with open('top82.xyz', 'r') as file:
+    lines = file.readlines()
+
+# Create folders named Mol_00001 to Mol_00082
+for i in range(1, num_molecules + 1):
+    folder_name = f'Mol_{i:05d}'  # Formatting the folder name as Mol_00001, Mol_00002, ...
+    os.makedirs(folder_name, exist_ok=True)
+
+    # Find the starting line for the current molecule
+    start_line = (i - 1) * 2  # The first 2 lines in each section are the atom count and molecule name
+    
+    # The first line contains the atom count, the second line is the molecule name
+    num_atoms = int(lines[start_line].strip())  # Get the number of atoms for the molecule
+
+    # The coordinates for the current molecule span the next `num_atoms` lines
+    molecule_lines = lines[start_line + 1:start_line + 1 + num_atoms]
+
+    # Save coordinates in geom.xyz within the respective folder
+    with open(f'{folder_name}/geom.xyz', 'w') as geom_file:
+        # Write the atom count and molecule name as the first two lines in the geom.xyz
+        geom_file.write(f"{num_atoms}\n")
+        geom_file.write(f"Mol_{i:05d}\n")
+        # Write the atom coordinates
+        geom_file.writelines(molecule_lines)
+
+    # Copy opt.com to the folder
+    shutil.copy('opt.com', f'{folder_name}/opt.com')
+
+print("Folders created and files copied successfully.")
+```
