@@ -13146,3 +13146,62 @@ for i in range(1, num_molecules + 1):
 
 print("Folders created and files copied successfully.")
 ```
+#
+```
+import os
+import shutil
+
+# Paths for source and destination directories
+source_dir = "top82_TPSSh_freq"
+destination_dir = "top82_G16_wB97XD3_opt_freq"
+
+# Gaussian input template
+gaussian_template = """%mem=64GB
+%nprocs=18
+#P  wB97XD/cc-pVDZ  SCF(maxcycles=100,verytight)  Int(Grid=ultrafine) Opt(maxcyc=1000, calcall, verytight) Freq
+
+Test
+
+0 1
+"""
+
+def create_gaussian_input(source_path, dest_path):
+    """Reads geom_DFT_S0.xyz and creates Gaussian input."""
+    try:
+        with open(source_path, "r") as xyz_file:
+            lines = xyz_file.readlines()
+
+        # Extract coordinates, skipping first 2 lines
+        coordinates = lines[2:]
+
+        # Write the Gaussian input file
+        with open(dest_path, "w") as g_input:
+            g_input.write(gaussian_template)
+            g_input.writelines(coordinates)
+            g_input.write("\n\n\n\n")  # Add 4 empty lines at the end
+
+        print(f"Created: {dest_path}")
+
+    except Exception as e:
+        print(f"Error processing {source_path}: {e}")
+
+# Iterate through folders and create Gaussian inputs
+for root, dirs, files in os.walk(source_dir):
+    for folder in dirs:
+        source_folder = os.path.join(root, folder)
+        xyz_file = os.path.join(source_folder, "geom_DFT_S0.xyz")
+
+        if os.path.exists(xyz_file):
+            # Create corresponding folder in destination directory
+            relative_path = os.path.relpath(source_folder, source_dir)
+            dest_folder = os.path.join(destination_dir, relative_path)
+            os.makedirs(dest_folder, exist_ok=True)
+
+            # Define the output Gaussian input file path
+            gaussian_input_path = os.path.join(dest_folder, "input.com")
+
+            # Create the Gaussian input file
+            create_gaussian_input(xyz_file, gaussian_input_path)
+
+print("All Gaussian input files have been created.")
+```
