@@ -13205,3 +13205,76 @@ for root, dirs, files in os.walk(source_dir):
 
 print("All Gaussian input files have been created.")
 ```
+#
+```
+import os
+
+# Template for inp.com
+inp_template = """memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={{
+{coordinates}}}
+
+basis={{
+default,vdz
+set,mp2fit
+default,vdz/mp2fit
+set,jkfit
+default,vdz/jkfit }}
+
+hf
+
+{{lt-df-lcc2                     !ground state CC2
+eom,-6.1,triplet=1              !triplet states
+eomprint,popul=-1,loceom=-1 }}   !minimize the output same thing for cc2 inp
+"""
+
+def extract_coordinates(file_path):
+    """Extract coordinates from the XYZ file, skipping the first two lines."""
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+        return ''.join(lines[2:])  # Skip the first two lines
+
+def create_inp_file(coordinates, output_path):
+    """Create the inp.com file."""
+    inp_content = inp_template.format(coordinates=coordinates)
+    os.makedirs(output_path, exist_ok=True)
+    with open(os.path.join(output_path, "inp.com"), 'w') as file:
+        file.write(inp_content)
+
+def process_xyz_file(source_base, target_base, folder_name):
+    """Process a single folder and create inp.com if geom_DFT_S0.xyz exists."""
+    source_folder = os.path.join(source_base, folder_name)
+    geom_file = os.path.join(source_folder, "geom_DFT_S0.xyz")
+    
+    if os.path.exists(geom_file):
+        try:
+            coordinates = extract_coordinates(geom_file)
+            output_folder = os.path.join(target_base, folder_name)
+            create_inp_file(coordinates, output_folder)
+        except Exception as e:
+            print(f"Error processing {folder_name}: {e}")
+    else:
+        print(f"Warning: geom_DFT_S0.xyz not found in {source_folder}")
+
+def process_all_folders(source_base, target_base, start_index=1, end_index=8):
+    """Process folders named P1, P2, ..., P8."""
+    for i in range(start_index, end_index + 1):
+        folder_name = f"P{i}"  # Generate folder names like P1, P2, etc.
+        print(f"Processing {folder_name}...")
+        process_xyz_file(source_base, target_base, folder_name)
+
+if __name__ == "__main__":
+    # Define source and target base folders
+    source_base = "wB97XD3_TZVP_opt_freq"
+    target_base = "LCC2_VDZ"
+
+    # Process folders from P1 to P8
+    process_all_folders(source_base, target_base, start_index=1, end_index=8)
+
+    print(f"inp.com files have been created in the folder: {target_base}")
+```
