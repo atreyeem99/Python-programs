@@ -13278,3 +13278,27 @@ if __name__ == "__main__":
 
     print(f"inp.com files have been created in the folder: {target_base}")
 ```
+#
+```
+import os
+
+# Read the folder names from stable_37.txt
+with open('stable_37.txt', 'r') as f:
+    folder_names = [line.strip() for line in f]
+
+# Open the combined output file
+with open('stable_37_TPSSh.xyz', 'w') as combined_xyz:
+    # Iterate over each folder
+    for folder in folder_names:
+        # Construct the path to the TPSSh.xyz file in the folder
+        file_path = os.path.join(folder, 'TPSSh.xyz')
+        
+        # Check if the file exists in the folder
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as f:
+                # Read the contents of TPSSh.xyz and append to the combined file
+                combined_xyz.write(f.read())
+                combined_xyz.write('\n')  # Add a newline to separate each file's content
+        else:
+            print(f"File {file_path} does not exist.")
+```
