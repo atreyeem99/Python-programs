@@ -13302,3 +13302,44 @@ with open('stable_37_TPSSh.xyz', 'w') as combined_xyz:
         else:
             print(f"File {file_path} does not exist.")
 ```
+#
+```
+import os
+import shutil
+
+# Read folder names from the stable_41.txt file
+with open('stable_41.txt', 'r') as file:
+    folder_names = [line.strip() for line in file if line.strip()]
+
+# Ensure the target directory exists
+fod_dir = 'FOD_41'
+os.makedirs(fod_dir, exist_ok=True)
+
+# Check for the presence of fod.com
+fod_com_path = os.path.join(fod_dir, 'fod.com')
+if not os.path.exists(fod_com_path):
+    raise FileNotFoundError(f"The file 'fod.com' was not found in {fod_dir}.")
+
+# Iterate through folder names and perform operations
+for i, folder_name in enumerate(folder_names, start=1):
+    # Create target subfolder in FOD_41
+    target_folder_name = f"Mol_{i:05d}"
+    target_folder_path = os.path.join(fod_dir, target_folder_name)
+    os.makedirs(target_folder_path, exist_ok=True)
+
+    # Define source and target paths for geom_DFT_S0.xyz
+    source_xyz_path = os.path.join(folder_name, 'geom_DFT_S0.xyz')
+    target_xyz_path = os.path.join(target_folder_path, 'geom_DFT_S0.xyz')
+
+    if not os.path.exists(source_xyz_path):
+        print(f"Warning: {source_xyz_path} does not exist. Skipping.")
+        continue
+
+    # Copy geom_DFT_S0.xyz to the target folder
+    shutil.copy(source_xyz_path, target_xyz_path)
+
+    # Copy fod.com to the target folder
+    shutil.copy(fod_com_path, target_folder_path)
+
+print("All files have been processed and copied.")
+```
