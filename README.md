@@ -13343,3 +13343,114 @@ for i, folder_name in enumerate(folder_names, start=1):
 
 print("All files have been processed and copied.")
 ```
+#
+```
+import os
+
+# Function to calculate necessary parameters
+def calculate_parameters(heavy_atoms, hydrogen_atoms):
+    N_heavy = heavy_atoms
+    N_Hydrogen = hydrogen_atoms
+
+    # Number of electrons
+    N_electrons = N_heavy * 6 + N_Hydrogen * 1
+
+    # No. of 1s core MOs
+    N_core = N_heavy
+
+    # Basis functions for H in cc-pVDZ
+    N_bas_VDZ_H = 5
+
+    # Basis functions for B/C/N in cc-pVDZ
+    N_bas_VDZ_CBN = 14
+
+    # Molecular orbitals in cc-pVDZ
+    N_MOs = 14 * N_heavy + 5 * N_Hydrogen
+
+    # Occupied MOs
+    N_occ = N_electrons // 2
+
+    # Unoccupied/virtual MOs
+    N_vir = N_MOs - N_occ
+
+    N_FROZEN_CORE = N_core
+    N_FROZEN_VIRTUAL = N_MOs - N_occ - 2 * (N_occ - N_core)
+
+    return N_FROZEN_CORE, N_FROZEN_VIRTUAL
+
+# Function to process geom_DFT_S0.xyz and create all1.com
+def process_xyz_file(source_folder, target_folder, folder_name):
+    xyz_file_path = os.path.join(source_folder, folder_name, "geom_DFT_S0.xyz")
+
+    if os.path.isfile(xyz_file_path):
+        # Read the .xyz file
+        with open(xyz_file_path, 'r') as f:
+            lines = f.readlines()
+
+        # Extract atom data from the .xyz file
+        atom_count = int(lines[0].strip())  # First line gives the number of atoms
+        heavy_atoms = 0
+        hydrogen_atoms = 0
+        atom_data = []
+        for line in lines[2:]:  # Skip the first two lines (atom count and comment)
+            parts = line.split()
+            atom_type = parts[0]
+            x, y, z = parts[1:4]  # Coordinates
+            if atom_type in ['B', 'C', 'N']:
+                heavy_atoms += 1
+            elif atom_type == 'H':
+                hydrogen_atoms += 1
+            atom_data.append(f"  {atom_type}   {x}   {y}   {z}\n")
+
+        # Calculate parameters
+        N_FROZEN_CORE, N_FROZEN_VIRTUAL = calculate_parameters(heavy_atoms, hydrogen_atoms)
+
+        # Prepare new .com file content
+        new_com_content = "$molecule\n"
+        new_com_content += "  0  1\n"  # Only one occurrence of "0 1"
+        new_com_content += "".join(atom_data)
+        new_com_content += "$end\n\n"
+        new_com_content += "$rem\n"
+        new_com_content += f"jobtype             sp\n"
+        new_com_content += f"method              adc(2)\n"
+        new_com_content += f"N_FROZEN_CORE       {N_FROZEN_CORE}\n"
+        new_com_content += f"N_FROZEN_VIRTUAL    {N_FROZEN_VIRTUAL}\n"
+        new_com_content += "basis               cc-pVDZ\n"
+        new_com_content += "aux_basis           rimp2-cc-pVDZ\n"
+        new_com_content += "mem_total           64000\n"
+        new_com_content += "mem_static          1000\n"
+        new_com_content += "maxscf              1000\n"
+        new_com_content += "cc_symmetry         false\n"
+        new_com_content += "ee_singlets         3\n"
+        new_com_content += "ee_triplets         3\n"
+        new_com_content += "sym_ignore          true\n"
+        new_com_content += "ADC_DAVIDSON_MAXITER 300\n"
+        new_com_content += "ADC_DAVIDSON_CONV 5\n"
+        new_com_content += "$end\n"
+
+        # Create the respective folder in the target directory
+        target_subfolder = os.path.join(target_folder, folder_name)
+        os.makedirs(target_subfolder, exist_ok=True)
+
+        # Write the new all1.com file
+        new_com_file_path = os.path.join(target_subfolder, "all1.com")
+        with open(new_com_file_path, 'w') as f:
+            f.write(new_com_content)
+
+# Main function to process all folders in the source directory
+def process_all_folders(source_base, target_base):
+    for folder_name in os.listdir(source_base):
+        folder_path = os.path.join(source_base, folder_name)
+        if os.path.isdir(folder_path):
+            print(f"Processing {folder_name}...")
+            process_xyz_file(source_base, target_base, folder_name)
+
+# Define source and target folder paths
+source_folder = "/home/atreyee/BNPAH/top82_wB97XD3_opt_freq"  # Replace with the actual path
+target_folder = "/home/atreyee/BNPAH/top82_wB97XD3_opt_freq/ADC2_FC_FV_VDZ"  # Replace with the actual path
+
+# Process all folders
+process_all_folders(source_folder, target_folder)
+
+print("All folders processed successfully!")
+```
