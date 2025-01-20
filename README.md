@@ -13454,3 +13454,72 @@ process_all_folders(source_folder, target_folder)
 
 print("All folders processed successfully!")
 ```
+#
+```
+import os
+import shutil
+
+# Define paths
+thiol_smiles_folder = '/path/to/THIOL_smiles'  # Update this path
+destination_folder = '/home/atreyee/THIOL/OPT_wB97XD3_def2SVP/molecules'
+
+# Process each subfolder in the 'THIOL_smiles' folder
+for subfolder in os.listdir(thiol_smiles_folder):
+    subfolder_path = os.path.join(thiol_smiles_folder, subfolder)
+
+    # Check if it's a directory
+    if os.path.isdir(subfolder_path):
+        # Find the 'foldername_conf.xyz' file inside the subfolder
+        xyz_file = os.path.join(subfolder_path, f'{subfolder}_conf.xyz')
+        
+        if os.path.exists(xyz_file):
+            print(f'Processing {subfolder}...')
+
+            # Create corresponding folder in destination
+            molecule_folder = os.path.join(destination_folder, subfolder)
+            os.makedirs(molecule_folder, exist_ok=True)
+
+            # Open the geometry file and start processing molecules
+            with open(xyz_file, 'r') as geom_file:
+                mol_counter = 1  # Initialize molecule counter
+
+                line = geom_file.readline().strip()
+                while line:
+                    # Read number of atoms (Nat)
+                    Nat = int(line)
+
+                    # Read molecule title
+                    title = geom_file.readline().strip()
+
+                    # Create new molecule name (sequentially numbered)
+                    mol_name = f"Mol_{mol_counter:05d}"
+                    print(f'Processing {mol_name} for {subfolder}')
+
+                    # Create folder for the molecule
+                    mol_folder = os.path.join(molecule_folder, mol_name)
+                    os.makedirs(mol_folder, exist_ok=True)
+
+                    # Prepare new geom.xyz file
+                    new_geomfile = os.path.join(mol_folder, 'geom.xyz')
+                    with open(new_geomfile, 'w') as inputfile:
+                        inputfile.write(f'{Nat}\n')
+                        inputfile.write(f'{mol_name}\n')
+
+                        # Read atoms' data for the molecule
+                        for _ in range(Nat):
+                            line = geom_file.readline().split()
+                            sym = line[0]
+                            R = [float(line[1]), float(line[2]), float(line[3])]
+                            inputfile.write(f'{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n')
+
+                    # Copy necessary files into the new folder
+                    shutil.copy('tddft.com', mol_folder)  # Adjust path if necessary
+
+                    mol_counter += 1  # Increment molecule counter
+
+                    # Read next molecule
+                    line = geom_file.readline().strip()
+
+        else:
+            print(f'Warning: {xyz_file} not found in {subfolder}. Skipping...')
+```
