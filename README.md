@@ -13523,3 +13523,63 @@ for subfolder in os.listdir(thiol_smiles_folder):
         else:
             print(f'Warning: {xyz_file} not found in {subfolder}. Skipping...')
 ```
+#
+```
+import csv
+
+# Conversion factor from Hartree to kcal/mol
+hartree_to_kcal = 627.509474
+
+# Constants
+H = -0.501445095782
+SH = -398.62824952
+
+# File paths
+mol_file = "mol_energy.txt"
+mol_C_file = "mol_C_energy.txt"
+mol_S_file = "mol_S_energy.txt"
+output_file = "results.csv"
+
+# Function to read energy values from a file
+def read_energies(file_path):
+    energies = {}
+    with open(file_path, "r") as file:
+        for line in file:
+            parts = line.strip().split()
+            if len(parts) == 2:
+                mol_name = parts[0]
+                energy = float(parts[1])
+                energies[mol_name] = energy
+    return energies
+
+# Read energy values from files
+mol_energies = read_energies(mol_file)
+mol_C_energies = read_energies(mol_C_file)
+mol_S_energies = read_energies(mol_S_file)
+
+# Perform calculations for each molecule and prepare results
+results = []
+for mol_name in mol_energies:
+    mol = mol_energies[mol_name]
+    mol_C = mol_C_energies[mol_name]
+    mol_S = mol_S_energies[mol_name]
+    
+    # Calculate E1 and E2 in kcal/mol
+    E1_hartree = mol - (mol_S + H)
+    E2_hartree = mol - (mol_C + SH)
+    E1_kcal = E1_hartree * hartree_to_kcal
+    E2_kcal = E2_hartree * hartree_to_kcal
+    
+    # Append results as a tuple
+    results.append((mol_name, E1_kcal, E2_kcal))
+
+# Write results to a CSV file
+with open(output_file, "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    # Write header
+    writer.writerow(["molname", "E1", "E2"])
+    # Write data
+    writer.writerows(results)
+
+print(f"Results saved to {output_file}")
+```
