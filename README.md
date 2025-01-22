@@ -13583,3 +13583,38 @@ with open(output_file, "w", newline="") as csvfile:
 
 print(f"Results saved to {output_file}")
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+
+def plot_histogram_from_csv(file_path, output_file):
+    labels = []
+    data = []
+
+    # Read the CSV file
+    with open(file_path, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            labels.append(row[reader.fieldnames[0]])  # First column for labels
+            data.append(float(row[reader.fieldnames[1]]))  # Second column for values
+
+    # Plot the histogram
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels, data, color='skyblue')
+    plt.xlabel('Labels')
+    plt.ylabel('Frequency')
+    plt.title('Histogram of 2nd Column')
+    plt.xticks(rotation=45, ha='right')
+    plt.axhline(0, color='black', linestyle='dotted', linewidth=1)  # Add horizontal dotted line
+    plt.tight_layout()
+
+    # Save the figure as a PNG file
+    plt.savefig(output_file, format='png', dpi=300)
+    plt.close()
+
+# Example usage
+file_path = 'your_file.csv'  # Replace with your CSV file path
+output_file = 'histogram.png'  # Replace with your desired output file path
+plot_histogram_from_csv(file_path, output_file)
+```
