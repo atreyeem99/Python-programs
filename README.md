@@ -13618,3 +13618,39 @@ file_path = 'your_file.csv'  # Replace with your CSV file path
 output_file = 'histogram.png'  # Replace with your desired output file path
 plot_histogram_from_csv(file_path, output_file)
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file
+csv_file = "data.csv"  # Replace with your CSV file name
+data = pd.read_csv(csv_file)
+
+# Extract the 1st, 4th, and 5th columns
+labels = data.iloc[:, 0]  # 1st column (molecule labels)
+x_values = data.iloc[:, 3]  # 4th column
+y_values = data.iloc[:, 4]  # 5th column
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(x_values, y_values, color="blue", alpha=0.7)
+
+# Annotate points with labels
+for label, x, y in zip(labels, x_values, y_values):
+    plt.text(x, y, str(label), fontsize=9, ha='right', va='bottom')
+
+# Add labels and title
+plt.xlabel("4th Column Values", fontsize=12)
+plt.ylabel("5th Column Values", fontsize=12)
+plt.title("Scatter Plot of 4th Column vs 5th Column with Labels", fontsize=14)
+plt.grid(True)
+
+# Save the plot as a PNG file
+output_file = "scatter_plot.png"
+plt.tight_layout()
+plt.savefig(output_file, dpi=300)
+plt.close()
+
+print(f"Scatter plot saved as {output_file}")
+```
