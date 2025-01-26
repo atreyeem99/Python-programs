@@ -13739,3 +13739,44 @@ plt.savefig("scatter_plot_with_lines.png", dpi=300)  # Save as a high-quality PN
 # Show the plot
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV file
+csv_file = "results.csv"  # Replace with your CSV file name
+data = pd.read_csv(csv_file)
+
+# Extract the required columns
+labels = data.iloc[:, 0]  # 1st column (molecule labels)
+x_values = data.iloc[:, 4]  # 4th column
+y_values = data.iloc[:, 3]  # 5th column
+
+# Coordinates for the lines
+x_coords = [x_values.iloc[2], x_values.iloc[0], x_values.iloc[3], x_values.iloc[1]]  # 3rd to 1st, 4th to 2nd
+y_coords = [y_values.iloc[2], y_values.iloc[0], y_values.iloc[3], y_values.iloc[1]]
+
+# Create a scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(x_values, y_values, color="blue", alpha=0.7)
+
+# Annotate points with labels
+for label, x, y in zip(labels, x_values, y_values):
+    plt.text(x, y, str(label), fontsize=9, ha='right', va='bottom')
+
+# Draw lines connecting points
+plt.plot(x_coords[:2], y_coords[:2], color='red', linestyle='--', linewidth=1.5, label='Line: 3rd to 1st row')
+plt.plot(x_coords[2:], y_coords[2:], color='green', linestyle='--', linewidth=1.5, label='Line: 4th to 2nd row')
+
+# Add labels and title
+plt.ylabel("Yield", fontsize=12)
+plt.xlabel("Relative Stabilization Energy per System [kcal/mol]", fontsize=12)
+# plt.title("Scatter Plot with Lines Connecting Specific Points", fontsize=14)
+plt.grid(True)
+plt.legend()
+
+# Show the plot
+plt.tight_layout()
+plt.show()
+```
