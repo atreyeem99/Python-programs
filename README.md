@@ -13780,3 +13780,46 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+import shutil
+
+def create_folders_and_copy_files(stable_file, source_folder, destination_folder):
+    # Read the folder names from stable_41.txt
+    with open(stable_file, 'r') as file:
+        folders = [line.strip() for line in file.readlines()]
+    
+    # Create 41 folders like Mol_00001 to Mol_00041
+    os.makedirs(destination_folder, exist_ok=True)
+    for i in range(1, 42):
+        folder_name = f"Mol_{i:05d}"
+        folder_path = os.path.join(destination_folder, folder_name)
+        os.makedirs(folder_path, exist_ok=True)
+        
+        # Copy the geom_DFT_S0.xyz from the source folders
+        if i <= len(folders):
+            source_geom_file = os.path.join(folders[i - 1], "geom_DFT_S0.xyz")
+            
+            # Copy geom_DFT_S0.xyz
+            if os.path.isfile(source_geom_file):
+                shutil.copy(source_geom_file, folder_path)
+                print(f"Copied {source_geom_file} to {folder_path}")
+            else:
+                print(f"geom_DFT_S0.xyz not found in {folders[i - 1]}")
+        
+        # Copy the tddft.com file from the SOS-PBE-QIDH_AVDZ folder
+        source_tddft_file = os.path.join(source_folder, "tddft.com")
+        if os.path.isfile(source_tddft_file):
+            shutil.copy(source_tddft_file, folder_path)
+            print(f"Copied {source_tddft_file} to {folder_path}")
+        else:
+            print(f"tddft.com not found in {source_folder}")
+
+# Usage
+stable_file = 'stable_41.txt'  # Path to the stable_41.txt
+source_folder = 'SOS-PBE-QIDH_AVDZ'  # Folder where tddft.com is located
+destination_folder = 'SOS-PBE-QIDH_AVDZ'  # Destination folder
+
+create_folders_and_copy_files(stable_file, source_folder, destination_folder)
+```
