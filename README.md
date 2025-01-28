@@ -13823,3 +13823,81 @@ destination_folder = 'SOS-PBE-QIDH_AVDZ'  # Destination folder
 
 create_folders_and_copy_files(stable_file, source_folder, destination_folder)
 ```
+#
+```
+import os
+
+# Template for the inp.com file
+inp_template = """memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={{
+{coordinates}
+}}
+
+basis={{
+default,avdz
+set,mp2fit
+default,avdz/mp2fit
+set,jkfit
+default,avdz/jkfit }}
+
+hf
+
+{{lt-df-lcc2                     !ground state CC2
+eom,-3.1,triplet=1              !triplet states
+eomprint,popul=-1,loceom=-1 }}   !minimize the output same thing for cc2 inp
+"""
+
+# Source and destination folders
+source_base_path = "/home/atreyee/BNPAH/Pyrene_63_wB97XD3_def2TZVP_OPT_freq"
+destination_base_path = "/home/atreyee/BNPAH/Pyrene_63_LCC2_AVDZ"
+
+def format_coordinates(lines):
+    """Formats the coordinates for alignment."""
+    formatted_lines = []
+    for line in lines:
+        parts = line.split()
+        if len(parts) == 4:
+            atom = parts[0]
+            x, y, z = map(float, parts[1:])
+            formatted_lines.append(f"{atom:<2} {x:>20.14f} {y:>20.14f} {z:>20.14f}")
+    return "\n".join(formatted_lines)
+
+def process_folders():
+    # Walk through the source base path
+    for root, dirs, _ in os.walk(source_base_path):
+        for dir_name in dirs:
+            source_folder = os.path.join(root, dir_name)
+            destination_folder = os.path.join(destination_base_path, dir_name)
+
+            # Ensure destination folder exists
+            os.makedirs(destination_folder, exist_ok=True)
+
+            # Check for the geom_DFT_S0.xyz file in the source folder
+            geom_file = os.path.join(source_folder, "geom_DFT_S0.xyz")
+            if os.path.exists(geom_file):
+                # Read the geometry from the geom_DFT_S0.xyz file
+                with open(geom_file, "r") as f:
+                    lines = f.readlines()
+                    # Skip the first two lines and format the remaining coordinates
+                    coordinates = format_coordinates(lines[2:])
+
+                # Create inp.com with the formatted coordinates
+                inp_content = inp_template.replace("{coordinates}", coordinates)
+
+                # Write inp.com to the destination folder
+                inp_file_path = os.path.join(destination_folder, "inp.com")
+                with open(inp_file_path, "w") as inp_file:
+                    inp_file.write(inp_content)
+
+                print(f"Created inp.com in {destination_folder}")
+            else:
+                print(f"geom_DFT_S0.xyz not found in {source_folder}")
+
+# Run the function
+process_folders()
+```
