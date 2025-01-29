@@ -13901,3 +13901,45 @@ def process_folders():
 # Run the function
 process_folders()
 ```
+#
+```
+import os
+import subprocess
+import shutil
+
+def process_folders():
+    base_dir = os.getcwd()  # Get the current working directory
+    all_csv_dir = os.path.join(base_dir, "all_csv_files")
+
+    # Create 'all_csv_files' directory if it doesn't exist
+    if not os.path.exists(all_csv_dir):
+        os.makedirs(all_csv_dir)
+
+    # Iterate over all folders in the base directory
+    for folder in os.listdir(base_dir):
+        if os.path.isdir(folder) and (folder.startswith('A') or folder.startswith('E') or folder.startswith('L')):
+            # Find the .sh file starting with 'e' in the folder
+            folder_path = os.path.join(base_dir, folder)
+            e_sh_file = None
+            for file in os.listdir(folder_path):
+                if file.startswith('e') and file.endswith('.sh'):
+                    e_sh_file = file
+                    break
+            
+            if e_sh_file:
+                # Run the script and redirect output to a CSV file
+                result_file = os.path.join(folder_path, f"{folder}.csv")
+                e_sh_path = os.path.join(folder_path, e_sh_file)
+                with open(result_file, 'w') as outfile:
+                    subprocess.run(['bash', e_sh_path], cwd=folder_path, stdout=outfile, stderr=outfile)
+
+                # Copy the CSV file to all_csv_files folder
+                shutil.copy(result_file, all_csv_dir)
+                print(f"CSV file for {folder} copied to {all_csv_dir}")
+            else:
+                print(f"No .sh file starting with 'e' found in {folder}")
+
+# Run the function
+if __name__ == "__main__":
+    process_folders()
+```
