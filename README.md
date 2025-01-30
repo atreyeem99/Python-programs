@@ -13943,3 +13943,37 @@ def process_folders():
 if __name__ == "__main__":
     process_folders()
 ```
+#
+```
+import numpy as np
+import pandas as pd
+
+def load_column(filename, col_index=2):
+    """Loads the specified column (0-based index) from a CSV file without headers."""
+    return pd.read_csv(filename, usecols=[col_index], header=None).values.flatten()
+
+def compute_errors(reference, target):
+    """Computes MSE, MAE, and SDE between reference and target arrays."""
+    mse = np.mean(reference - target)
+    mae = np.mean(np.abs(reference - target))
+    sde = np.std(reference - target)
+    return mse, mae, sde
+
+# File names
+reference_file = "Pyrene_63_LCC2_AVDZ.csv"
+target_files = [
+    "Pyrene_63_PBE-QIDH_AVDZ.csv",
+    "Pyrene_63_PBE-QIDH_AVDZ_0.70_0.65.csv",
+    "Pyrene_63_PBE-QIDH_AVDZ_0.75_0.45.csv"
+]
+
+# Load reference column
+reference_data = load_column(reference_file)
+
+# Compute and print errors for each target file
+for target_file in target_files:
+    target_data = load_column(target_file)
+    mse, mae, sde = compute_errors(reference_data, target_data)
+    print(f"Comparison with {target_file}:")
+    print(f"MSE: {mse:.6f}, MAE: {mae:.6f}, SDE: {sde:.6f}\n")
+```
