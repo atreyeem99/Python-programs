@@ -13977,3 +13977,36 @@ for target_file in target_files:
     print(f"Comparison with {target_file}:")
     print(f"MSE: {mse:.6f}, MAE: {mae:.6f}, SDE: {sde:.6f}\n")
 ```
+#
+```
+import pandas as pd
+
+# File names
+files = [
+    "LCC2_AVTZ.csv",
+    "LADC2_AVDZ.csv",
+    "Method_PBE-QIDH_AVDZ.csv",
+    "Scaled_Method_PBE-QIDH_AVDZ.csv",
+    "TBE.csv"
+]
+
+# Read CSV files and extract the 3rd column
+columns = []
+for file in files:
+    data = pd.read_csv(file, header=None)
+    columns.append(data.iloc[:12, 2].values)  # Extract first 12 values from the 3rd column
+
+# Generate LaTeX table
+latex_table = "\\begin{table}[h]\n\\centering\n\\begin{tabular}{c|ccccc}\n"
+latex_table += "Serial & LCC2 & LADC2 & PBE-QIDH & Scaled PBE-QIDH & TBE \\\\ \hline\n"
+for i in range(12):
+    row = [str(i + 1)] + [f"{val:.3f}" for val in [col[i] for col in columns]]
+    latex_table += " & ".join(row) + " \\\\ \n"
+latex_table += "\\end{tabular}\n\\caption{Comparison of Methods}\n\\end{table}"
+
+# Save to file
+with open("table.tex", "w") as f:
+    f.write(latex_table)
+
+print("LaTeX table saved as table.tex")
+```
