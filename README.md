@@ -14114,3 +14114,46 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import os
+import glob
+import csv
+
+def extract_gibbs_energy(folder):
+    """Extract the final Gibbs free energy from opt_int.out"""
+    file_path = os.path.join(folder, "opt_int.out")
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            lines = f.readlines()
+        energies = [line for line in lines if "Final Gibbs free energy" in line]
+        if energies:
+            return float(energies[-1].split()[5])  # Extract energy value in Hartree
+    return None
+
+def hartree_to_kcalmol(energy_hartree):
+    """Convert energy from Hartree to kcal/mol"""
+    return energy_hartree * 627.509
+
+def main():
+    mol_folders = sorted(glob.glob("Mol_*"))
+    energy_data = []
+
+    for folder in mol_folders:
+        energy_hartree = extract_gibbs_energy(folder)
+        if energy_hartree is not None:
+            energy_kcalmol = hartree_to_kcalmol(energy_hartree)
+            energy_data.append((folder, energy_kcalmol))
+
+    # Save results to CSV
+    csv_filename = "gibbs_energies.csv"
+    with open(csv_filename, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Folder Name", "Energy (kcal/mol)"])
+        writer.writerows(energy_data)
+
+    print(f"Saved Gibbs free energies in {csv_filename}")
+
+if __name__ == "__main__":
+    main()
+```
