@@ -14193,3 +14193,42 @@ if __name__ == "__main__":
     csv_file = "Cys_lowest_10_energies.csv"  # Replace with your actual CSV file name
     plot_histogram(csv_file)
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_histogram(csv_file):
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    
+    # Extract the first column (labels) and second column (values)
+    labels = df.iloc[:, 0]
+    values = df.iloc[:, 1]
+    
+    # Conversion factor from Hartree to kcal/mol
+    hartree_to_kcal = 627.509
+    
+    # Convert reference energies from Hartree to kcal/mol
+    reference_energy_1 = -720.79682962 * hartree_to_kcal
+    reference_energy_2 = -1024.51562513 * hartree_to_kcal
+    
+    # Subtract both reference energies sequentially
+    adjusted_values = values - reference_energy_1 - reference_energy_2
+    
+    # Plot the histogram
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels, adjusted_values, color='skyblue', edgecolor='black', alpha=0.7)
+    plt.ylim(min(adjusted_values) - 1, max(adjusted_values) + 1)  # Zoom in further
+    plt.xlabel('Conformer Names')
+    plt.ylabel('Relative Energy (kcal/mol)')
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(axis='y', linestyle='--', alpha=0.6)
+    
+    # Show the plot
+    plt.show()
+
+if __name__ == "__main__":
+    csv_file = "Cys_lowest_10_energies.csv"  # Replace with your actual CSV file name
+    plot_histogram(csv_file)
+```
