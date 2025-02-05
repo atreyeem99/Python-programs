@@ -14232,3 +14232,38 @@ if __name__ == "__main__":
     csv_file = "Cys_lowest_10_energies.csv"  # Replace with your actual CSV file name
     plot_histogram(csv_file)
 ```
+#
+```
+systems=$( echo Ac_Cys Ac_pen Cys Pen )
+
+for sys in $systems; do
+  cd $sys
+  rm -f gibbs.txt
+
+  # Initialize variables to track the folder with the lowest energy
+  min_energy=9999999  # Set a high initial value for comparison
+  min_folder=""
+
+  # Determine the file pattern based on the folder name
+  if [[ $sys == "Ac_Cys" || $sys == "Ac_pen" ]]; then
+    file_pattern="Mol*/opt1.out"
+  else
+    file_pattern="Mol*/opt.out"
+  fi
+
+  for mol in $file_pattern; do
+    energy=$(grep 'Final Gibbs free energy' $mol | tail -1 | awk '{print $6}')
+    folder_name=$(basename $(dirname $mol))  # Extract the folder name (Mol?)
+
+    # Update if the current energy is lower than the previous minimum
+    if (( $(echo "$energy < $min_energy" | bc -l) )); then
+      min_energy=$energy
+      min_folder=$folder_name
+    fi
+  done
+
+  # Print the system, minimum energy, and folder with the lowest energy
+  echo "$sys: Lowest energy = $min_energy in folder $min_folder"
+  cd ..
+done
+```
