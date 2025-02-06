@@ -14267,3 +14267,33 @@ for sys in $systems; do
   cd ..
 done
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_histogram(csv_file):
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    
+    # Extract the first column (labels) and second column (values)
+    labels = df.iloc[:, 0]
+    values = df.iloc[:, 1]
+    
+    # Adjust scale for better visualization
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels, values, color='skyblue', edgecolor='black', alpha=0.7)
+    plt.ylim(min(values) - 1, max(values) + 1)  # Zoom in further
+    plt.xlabel('Folder Name')
+    plt.ylabel('Energy (kcal/mol)')
+    plt.title(f'Histogram of {df.columns[1]} by {df.columns[0]}')
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(axis='y', linestyle='--', alpha=0.6)
+    
+    # Show the plot
+    plt.show()
+
+if __name__ == "__main__":
+    csv_file = "your_file.csv"  # Replace with your actual CSV file name
+    plot_histogram(csv_file)
+```
