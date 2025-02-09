@@ -14352,3 +14352,38 @@ def correct_csv(input_file, output_file):
 # Example usage
 correct_csv('input.csv', 'corr.csv')
 ```
+#
+```
+lowest_energy=9999999  # Initialize with a large number
+lowest_folder=""
+
+for sys in */; do
+  # Determine the file pattern based on the folder name
+  if [[ $sys == "Ac_Cys" || $sys == "Ac_pen" ]]; then
+    file_pattern="Mol*/opt1.out"
+  else
+    file_pattern="Mol*/opt.out"
+  fi
+
+  gibbs_file="gibbs.txt"
+  > $gibbs_file  # Clear gibbs.txt before appending new data
+
+  for mol in $file_pattern; do
+    grep 'Final Gibbs free energy' $mol | tail -1 >> $gibbs_file
+  done
+
+  energy=$( sort -k6 $gibbs_file | tail -1 | awk '{print $6}' )
+  echo "$sys $energy"
+
+  # Check if the current folder has the lowest energy
+  if (( $(echo "$energy < $lowest_energy" | bc -l) )); then
+    lowest_energy=$energy
+    lowest_folder=$sys
+  fi
+
+  cd ..
+done
+
+# Print the folder with the lowest energy
+echo "Folder with the lowest energy: $lowest_folder with energy $lowest_energy"
+```
