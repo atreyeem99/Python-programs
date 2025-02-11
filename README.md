@@ -14422,3 +14422,33 @@ file_path = 'your_file.csv'  # Replace with your CSV file path
 output_file = 'histogram.png'  # Replace with your desired output file path
 plot_histogram_from_csv(file_path, output_file)
 ```
+#
+```
+import numpy as np
+import pandas as pd
+
+def compute_errors(file1, file2):
+    # Load CSV files
+    data1 = np.loadtxt(file1, delimiter=',', usecols=(0, 1, 2))  # Method data
+    data2 = np.loadtxt(file2, delimiter=',', usecols=(0, 1, 2))  # TBE data
+    
+    # Compute error metrics
+    error = data1 - data2
+    minE = np.min(error, axis=0)
+    maxE = np.max(error, axis=0)
+    mse = np.mean(error, axis=0)
+    mae = np.mean(np.abs(error), axis=0)
+    sde = np.std(error, axis=0)
+    
+    # Method name
+    method = file1.replace('.csv', '')
+    
+    # Print results in Overleaf table format
+    energies = ["S$_1$", "T$_1$", "STG"]
+    print(f"{method}$^a$              &{energies[0]}&  {mse[0]:8.3f} &  {mae[0]:8.3f} &  {sde[0]:8.3f} &  {minE[0]:8.3f} &  {maxE[0]:8.3f}\\")
+    print(f"                     &{energies[1]}&  {mse[1]:8.3f} &  {mae[1]:8.3f} &  {sde[1]:8.3f} &  {minE[1]:8.3f} &  {maxE[1]:8.3f}\\")
+    print(f"                     &{energies[2]}&  {mse[2]:8.3f} &  {mae[2]:8.3f} &  {sde[2]:8.3f} &  {minE[2]:8.3f} &  {maxE[2]:8.3f}\\")
+
+# Example usage
+compute_errors("LCC2_AVDZ.csv", "TBE.csv")
+```
