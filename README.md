@@ -14452,3 +14452,55 @@ def compute_errors(file1, file2):
 # Example usage
 compute_errors("LCC2_AVDZ.csv", "TBE.csv")
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load data (assuming no headers)
+def load_column(filename, col_index=2):
+    return np.loadtxt(filename, delimiter=',', usecols=[col_index])
+
+# Load 3rd column from each file (index 2 in zero-based indexing)
+tbe_x = load_column("TBE.csv")
+adc2_y = load_column("LCC2_AVTZ.csv")
+adc2_tbe_y = load_column("CC2_AVTZ.csv")
+
+# Uncomment this line if the file exists
+# cc2_y = load_column("LADC2_AVTZ.csv")
+
+# Ensure the arrays have the same length
+if len(tbe_x) != len(adc2_y) or len(tbe_x) != len(adc2_tbe_y):
+    raise ValueError("Data columns have different lengths!")
+
+# Plot scatter plots
+plt.figure(figsize=(8, 8))  # Square plot
+plt.scatter(tbe_x, adc2_y, label="L-CC2/aug-cc-pVTZ (This work)", color='r', marker='x', alpha=0.7)
+
+# Only plot CC2 if the file exists
+# plt.scatter(tbe_x, cc2_y, label="CC2/aug-cc-pVTZ (Ref 1)", color='b', marker='s', alpha=0.7)
+
+plt.scatter(tbe_x, adc2_tbe_y, label="ADC(2)/aug-cc-pVTZ (Ref 1)", color='g', marker='o', alpha=0.7)
+
+# Plot y = x line
+plt.plot([-0.45, 0.0], [-0.45, 0.0], linestyle='--', color='black')
+
+# Set limits
+plt.xlim(-0.45, 0.0)
+plt.ylim(-0.45, 0.0)
+
+# Labels and legend
+plt.xlabel("S$_1$-T$_1$ gap, TBE (eV)")
+plt.ylabel("S$_1$-T$_1$ gap, CC2 (eV)")
+plt.legend()
+plt.grid(True)
+
+# Set font
+plt.rcParams.update({'font.size': 18})
+plt.rcParams['font.family'] = 'sans-serif'  # Use default sans-serif instead of Arial
+
+# Save as PDF
+plt.savefig("scatter_plot_s1_2.pdf", dpi=300, bbox_inches='tight')
+
+plt.show()
+```
