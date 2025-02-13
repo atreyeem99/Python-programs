@@ -14504,3 +14504,107 @@ plt.savefig("scatter_plot_s1_2.pdf", dpi=300, bbox_inches='tight')
 
 plt.show()
 ```
+#
+```
+import os
+import shutil
+import glob
+
+def extract_gibbs_energy(folder):
+    """Extract the final Gibbs free energy from opt_int.out"""
+    file_path = os.path.join(folder, "opt_int.out")
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            lines = f.readlines()
+        energies = [line for line in lines if "Final Gibbs free energy" in line]
+        if energies:
+            return float(energies[-1].split()[5])  # Extract energy value
+    return None
+
+def get_ps_c3_distance(xyz_file):
+    """Extract the P-S and C(3)-S distances from geom_DFT_S0.xyz"""
+    if not os.path.exists(xyz_file):
+        return float('inf'), float('inf')
+    with open(xyz_file, "r") as f:
+        lines = f.readlines()
+    atoms = [line.split() for line in lines[2:]]  # Skip first two lines (header)
+    p_atoms = [list(map(float, atom[1:])) for atom in atoms if atom[0] == "P"]
+    s_atoms = [list(map(float, atom[1:])) for atom in atoms if atom[0] == "S"]
+    
+    # Ensure we are selecting the 4th C atom (index 3)
+    c_atoms = [list(map(float, atom[1:])) for atom in atoms if atom[0] == "C"]
+    
+    if len(c_atoms) < 4:  # Ensure there are at least 4 carbon atoms
+        return float('inf'), float('inf')
+    
+    c3_atom = c_atoms[3]  # Select the 4th C atom (C(3))
+    
+    if not p_atoms or not s_atoms or c3_atom is None:
+        return float('inf'), float('inf')
+    
+    ps_distance = min(
+        ((p[0] - s[0])**2 + (p[1] - s[1])**2 + (p[2] - s[2])**2)**0.5
+        for p in p_atoms for s in s_atoms
+    )
+    c3s_distance = min(
+        ((c3_atom[0] - s[0])**2 + (c3_atom[1] - s[1])**2 + (c3_atom[2] - s[2])**2)**0.5
+        for s in s_atoms
+    )
+    
+    return ps_distance, c3s_distance
+
+def main():
+    mol_folders = sorted(glob.glob("Mol_*"))
+    energy_data = []
+
+    for folder in mol_folders:
+        energy = extract_gibbs_energy(folder)
+        xyz_path = os.path.join(folder, "geom_DFT_S0.xyz")
+        ps_distance, c3s_distance = get_ps_c3_distance(xyz_path)
+        
+        if energy is not None and ps_distance < 3.0 and c3s_distance < 3.0:
+            energy_data.append((folder, energy))
+
+    # Sort by energy (ascending order)
+    energy_data.sort(key=lambda x: x[1])
+    top_10 = energy_data[:10]
+
+    # Create target folder
+    target_folder = "OPT_10_wb97XD3_SVP"
+    os.makedirs(target_folder, exist_ok=True)
+    
+    # Create and write to energy file
+    energy_file_path = os.path.join(target_folder, "lowest_energies.txt")
+    with open(energy_file_path, "w") as energy_file:
+        for folder, energy in top_10:
+            energy_file.write(f"{folder} {energy}\n")
+    
+    # Create combined XYZ file
+    combined_xyz_path = os.path.join(target_folder, "top10.xyz")
+    with open(combined_xyz_path, "w") as combined_xyz:
+        for folder, _ in top_10:
+            src_xyz = os.path.join(folder, "geom_DFT_S0.xyz")
+            if os.path.exists(src_xyz):
+                with open(src_xyz, "r") as xyz_file:
+                    contents = xyz_file.readlines()
+                combined_xyz.writelines(contents)
+
+    for i, (folder, _) in enumerate(top_10, start=1):
+        new_folder_name = f"Mol_{i:05d}"
+        new_folder_path = os.path.join(target_folder, new_folder_name)
+        os.makedirs(new_folder_path, exist_ok=True)
+        
+        # Copy files
+        src_xyz = os.path.join(folder, "geom_DFT_S0.xyz")
+        src_com = os.path.join(target_folder, "opt.com")
+        
+        if os.path.exists(src_xyz):
+            shutil.copy(src_xyz, new_folder_path)
+        if os.path.exists(src_com):
+            shutil.copy(src_com, new_folder_path)
+
+    print("Process completed. 10 lowest energy molecules with P-S and C(3)-S distances < 3 Å copied, recorded in lowest_energies.txt, and combined in top10.xyz.")
+
+if __name__ == "__main__":
+    main()
+```
