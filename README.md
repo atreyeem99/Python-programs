@@ -14608,3 +14608,27 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+systems=$( echo Ac_Cys Ac_pen Cys Pen )
+
+for sys in $systems; do
+  cd $sys
+  rm -f gibbs.txt
+  
+  # Determine the file pattern based on the folder name
+  if [[ $sys == "Ac_Cys" || $sys == "Ac_pen" ]]; then
+    file_pattern="Mol*/opt1.out"
+  else
+    file_pattern="Mol*/opt.out"
+  fi
+
+  for mol in $file_pattern; do
+    grep 'Final Gibbs free energy' $mol | tail -1 >> gibbs.txt
+  done
+
+  energy=$( sort -k6 gibbs.txt | tail -1 | awk '{print $6}' )
+  echo $sys $energy
+  cd ..
+done
+```
