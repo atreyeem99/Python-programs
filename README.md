@@ -14632,3 +14632,58 @@ for sys in $systems; do
   cd ..
 done
 ```
+#
+```
+import os
+
+# Define source and destination folders
+src_folder = "SCS-PBE-QIDH_VDZ_33059"
+dest_folder = "LADC2_AVDZ_33059"
+
+# Input template
+inp_template = """memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={{
+{coordinates}
+}}
+
+basis={{
+default,avdz
+set,mp2fit
+default,avdz/mp2fit
+set,jkfit
+default,avdz/jkfit }}
+
+hf
+
+{{lt-df-ladc(2)                
+eom,-3.1,triplet=1            
+}} 
+"""
+
+# Ensure destination folder exists
+os.makedirs(dest_folder, exist_ok=True)
+
+# Process each molecule folder
+for i in range(1, 33060):
+    mol_name = f"Mol_{i:05d}"
+    src_path = os.path.join(src_folder, mol_name, "geom_DFT_S0.xyz")
+    dest_mol_folder = os.path.join(dest_folder, mol_name)
+    os.makedirs(dest_mol_folder, exist_ok=True)
+    dest_file = os.path.join(dest_mol_folder, "inp.com")
+    
+    # Read coordinates from geom_DFT_S0.xyz
+    if os.path.exists(src_path):
+        with open(src_path, "r") as f:
+            lines = f.readlines()
+            coordinates = "".join(lines[2:])  # Skip first 2 lines
+        
+        # Create inp.com
+        inp_content = inp_template.format(coordinates=coordinates.strip())
+        with open(dest_file, "w") as f:
+            f.write(inp_content)
+```
