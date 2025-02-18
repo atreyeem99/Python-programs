@@ -14768,3 +14768,60 @@ def create_folders_from_xyz(input_file):
 # Call the function with the path to your input file
 create_folders_from_xyz('BME_conf.xyz')
 ```
+#
+```
+import os
+
+# Function to read the xyz file and create folders with coordinates
+def create_folders_from_xyz(input_file):
+    # Open the xyz file
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    # Initialize variables to process molecules
+    molecule_name = None
+    coordinates = []
+    molecule_count = 1
+
+    for line in lines:
+        # Skip empty lines
+        if line.strip() == "":
+            continue
+
+        # Read the first line of each molecule (number of atoms and molecule name)
+        if len(coordinates) == 0:
+            first_line = line.strip().split()
+            
+            # Check if the line has both number of atoms and molecule name
+            if len(first_line) < 2:
+                print(f"Skipping malformed line: {line.strip()}")
+                continue
+            
+            num_atoms = int(first_line[0])  # Number of atoms
+            molecule_name = first_line[1]  # Molecule name
+            
+            coordinates = [line]  # Start collecting coordinates
+
+        else:
+            # Collecting coordinates
+            coordinates.append(line.strip())
+
+            # If we've collected the expected number of atoms, process the molecule
+            if len(coordinates) == num_atoms + 1:
+                # Create a folder for the molecule
+                folder_name = f"{molecule_name}_{molecule_count}"
+                os.makedirs(folder_name, exist_ok=True)
+
+                # Write the coordinates to a geom.xyz file inside the folder
+                with open(os.path.join(folder_name, "geom.xyz"), 'w') as geom_file:
+                    geom_file.write(f"{num_atoms}\n")
+                    geom_file.write(f"{molecule_name}\n")
+                    geom_file.writelines([f"{coord}\n" for coord in coordinates[1:]])
+
+                # Prepare for the next molecule
+                molecule_count += 1
+                coordinates = []
+
+# Call the function with the path to your input file
+create_folders_from_xyz('BME_conf.xyz')
+```
