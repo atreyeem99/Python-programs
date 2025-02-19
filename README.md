@@ -14825,3 +14825,34 @@ def create_folders_from_xyz(input_file):
 # Call the function with the path to your input file
 create_folders_from_xyz('BME_conf.xyz')
 ```
+#
+```
+# Replace first column values and format with '&'
+names = [
+   "names"
+]
+
+# Function to replace first column and format with '&'
+def process_file(input_file, output_file):
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
+    
+    # Replace first column values with names from the list
+    for i in range(1, len(lines)):  # Skip the header row
+        columns = lines[i].strip().split()
+        columns[0] = names[i - 1]  # Replace first column value
+        lines[i] = '&'.join(columns) + '\n'  # Join columns with '&'
+
+    # Write the modified lines to the output file
+    with open(output_file, 'w') as file:
+        file.writelines(lines)
+
+# Specify your input and output file names
+input_file = 'input.txt'  # Your original file name
+output_file = 'output.txt'  # The name for the modified file
+
+# Call the function to process the file
+process_file(input_file, output_file)
+
+print(f"File has been processed and saved as {output_file}.")
+```
