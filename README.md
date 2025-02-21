@@ -14891,3 +14891,41 @@ csv_file_path = 'your_file.csv'  # Replace with your CSV file path
 # Process the CSV file
 process_csv(csv_file_path)
 ```
+#
+```
+import csv
+
+# Function to read the CSV file and process it
+def process_csv(file_path):
+    rows = []
+
+    # Read the CSV file
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            # Convert numeric columns to float for comparison
+            try:
+                row[1] = float(row[1])  # Convert 2nd column
+                row[2] = float(row[2])  # Convert 3rd column
+                row[3] = float(row[3])  # Convert 4th column
+                row[5] = int(row[5])    # Convert 6th column
+            except ValueError:
+                continue  # Skip rows with invalid numeric data
+
+            # Check if the 6th column is 25, and 2nd and 3rd columns are positive
+            if row[5] == 25 and row[1] > 0 and row[2] > 0:
+                rows.append(row)
+
+    # Sort the filtered rows by the 4th column (small to large)
+    rows.sort(key=lambda x: x[3])
+
+    # Print the sorted rows
+    for row in rows:
+        print(','.join(map(str, row)))
+
+# File path to the CSV file
+csv_file_path = 'your_file.csv'  # Replace with your CSV file path
+
+# Process the CSV file
+process_csv(csv_file_path)
+```
