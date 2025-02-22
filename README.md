@@ -14929,3 +14929,38 @@ csv_file_path = 'your_file.csv'  # Replace with your CSV file path
 # Process the CSV file
 process_csv(csv_file_path)
 ```
+#
+```
+import csv
+
+# Function to read the CSV file and process it
+def process_csv(file_path):
+    rows = []
+
+    # Read the CSV file
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            # Parse numeric values directly from the relevant columns
+            col2 = float(row[1])  # 2nd column
+            col3 = float(row[2])  # 3rd column
+            col4 = float(row[3])  # 4th column
+            col6 = int(row[5])    # 6th column
+
+            # Check conditions: 6th column is 25, and 2nd & 3rd columns are positive
+            if col6 == 25 and col2 > 0 and col3 > 0:
+                rows.append(row)
+
+    # Sort the filtered rows by the 4th column (small to large)
+    rows.sort(key=lambda x: float(x[3]))
+
+    # Print the sorted rows
+    for row in rows:
+        print(','.join(row))
+
+# File path to the CSV file
+csv_file_path = 'your_file.csv'  # Replace with your CSV file path
+
+# Process the CSV file
+process_csv(csv_file_path)
+```
