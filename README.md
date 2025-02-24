@@ -15021,3 +15021,19 @@ def create_folders_from_xyz(input_file):
 # Call the function with the path to your input file
 create_folders_from_xyz('BME_conf.xyz')
 ```
+#
+```
+import csv
+
+def correct_csv(input_file, output_file):
+    with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
+        reader = csv.reader(infile)
+        writer = csv.writer(outfile)
+        
+        for row in reader:
+            corrected_value = round(float(row[2]) * 0.9546 - 0.0065, 3)
+            writer.writerow(row + [corrected_value])
+
+# Example usage
+correct_csv('input.csv', 'corr.csv')
+```
