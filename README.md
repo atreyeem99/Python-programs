@@ -15037,3 +15037,36 @@ def correct_csv(input_file, output_file):
 # Example usage
 correct_csv('input.csv', 'corr.csv')
 ```
+#
+```
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define file names
+files = [
+    "7AP_der_B2GP_PLYP_AVDZ.csv",
+    "7AP_der_B2GP_PLYP_AVDZ_params_0.75_0.45.csv",
+    "7AP_der_Scaled_Method_B2GP-PLYP_AVDZ.csv"
+]
+reference_file = "7AP_der_LCC2_AVDZ.csv"
+
+# Read the reference file (4th column)
+ref_data = pd.read_csv(reference_file, header=None, usecols=[3], delimiter=",").values.flatten()
+
+# Read and process each file
+colors = ['r', 'g', 'b']
+labels = ['B2GP_PLYP_AVDZ', 'B2GP_PLYP_AVDZ_params', 'Scaled_Method_B2GP_PLYP']
+
+plt.figure(figsize=(8, 6))
+for file, color, label in zip(files, colors, labels):
+    data = pd.read_csv(file, header=None, usecols=[3], delimiter=",").values.flatten()
+    diff = data - ref_data
+    plt.hist(diff, bins=30, color=color, alpha=0.5, label=label, edgecolor='black')
+
+plt.xlabel("Difference with LCC2 (4th column values)")
+plt.ylabel("Frequency")
+plt.title("Histogram of Differences")
+plt.legend()
+plt.show()
+```
