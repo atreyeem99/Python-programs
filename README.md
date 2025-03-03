@@ -15268,3 +15268,38 @@ def process_molecules(scs_folder, output_base_folder):
         else:
             print(f"Warning: geom_DFT_S0.xyz not found for molecule {molecule_name} in {scs_folder}")
 ```
+#
+```
+for dir in Mol_*; do
+  
+    file="$dir/inp.out"
+
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -8 | tail -1)
+        STG=$(awk -v s="$S1" -v t="$T1" 'BEGIN {printf "%.2f", s - t}')
+
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            # Format S1 and T1 to two decimal places
+            S1=$(printf "%.2f" "$S1")
+            T1=$(printf "%.2f" "$T1")
+
+            if [[ $(echo "$S1 < 0.0" | bc -l) -eq 1 || $(echo "$T1 < 0.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1 $T1 $STG $PAH      De-excitation prone"
+            elif [[ $(echo "$S1 < 1.0" | bc -l) -eq 1 || $(echo "$T1 < 1.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1 $T1 $STG $PAH      Distortion prone"
+            else
+                echo "$dir $S1 $T1 $STG $PAH"
+            fi
+        else
+            echo "$dir $S1 $T1 $STG $PAH      Convergence failed"
+        fi
+    fi
+
+done
+```
