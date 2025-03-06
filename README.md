@@ -15356,3 +15356,57 @@ hf
 eom,-6.1,triplet=1              !triplet states
 eomprint,popul=-1,loceom=-1 }   !minimize the output same thing for cc2 inp
 ```
+#
+```
+import os
+import pandas as pd
+
+# Function to check if the molecule is already processed
+def molecule_in_csv(csv_file, molecule_name):
+    # Check if the CSV file exists
+    if os.path.exists(csv_file):
+        # Load the CSV file into a DataFrame
+        df = pd.read_csv(csv_file, header=None)
+        # Check if the molecule is already in the CSV file (in the first column)
+        if molecule_name in df[0].values:
+            return True
+    return False
+
+# Function to read the ADC2 data from the CSV
+def get_adc2_data(csv_file, molecule_name):
+    if os.path.exists(csv_file):
+        df = pd.read_csv(csv_file, header=None)
+        # Check for the molecule and return its ADC2 data
+        if molecule_name in df[0].values:
+            return df[df[0] == molecule_name].iloc[0, 1]  # Assuming ADC2 data is in column 1
+    return None
+
+# Assuming these are placeholders for the actual functions
+def perform_tddft(molecule_name):
+    print(f"Performing TDDFT calculation for {molecule_name}")
+    # Your TDDFT code here
+
+def perform_adc2(molecule_name):
+    print(f"Performing ADC2 calculation for {molecule_name}")
+    # Your ADC2 code here
+
+def process_molecule(csv_file, molecule_name):
+    # Check if molecule is already processed for TDDFT
+    if molecule_in_csv(csv_file, molecule_name):
+        print(f"{molecule_name} already processed for TDDFT. Skipping.")
+    else:
+        perform_tddft(molecule_name)
+    
+    # Check if molecule is already processed for ADC2
+    adc2_data = get_adc2_data(csv_file, molecule_name)
+    if adc2_data:
+        print(f"{molecule_name} already has ADC2 data. Using stored data: {adc2_data}")
+    else:
+        perform_adc2(molecule_name)
+
+# Main part of the script where you call the function
+csv_file = 'molecule_data.csv'  # Path to your CSV file
+molecule_name = 'Sample_Molecule'  # Example molecule name, replace as needed
+
+process_molecule(csv_file, molecule_name)
+```
