@@ -15464,3 +15464,33 @@ molecule_name = 'Sample_Molecule'  # Example molecule name, replace as needed
 
 process_molecule(csv_file, molecule_name)
 ```
+#
+```
+import os
+import matplotlib.pyplot as plt
+
+def extract_gibbs_energy(folder):
+    """Extract the final Gibbs free energy from opt_int2.out."""
+    file_path = os.path.join(folder, "opt_int2.out")
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            lines = f.readlines()
+        energies = [line for line in lines if "Final Gibbs free energy" in line]
+        if energies:
+            return float(energies[-1].split()[5])  # Extract energy value
+    return None
+
+# Get all folders starting with "Mol"
+folders = [d for d in os.listdir() if os.path.isdir(d) and d.startswith("Mol")]
+
+# Extract Gibbs free energy values
+energies = [extract_gibbs_energy(folder) for folder in folders]
+energies = [e for e in energies if e is not None]  # Remove None values
+
+# Plot histogram
+plt.hist(energies, bins=20, edgecolor="black")
+plt.xlabel("Gibbs Free Energy")
+plt.ylabel("Frequency")
+plt.title("Histogram of Gibbs Free Energy from opt_int2.out")
+plt.show()
+```
