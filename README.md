@@ -15494,3 +15494,38 @@ plt.ylabel("Frequency")
 plt.title("Histogram of Gibbs Free Energy from opt_int2.out")
 plt.show()
 ```
+#
+```
+for dir in Mol_*; do
+  
+    file="$dir/inp.out"
+
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -6 | tail -1)
+
+        STG=$(awk -v s="$S1" -v t="$T1" 'BEGIN {printf "%.2f", s - t}')
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            # Round S1 and T1 only for display purposes
+            S1_display=$(printf "%.2f" "$S1")
+            T1_display=$(printf "%.2f" "$T1")
+
+            if [[ $(echo "$S1 < 0.0" | bc -l) -eq 1 || $(echo "$T1 < 0.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1_display $T1_display $STG $PAH      De-excitation prone"
+            elif [[ $(echo "$S1 < 1.0" | bc -l) -eq 1 || $(echo "$T1 < 1.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1_display $T1_display $STG $PAH      Distortion prone"
+            else
+                echo "$dir $S1_display $T1_display $STG $PAH"
+            fi
+        else
+            echo "$dir $S1_display $T1_display $STG $PAH      Convergence failed"
+        fi
+    fi
+
+done
+```
