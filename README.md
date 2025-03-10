@@ -15529,3 +15529,26 @@ for dir in Mol_*; do
 
 done
 ```
+#
+```
+import pandas as pd
+
+def csv_to_latex(a_file, b_file, c_file, output_file):
+    # Read the first three columns of each CSV file (assuming no headers)
+    a = pd.read_csv(a_file, usecols=[0, 1, 2], header=None)
+    b = pd.read_csv(b_file, usecols=[0, 1, 2], header=None)
+    c = pd.read_csv(c_file, usecols=[0, 1, 2], header=None)
+    
+    # Concatenate the columns horizontally
+    result = pd.concat([a, b, c], axis=1)
+    
+    # Convert to LaTeX table format
+    latex_rows = result.apply(lambda row: ' & '.join(map(str, row)) + ' \\', axis=1)
+    
+    # Write to output file
+    with open(output_file, 'w') as f:
+        f.write('\n'.join(latex_rows))
+
+# Example usage
+csv_to_latex('a.csv', 'b.csv', 'c.csv', 'output.tex')
+```
