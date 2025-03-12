@@ -15587,3 +15587,27 @@ for dir in Mol_*; do
 
 done
 ```
+#
+```
+missing_file="../missing_78.txt"
+
+dest_dir=""
+
+if [ ! -f "$missing_file" ]; then
+  echo "Error: missing_78.txt not found."
+  exit 1
+fi
+
+while IFS= read -r f; do
+  f=$(echo "$f" | xargs) # Trim spaces
+  folder="$dest_dir/$f"
+  if [ -d "$folder" ]; then
+    echo "$f"
+    cd "$folder" || exit
+    runmolpro "${f}_lcc2_vdz" qc 96 24 inp.com min
+    cd ..
+  else
+    echo "Warning: Folder $folder not found."
+  fi
+done < "$missing_file"
+```
