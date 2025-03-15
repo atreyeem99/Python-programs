@@ -15686,3 +15686,81 @@ for dir in Mol_*; do
 
 done
 ```
+#
+```
+import os
+import shutil
+
+def create_folders_and_files():
+    source_dir = ""
+    dest_dir = ""
+    folder_list_file = os.path.join(source_dir, "a.txt")
+
+    if not os.path.exists(folder_list_file):
+        print(f"Error: {folder_list_file} not found.")
+        return
+
+    # Read folder names
+    with open(folder_list_file, "r") as f:
+        folder_names = [line.strip() for line in f.readlines() if line.strip()]
+
+    for folder in folder_names:
+        source_folder = os.path.join(source_dir, folder)
+        dest_folder = os.path.join(dest_dir, folder)
+
+        # Create destination folder
+        os.makedirs(dest_folder, exist_ok=True)
+
+        # Copy PAH_index file from the new path
+        source_pah_index = os.path.join("/home/atreyee/BNPAH/LCC2_VDZ_3953_SCS_negatives", folder, "PAH_index")
+        dest_pah_index = os.path.join(dest_folder, "PAH_index")
+        if os.path.exists(source_pah_index):
+            shutil.copy(source_pah_index, dest_pah_index)
+        else:
+            print(f"Warning: {source_pah_index} not found.")
+
+        # Read geometry from geom_reopt.xyz
+        geom_file = os.path.join(source_folder, "geom_reopt.xyz")
+        if os.path.exists(geom_file):
+            with open(geom_file, "r") as f:
+                geom_data = f.readlines()
+
+            if len(geom_data) < 3:
+                print(f"Warning: {geom_file} has insufficient data.")
+                continue
+
+            # Exclude first two lines and remove trailing newline
+            geometry_section = "".join(geom_data[2:]).strip()
+        else:
+            print(f"Error: {geom_file} not found.")
+            continue
+
+        # Create inp.com file
+        inp_content = f"""memory,8,g
+charge=0
+
+gdirectsymmetry,nosym;orient,noorient
+
+geometry={{
+{geometry_section}
+}}
+
+basis={{
+default,avdz
+set,mp2fit
+default,avdz/mp2fit
+set,jkfit
+default,avdz/jkfit }}
+
+ly for first excited state
+eomprint,popul=-1,loceom=-1 }}   !minimize the output"""
+
+        inp_file_path = os.path.join(dest_folder, "inp.com")
+        with open(inp_file_path, "w") as f:
+            f.write(inp_content)
+
+    print("Task completed successfully.")
+
+if __name__ == "__main__":
+    create_folders_and_files()
+```
