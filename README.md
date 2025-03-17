@@ -15804,3 +15804,12 @@ echo "\caption{Sorted Table of LCC2 Values}"
 echo "\label{tab:lcc2}"
 echo "\end{table}"
 ```
+#
+```
+while read -r f; do
+  echo "$f"
+  cd "$f" || continue
+  runmolpro "${f}_vdz" qc 96 24 inp.com min
+  cd ..
+done < missing_78.txt
+```
