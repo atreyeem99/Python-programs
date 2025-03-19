@@ -15853,3 +15853,49 @@ if __name__ == "__main__":
     check_boron_in_folders("76.txt", "bora_76.txt")
     merge_xyz_files("bora_76.txt", "bora_76.xyz")
 ```
+#
+```
+import os
+import subprocess
+
+# Define paths
+base_dir = "."  # Current directory
+homo_lumo_file = "homo_lumo_numbers.txt"
+
+# Read HOMO and LUMO numbers from the file
+homo_lumo_data = {}
+with open(homo_lumo_file, "r") as f:
+    next(f)  # Skip header
+    for line in f:
+        folder, homo, lumo = line.strip().split()
+        homo_lumo_data[folder] = (int(homo), int(lumo))
+
+# Loop through all folders
+for folder in homo_lumo_data.keys():
+    folder_path = os.path.join(base_dir, folder)
+    gbw_file = os.path.join(folder_path, "TDDFT.gbw")
+
+    if os.path.exists(gbw_file):
+        homo, lumo = homo_lumo_data[folder]
+
+        # Create orca_plot input file for HOMO
+        input_file = os.path.join(folder_path, "orca_plot.inp")
+        with open(input_file, "w") as f:
+            f.write(f"""1\n1\n2\n{homo}\n5\n7\n4\n120\n11\n12\n""")
+
+        # Run orca_plot for HOMO
+        orca_plot_cmd = f"/apps/orca/orca.6.0.0/orca_plot {gbw_file} -i orca_plot.inp"
+        subprocess.run(orca_plot_cmd, shell=True, cwd=folder_path)
+
+        # Create orca_plot input file for LUMO
+        with open(input_file, "w") as f:
+            f.write(f"""1\n1\n2\n{lumo}\n5\n7\n4\n120\n11\n12\n""")
+
+        # Run orca_plot for LUMO
+        subprocess.run(orca_plot_cmd, shell=True, cwd=folder_path)
+
+        # Clean up orca_plot.inp after running
+        os.remove(input_file)
+
+print("Cube files for HOMO and LUMO generated successfully in all folders.")
+```
