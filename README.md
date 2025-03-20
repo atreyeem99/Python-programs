@@ -15899,3 +15899,41 @@ for folder in homo_lumo_data.keys():
 
 print("Cube files for HOMO and LUMO generated successfully in all folders.")
 ```
+#
+```
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{caption}
+\captionsetup[table]{skip=10pt}
+
+\begin{document}
+
+\begin{longtable}{c c c c}
+\caption{Molecule, HOMO, and LUMO Images.} \\
+\hline
+Index & Molecule & HOMO & LUMO \\
+\hline
+\endfirsthead
+
+\hline
+Index & Molecule & HOMO & LUMO \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+1 & \includegraphics[width=0.2\textwidth]{mol1.png} & \includegraphics[width=0.2\textwidth]{homo1.png} & \includegraphics[width=0.2\textwidth]{lumo1.png} \\
+2 & \includegraphics[width=0.2\textwidth]{mol2.png} & \includegraphics[width=0.2\textwidth]{homo2.png} & \includegraphics[width=0.2\textwidth]{lumo2.png} \\
+3 & \includegraphics[width=0.2\textwidth]{mol3.png} & \includegraphics[width=0.2\textwidth]{homo3.png} & \includegraphics[width=0.2\textwidth]{lumo3.png} \\
+4 & \includegraphics[width=0.2\textwidth]{mol4.png} & \includegraphics[width=0.2\textwidth]{homo4.png} & \includegraphics[width=0.2\textwidth]{lumo4.png} \\
+5 & \includegraphics[width=0.2\textwidth]{mol5.png} & \includegraphics[width=0.2\textwidth]{homo5.png} & \includegraphics[width=0.2\textwidth]{lumo5.png} \\
+% Add more rows as needed
+\end{longtable}
+
+\end{document}
+```
