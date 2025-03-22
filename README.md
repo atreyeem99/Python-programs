@@ -15970,3 +15970,22 @@ for folder in os.listdir(base_folder):
 
 print("All cube files renamed and moved successfully!")
 ```
+#
+```
+import os
+
+base_dir = "."
+homo_lumo_file = "homo_lumo_numbers.txt"
+
+# Read folders to check
+with open(homo_lumo_file, "r") as f:
+    next(f)
+    for line in f:
+        folder, homo, lumo = line.strip().split()
+        gbw_file = os.path.join(base_dir, folder, "TDDFT.gbw")
+
+        if os.path.exists(gbw_file):
+            print(f"FOUND: {gbw_file}")
+        else:
+            print(f"MISSING: {gbw_file}")
+```
