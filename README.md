@@ -15989,3 +15989,36 @@ with open(homo_lumo_file, "r") as f:
         else:
             print(f"MISSING: {gbw_file}")
 ```
+#
+```
+import os
+import shutil
+
+# Define the base folder where all the folders are located
+base_folder = "."
+
+# Create the destination folder for storing renamed cube files
+cube_folder = "cubefiles"
+os.makedirs(cube_folder, exist_ok=True)
+
+# Loop through all folders in the base directory
+for folder in os.listdir(base_folder):
+    folder_path = os.path.join(base_folder, folder)
+
+    # Skip the cubefiles folder and ensure it's a directory
+    if folder == "cubefiles" or not os.path.isdir(folder_path):
+        continue
+
+    # Loop through all files in the folder
+    for file in os.listdir(folder_path):
+        if file.endswith(".cube"):
+            # Create new file name only with folder name as prefix
+            new_name = f"{folder}_{file}"  # Correct name format
+            source_file = os.path.join(folder_path, file)
+            dest_file = os.path.join(cube_folder, new_name)
+
+            # Move the renamed file to the cube folder
+            shutil.move(source_file, dest_file)
+
+print("All cube files renamed and moved successfully!")
+```
