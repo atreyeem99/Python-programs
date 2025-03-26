@@ -16090,3 +16090,35 @@ def tbe_to_latex(tbe_file, output_file):
 # Example usage
 tbe_to_latex('TBE.csv', 'tbe_table.tex')
 ```
+#
+```
+import os
+
+# Input and output file names
+folder_list_file = "top46.txt"
+output_xyz_file = "top46.xyz"
+xyz_filename = "geom_reopt.xyz"
+
+# Read folder names from top46.txt
+with open(folder_list_file, "r") as f:
+    folder_names = [line.strip() for line in f if line.strip()]
+
+# Open the output file to write all XYZ data
+with open(output_xyz_file, "w") as outfile:
+    for folder in folder_names:
+        xyz_path = os.path.join(folder, xyz_filename)
+
+        # Check if geom_reopt.xyz exists in the folder
+        if os.path.exists(xyz_path):
+            with open(xyz_path, "r") as xyz_file:
+                lines = xyz_file.readlines()
+
+                # Check if the file has enough content
+                if len(lines) >= 2:
+                    # Write number of atoms and folder name in the output file
+                    outfile.write(lines[0])  # Number of atoms
+                    outfile.write(f"{folder}\n")  # Folder name as 2nd line
+
+                    # Write the coordinates
+                    outfile.writelines(lines[2:])
+```
