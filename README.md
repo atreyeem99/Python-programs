@@ -16122,3 +16122,53 @@ with open(output_xyz_file, "w") as outfile:
                     # Write the coordinates
                     outfile.writelines(lines[2:])
 ```
+#
+```
+import os
+
+# Input and output file names
+folder_list_file = "top46.txt"
+output_file = "coor.txt"
+xyz_filename = "geom_reopt.xyz"
+
+# Read folder names from top46.txt
+with open(folder_list_file, "r") as f:
+    folder_names = [line.strip() for line in f if line.strip()]
+
+# Open the output file to write the formatted data
+with open(output_file, "w") as outfile:
+    for index, folder in enumerate(folder_names, start=1):
+        xyz_path = os.path.join(folder, xyz_filename)
+
+        # Check if geom_reopt.xyz exists in the folder
+        if os.path.exists(xyz_path):
+            with open(xyz_path, "r") as xyz_file:
+                lines = xyz_file.readlines()
+
+                # Check if the file has enough content
+                if len(lines) >= 2:
+                    num_atoms = lines[0].strip()
+                    energy_info = lines[1].strip()
+
+                    # Write header for each molecule
+                    outfile.write(r"\singlespacing" + "\n")
+                    outfile.write(r"\footnotesize" + "\n")
+                    outfile.write("{\n")
+                    outfile.write(r"\begin{verbatim}" + "\n")
+                    outfile.write("-------------------------------------------------------------------------\n")
+                    outfile.write("EQUILIBRIUM COORDINATES (ANGSTROEM), wB97X-D3 RIJCOSX def2-TZVP\n")
+                    outfile.write(f"MOLECULE: {folder}\n")
+                    outfile.write("-------------------------------------------------------------------------\n")
+                    outfile.write("CARTESIAN COORDINATES\n")
+                    outfile.write("---------------------\n")
+                    outfile.write(f"{num_atoms}\n")
+                    outfile.write(f"{energy_info}\n")
+
+                    # Write coordinates
+                    outfile.writelines(lines[2:])
+
+                    # End of molecule
+                    outfile.write("---------------------------------------------------------------------------\n")
+                    outfile.write(r"\end{verbatim}" + "\n")
+                    outfile.write("}\n")
+```
