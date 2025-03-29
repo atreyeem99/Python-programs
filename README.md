@@ -16205,3 +16205,39 @@ for folder in os.listdir(base_folder):
 
 print("All cube files renamed and moved successfully!")
 ```
+#
+```
+indices=$(cat indscr.txt)
+
+cp 1AP_d3h.com inp_scr.com
+
+for index in $indices; do
+    C="C${index}"
+    N="N${index}"
+
+    # Assign the corresponding hydrogen based on the carbon index
+    case "$C" in
+        "C5") H="H14" ;;
+        "C6") H="H15" ;;
+        "C7") H="H16" ;;
+        "C8") H="H17" ;;
+        "C9") H="H18" ;;
+        "C10") H="H19" ;;
+        "C11") H="H20" ;;
+        "C12") H="H21" ;;
+        "C13") H="H22" ;;
+        *) echo "Invalid index $index"; continue ;;
+    esac
+
+    # Remove only the hydrogen $H from inp_scr.com
+    awk -v h="$H" '$1 != h' inp_scr.com > opt.com
+
+    # Replace C with N in opt.com
+    sed -i "s/$C/$N/g" opt.com
+
+    # Update inp_scr.com for the next iteration
+    cp opt.com inp_scr.com
+done
+
+rm inp_scr.com
+```
