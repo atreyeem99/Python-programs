@@ -16241,3 +16241,18 @@ done
 
 rm inp_scr.com
 ```
+#
+```
+Nmols=$(wc -l < indices.txt)
+
+for imol in $(seq $Nmols); do
+    folder=$(head -${imol} folders.txt | tail -1)
+    head -${imol} indices.txt | tail -1 > indscr.txt
+
+    bash makeinp.sh
+
+    mkdir -p ../$folder
+    echo $folder
+    mv opt.com ../$folder
+done
+```
