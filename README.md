@@ -16256,3 +16256,35 @@ for imol in $(seq $Nmols); do
     mv opt.com ../$folder
 done
 ```
+#
+```
+#!/bin/bash
+
+# Input file name
+logfile="S1_tddft_SP.log"
+outputfile="energy"
+
+# Check if log file exists
+if [ ! -f "$logfile" ]; then
+    echo "Error: $logfile not found!"
+    exit 1
+fi
+
+# Extract S1 energy and oscillator strength
+S1_energy=$(grep -A 1 "Excited State   1" "$logfile" | grep "eV" | awk '{print $5/27.2114}')  # Convert eV to Hartree
+osc_strength=$(grep "Excited State   1" "$logfile" | awk -F "f=" '{print $2}' | awk '{print $1}')
+
+# Check if values were extracted
+if [ -z "$S1_energy" ] || [ -z "$osc_strength" ]; then
+    echo "Error: Could not extract S1 energy or oscillator strength!"
+    exit 1
+fi
+
+# Create the energy file
+cat << EOF > $outputfile
+1 0.000000
+2 $S1_energy $osc_strength
+EOF
+
+echo "Energy file created successfully: $outputfile"
+```
