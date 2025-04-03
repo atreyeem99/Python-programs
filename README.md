@@ -16339,3 +16339,63 @@ with open(output_xyz_file, "w") as outfile:
                     # Write the coordinates
                     outfile.writelines(lines[2:])
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# Exponential decay function
+def decay_function(t, P0, tau):
+    return P0 * np.exp(-t / tau)
+
+# Load data from en.dat (assuming columns: time, E0, E1, E2, ...)
+def load_en_dat(filename):
+    data = np.loadtxt(filename)
+    time = data[:, 0]  # First column is time
+    energies = data[:, 1:]  # Rest are energies of different states
+    return time, energies
+
+# Compute population as the number of trajectories in each state
+def compute_population(energies):
+    num_states = energies.shape[1]
+    populations = np.zeros((energies.shape[0], num_states))
+    
+    for i in range(energies.shape[0]):
+        min_state = np.argmin(energies[i])  # Identify the lowest energy state at each time step
+        populations[i, min_state] = 1  # Assign population to that state
+
+    # Sum over trajectories (assuming each row represents a trajectory at that time step)
+    populations = np.cumsum(populations, axis=0)
+    return populations / populations[0].sum(axis=0)  # Normalize to initial population
+
+# Plot population decay and fit to find lifetime
+def plot_population_decay(time, populations):
+    plt.figure(figsize=(6, 4))
+    for i in range(populations.shape[1]):
+        plt.plot(time, populations[:, i], label=f'State {i}')
+    
+    # Fit exponential decay for the first excited state
+    popt, _ = curve_fit(decay_function, time, populations[:, 1], p0=[1, 1])
+    fitted_curve = decay_function(time, *popt)
+    tau = popt[1]  # Extract excited-state lifetime
+
+    plt.plot(time, fitted_curve, 'r--', label=f'Fit (τ = {tau:.2f} fs)')
+    plt.xlabel('Time (fs)')
+    plt.ylabel('Population')
+    plt.legend()
+    plt.title('Excited-State Population Decay')
+    plt.show()
+    
+    print(f"Estimated excited-state lifetime (τ): {tau:.2f} fs")
+
+# Main function
+def main():
+    filename = "en.dat"  # Change if needed
+    time, energies = load_en_dat(filename)
+    populations = compute_population(energies)
+    plot_population_decay(time, populations)
+
+if __name__ == "__main__":
+    main()
+```
