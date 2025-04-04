@@ -16399,3 +16399,39 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import re
+
+def extract_hopping_geometries(traj_file, output_file="hopping_geometries.xyz"):
+    with open(traj_file, "r") as f:
+        lines = f.readlines()
+    
+    hopping_geometries = []
+    capturing = False
+    current_geometry = []
+    
+    for line in lines:
+        if "HOP ACCEPTED" in line:  # Identify hopping event
+            capturing = True
+            current_geometry = ["\nHopping Event\n"]
+        
+        if capturing:
+            if re.match(r"^\s*\d+\s+[A-Z]+\s+", line):  # Extract atomic positions
+                current_geometry.append(line.strip())
+        
+        if capturing and line.strip() == "":  # Stop capturing at blank line
+            hopping_geometries.append(current_geometry)
+            capturing = False
+    
+    # Write extracted geometries to an XYZ file
+    with open(output_file, "w") as out:
+        for geometry in hopping_geometries:
+            out.write(f"{len(geometry) - 1}\n")
+            out.writelines("\n".join(geometry) + "\n")
+
+    print(f"Extracted {len(hopping_geometries)} hopping geometries to {output_file}")
+
+# Usage
+extract_hopping_geometries("TRAJ.LOG")
+```
