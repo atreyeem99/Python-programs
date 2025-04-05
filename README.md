@@ -16435,3 +16435,58 @@ def extract_hopping_geometries(traj_file, output_file="hopping_geometries.xyz"):
 # Usage
 extract_hopping_geometries("TRAJ.LOG")
 ```
+# 
+```
+import os
+import subprocess
+
+# Define paths
+base_dir = "."  # Current directory
+homo_lumo_file = "homo_lumo_numbers.txt"
+
+# Read HOMO and LUMO numbers from the file
+homo_lumo_data = {}
+with open(homo_lumo_file, "r") as f:
+    next(f)  # Skip header
+    for line in f:
+        folder, homo, lumo = line.strip().split()
+        homo_lumo_data[folder] = (int(homo), int(lumo))
+
+# Loop through all folders
+for folder in homo_lumo_data.keys():
+    folder_path = os.path.join(base_dir, folder)
+    gbw_file = os.path.join(folder_path, "TDDFT.gbw")
+
+    # Skip if GBW file does not exist
+    if not os.path.exists(gbw_file):
+        print(f"Skipping {folder}: TDDFT.gbw not found!")
+        continue
+
+    homo, lumo = homo_lumo_data[folder]
+
+    # Define the interactive input for HOMO
+    homo_input = f"""1\n1\n2\n{homo}\n5\n7\n4\n120\n11\n12\n"""
+
+    # Run orca_plot for HOMO
+    subprocess.run(
+        f"/apps/orca/orca.6.0.0/orca_plot {gbw_file} -i",
+        input=homo_input,
+        text=True,
+        shell=True,
+        cwd=folder_path
+    )
+
+    # Define the interactive input for LUMO
+    lumo_input = f"""1\n1\n2\n{lumo}\n5\n7\n4\n120\n11\n12\n"""
+
+    # Run orca_plot for LUMO
+    subprocess.run(
+        f"/apps/orca/orca.6.0.0/orca_plot {gbw_file} -i",
+        input=lumo_input,
+        text=True,
+        shell=True,
+        cwd=folder_path
+    )
+
+print("Cube files for HOMO and LUMO generated successfully where possible.")
+```
