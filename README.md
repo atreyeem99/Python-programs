@@ -16558,3 +16558,29 @@ echo "\caption{Sorted Table of LCC2 Values}"
 echo "\label{tab:lcc2}"
 echo "\end{table}"
 ```
+#
+```
+def prep_run_2(run_files, file_index):
+    run_files[file_index].write(f"export OMP_NUM_THREADS=1\n")
+    run_files[file_index].write(f"ulimit -s unlimited\n")
+
+    # Set Gaussian root directory
+    run_files[file_index].write(f"g16root=/home/atreyee\n")
+    run_files[file_index].write(f"export g16root\n")
+    
+    # Load Gaussian environment
+    run_files[file_index].write(f". /home/atreyee/g16/bsd/g16.profile\n")
+    
+    # Set working directory
+    run_files[file_index].write(f"WORKDIR=/scratch/atreyee/PBS_$PBS_JOBID\n")
+    run_files[file_index].write(f"mkdir -p $WORKDIR\n")
+    run_files[file_index].write(f"cd $WORKDIR\n")
+    
+    # Set Gaussian scratch directory
+    run_files[file_index].write(f"GAUSS_SCRDIR=$WORKDIR\n")
+    run_files[file_index].write(f"export GAUSS_SCRDIR\n")
+
+    # Print hostname and working directory
+    run_files[file_index].write(f"echo $HOSTNAME > scrpath.txt\n")
+    run_files[file_index].write(f"echo $PWD >> scrpath.txt\n")
+```
