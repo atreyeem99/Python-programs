@@ -16584,3 +16584,73 @@ def prep_run_2(run_files, file_index):
     run_files[file_index].write(f"echo $HOSTNAME > scrpath.txt\n")
     run_files[file_index].write(f"echo $PWD >> scrpath.txt\n")
 ```
+#
+```
+import os
+import csv
+
+# Input CSV file and target folder
+input_csv = "negative_values.csv"
+adc2_folder = "adc2"
+
+# Create the adc2 folder if it doesn't exist
+os.makedirs(adc2_folder, exist_ok=True)
+
+# Template for the ADC(2) input file
+adc2_template = """$molecule
+  0  1
+{coordinates}$end
+
+$rem
+jobtype             sp
+method              adc(2)
+basis               cc-pVDZ
+aux_basis           rimp2-cc-pVDZ
+mem_total           64000
+mem_static          1000
+maxscf              1000
+cc_symmetry         false
+ee_singlets         3
+ee_triplets         3
+sym_ignore          true
+ADC_DAVIDSON_MAXITER 300
+ADC_DAVIDSON_CONV 5
+$end
+"""
+
+# Read the CSV and process each folder
+with open(input_csv, "r") as csvfile:
+    reader = csv.reader(csvfile)
+    header = next(reader)  # Skip the header
+
+    for row in reader:
+        folder_name = row[0]  # First column is the folder name
+        geom_file = os.path.join(folder_name, "geom_DFT_S0.xyz")
+
+        # Check if geom_DFT_S0.xyz exists
+        if os.path.isfile(geom_file):
+            # Read the coordinates from geom_DFT_S0.xyz
+            coordinates = ""
+            with open(geom_file, "r") as geom:
+                lines = geom.readlines()[2:]  # Skip the first two lines (header in XYZ files)
+                for line in lines:
+                    coordinates += line
+
+            # Generate the ADC(2) input content
+            adc2_input = adc2_template.format(coordinates=coordinates)
+
+            # Create the subfolder in adc2
+            target_subfolder = os.path.join(adc2_folder, folder_name)
+            os.makedirs(target_subfolder, exist_ok=True)
+
+            # Write the input file as all.com
+            input_file = os.path.join(target_subfolder, "all.com")
+            with open(input_file, "w") as outfile:
+                outfile.write(adc2_input)
+
+            print(f"Created ADC(2) input file: {input_file}")
+        else:
+            print(f"Geometry file not found: {geom_file}")
+
+print("Process completed.")
+```
