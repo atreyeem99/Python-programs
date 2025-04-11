@@ -16654,3 +16654,33 @@ with open(input_csv, "r") as csvfile:
 
 print("Process completed.")
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+
+def plot_histogram_from_csv(file_path):
+    labels = []
+    data = []
+
+    # Read the CSV file
+    with open(file_path, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            labels.append(row[reader.fieldnames[0]])  # First column for labels
+            data.append(float(row[reader.fieldnames[1]]))  # Second column for values
+
+    # Plot the histogram
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels, data, color='skyblue')
+    plt.xlabel('Labels')
+    plt.ylabel('Frequency')
+    plt.title('Histogram of 2nd Column')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+# Example usage
+file_path = 'your_file.csv'  # Replace with your CSV file path
+plot_histogram_from_csv(file_path)
+```
