@@ -16684,3 +16684,43 @@ def plot_histogram_from_csv(file_path):
 file_path = 'your_file.csv'  # Replace with your CSV file path
 plot_histogram_from_csv(file_path)
 ```
+#
+```
+#!/bin/bash
+
+echo "\begin{table}[h]"
+echo "\centering"
+echo "\begin{tabular}{c c c c c}"
+echo "\hline"
+echo "Index & S1 (f01) & T1 & STG \\\\"
+echo "\hline"
+
+data=""
+
+for dir in Mol_*; do
+    file="$dir/inp.out"
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -7 | tail -1)
+        STG=$(awk -v s="$S1" -v t="$T1" 'BEGIN {printf "%.2f", s - t}')
+        f01=$(grep 'DF-LCC2  oszillator strength:  ' "$file" | awk '{printf "%.3f", $4}')
+
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            data+="$PAH $(printf "%.2f" "$S1") $f01 $(printf "%.2f" "$T1") $STG\n"
+        fi
+    fi
+done
+
+# Sort by STG and format in Overleaf syntax
+echo -e "$data" | sort -nk5 | awk '{printf "$%d(%s)$ & $%s$ ($%s$) & $%s$ & $%s$ \\\\\n", NR, $1, $2, $3, $4, $5}'
+
+echo "\hline"
+echo "\end{tabular}"
+echo "\caption{Sorted Table of LCC2 Values}"
+echo "\label{tab:lcc2}"
+echo "\end{table}"
+```
