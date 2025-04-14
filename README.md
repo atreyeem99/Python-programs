@@ -16758,3 +16758,69 @@ for target_file in target_files:
     print(f"Comparison with {target_file}:")
     print(f"MSE: {mse:.6f}, MAE: {mae:.6f}, SDE: {sde:.6f}\n")
 ```
+#
+```
+import os
+from rdkit import Chem
+from rdkit.Chem import RDConfig
+import sys
+
+# Add SA_Score path
+sys.path.append(os.path.join(RDConfig.RDContribDir, 'SA_Score'))
+import sascorer
+
+# Input and output files
+input_file = "BNPAH_33059_fixedgeom_mod.smi"
+output_file = "33059_sa_score.txt"
+
+def calculate_sa_scores(input_file, output_file):
+    """
+    Calculate synthetic accessibility (SA) scores for molecules from a SMILES file.
+
+    Args:
+        input_file (str): Path to the input file containing SMILES strings.
+        output_file (str): Path to the output file where SA scores will be written.
+
+    Returns:
+        None
+    """
+    try:
+        with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+            # Write header to the output file
+            outfile.write("Molecule_Name\tSMILES\tSA_Score\n")
+
+            # Read SMILES strings and process each
+            for idx, line in enumerate(infile, start=1):
+                smiles = line.strip()
+
+                if not smiles:  # Skip empty lines
+                    continue
+
+                molecule_name = f"Mol{idx:02d}"
+
+                try:
+                    # Convert SMILES to RDKit molecule
+                    mol = Chem.MolFromSmiles(smiles)
+
+                    if mol is not None:
+                        # Calculate SA score
+                        sa_score = sascorer.calculateScore(mol)
+                        # Write to output file
+                        outfile.write(f"{molecule_name}\t{smiles}\t{sa_score:.3f}\n")
+                    else:
+                        outfile.write(f"{molecule_name}\t{smiles}\tInvalid_SMILES\n")
+
+                except Exception as e:
+                    outfile.write(f"{molecule_name}\t{smiles}\tError: {str(e)}\n")
+
+        print(f"SA scores successfully written to {output_file}.")
+
+    except FileNotFoundError:
+        print(f"Error: Input file {input_file} not found.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+
+# Run the function
+if __name__ == "__main__":
+    calculate_sa_scores(input_file, output_file)
+```
