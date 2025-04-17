@@ -16989,3 +16989,31 @@ plt.savefig('energies_plot.pdf')
 # Show the plot
 plt.show()
 ```
+#
+```
+for imol in range(Nmol):
+
+    line = geom_file.readline().strip()
+
+    if line:
+
+        Nat = int(line)
+        _ = geom_file.readline().strip()  # Ignore original title
+
+        inputfile = open('geom.xyz', 'w')
+
+        inputfile.write(f'{Nat}\n')
+        inputfile.write(f'{imol + 1:03d}\n')  # Write 001, 002, ...
+
+        for iat in range(1, Nat + 1):
+            line = geom_file.readline().split()
+            sym = line[0]
+            R = [float(line[1]), float(line[2]), float(line[3])]
+            inputfile.write(f'{sym}   {R[0]:15.8f}   {R[1]:15.8f}   {R[2]:15.8f}\n')
+
+        inputfile.close()
+
+        os.system(f'obabel geom.xyz -oxyz -O geom_tmp.xyz --minimize --ff UFF --sd --c 1e-6 --n 10000')
+        os.system(f'cat geom_tmp.xyz >> {XYZfina}')
+        os.system(f'rm geom.xyz geom_tmp.xyz')
+```
