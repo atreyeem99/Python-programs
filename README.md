@@ -17017,3 +17017,31 @@ for imol in range(Nmol):
         os.system(f'cat geom_tmp.xyz >> {XYZfina}')
         os.system(f'rm geom.xyz geom_tmp.xyz')
 ```
+#
+```
+import csv
+
+hartree_to_kjmol = 2625.49962  # Conversion factor
+reference_energy = -721.009820224996  # Fixed reference
+
+input_csv = "sp_mol.csv"
+output_csv = "sp_mol_relative.csv"
+
+data = []
+
+# Read input CSV
+with open(input_csv, newline='') as csvfile:
+    reader = csv.reader(csvfile)
+    header = next(reader)
+    for row in reader:
+        folder = row[0]
+        energy = float(row[1])
+        relative_kjmol = (energy - reference_energy) * hartree_to_kjmol
+        data.append([folder, energy, relative_kjmol])
+
+# Write output CSV
+with open(output_csv, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Folder", "Energy", "Relative_Energy_kJmol"])
+    writer.writerows(data)
+```
