@@ -17045,3 +17045,32 @@ with open(output_csv, "w", newline="") as f:
     writer.writerow(["Folder", "Energy", "Relative_Energy_kJmol"])
     writer.writerows(data)
 ```
+#
+```
+import os
+import re
+import csv
+
+base_dir = "/home/atreyee/THIOL_FINAL/Cys/ORCA_DLPNO-CCSD-VTZ_SP/molecule"
+correction = -0.49992155623993
+output_csv = "sp.csv"
+data = []
+
+for root, dirs, files in os.walk(base_dir):
+    if "opt.out" in files:
+        filepath = os.path.join(root, "opt.out")
+        with open(filepath, "r") as f:
+            lines = f.readlines()
+        energies = [float(m.group(1)) for line in lines if (m := re.search(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)", line))]
+        if energies:
+            last_energy = energies[-1]
+            corrected_energy = last_energy + correction
+            foldername = os.path.relpath(root, base_dir)
+            data.append([foldername, last_energy, corrected_energy])
+
+# Write to CSV
+with open(output_csv, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Folder", "SP_Energy_Eh", "Corrected_Energy_Eh"])
+    writer.writerows(data)
+```
