@@ -17074,3 +17074,38 @@ with open(output_csv, "w", newline="") as f:
     writer.writerow(["Folder", "SP_Energy_Eh", "Corrected_Energy_Eh"])
     writer.writerows(data)
 ```
+#
+```
+import os
+import re
+import csv
+
+# Root directory to search
+root_dir = os.getcwd()  # or replace with absolute path if needed
+
+# Prepare list to store results
+results = []
+
+# Walk through all folders under root
+for subdir, _, files in os.walk(root_dir):
+    if "opt.out" in files:
+        filepath = os.path.join(subdir, "opt.out")
+        energy = None
+
+        with open(filepath, "r") as f:
+            for line in f:
+                if "FINAL SINGLE POINT ENERGY" in line:
+                    match = re.search(r"(-?\d+\.\d+)", line)
+                    if match:
+                        energy = match.group(1)
+
+        if energy:
+            folder_name = os.path.basename(subdir)
+            results.append([folder_name, energy])
+
+# Write to sp.csv
+with open("sp.csv", "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(["Folder", "Energy"])
+    writer.writerows(results)
+```
