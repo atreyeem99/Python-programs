@@ -17109,3 +17109,32 @@ with open("sp.csv", "w", newline="") as csvfile:
     writer.writerow(["Folder", "Energy"])
     writer.writerows(results)
 ```
+#
+```
+import csv
+from itertools import zip_longest
+
+# Input files
+files = [
+    ("sp_mol_relative.csv", "R"),
+    ("sp_mol_relative_S.csv", "S"),
+    ("sp_mol_relative_int.csv", "int"),
+    ("sp_mol_relative_C.csv", "C"),
+]
+
+# Read third column (Relative_Energy_kJmol or int values) from each file
+columns = []
+
+for file, label in files:
+    with open(file, newline='') as f:
+        reader = csv.reader(f)
+        next(reader)  # skip header
+        col = [row[2] for row in reader]
+        columns.append(col)
+
+# Merge and write to output.txt
+with open("merged_relative_energies.txt", "w") as out:
+    out.write(f"{'R':>15} {'S':>15} {'int':>15} {'C':>15}\n")
+    for row in zip_longest(*columns, fillvalue=""):
+        out.write(f"{row[0]:>15} {row[1]:>15} {row[2]:>15} {row[3]:>15}\n")
+```
