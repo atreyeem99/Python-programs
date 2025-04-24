@@ -17191,3 +17191,58 @@ for i in range(len(E)):
     plt.savefig(f"mo_{i+1}.png", dpi=150)
     plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# === Input section ===
+
+# Atomic coordinates (XY)
+XY = np.array([
+    [ 1.0000,  0.0000],
+    [-1.0000,  0.0000]
+])
+
+# Hückel Hamiltonian
+H = np.array([
+    [ 0.0, -1.0],
+    [-1.0,  0.0]
+])
+
+# Solve Eigenproblem
+E, V = np.linalg.eigh(H)
+
+# Output eigenvalues and eigenvectors to file
+with open("huckel_py.out", "w") as f:
+    for i in range(len(E)):
+        f.write(f"Root: {i+1:2d} Eigen value: {E[i]:15.8f}\n\n")
+        f.write("Eigen vector\n")
+        for v in V[:, i]:
+            f.write(f"{v:15.8f}\n")
+        f.write("\n")
+
+# Plot each MO
+for i in range(len(E)):
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.set_xlim(-2, 2)
+    ax.set_ylim(-2, 2)
+    ax.set_title(f"Molecular Orbital {i+1}\nEnergy = {E[i]:.3f}")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+
+    for j in range(len(XY)):
+        x, y = XY[j]
+        coeff = V[j, i]
+        color = 'blue' if coeff >= 0 else 'red'
+        size = abs(coeff) * 2000  # scale bubble size
+        ax.scatter(x, y, s=size, c=color, edgecolors='black', alpha=0.6)
+
+    # Draw bond
+    ax.plot(XY[:,0], XY[:,1], color='black', linewidth=2)
+
+    plt.grid(True)
+    plt.savefig(f"mo_{i+1}.png", dpi=150)
+    plt.show()
+```
