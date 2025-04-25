@@ -17246,3 +17246,28 @@ for i in range(len(E)):
     plt.savefig(f"mo_{i+1}.png", dpi=150)
     plt.show()
 ```
+#
+```
+#!/bin/bash
+
+file=$1
+
+# Extract number of atoms
+Nat=$(grep 'NAtoms=' "$file" | awk '{print $2}' | head -1)
+echo "$Nat"
+echo "$file"
+
+# Extract and format atomic coordinates from Standard orientation
+grep -A$((Nat + 4)) 'Standard orientation:' "$file" | tail -n "$Nat" | \
+awk '{
+    atom_num = $2
+    if (atom_num == 1)      atom = "H"
+    else if (atom_num == 6) atom = "C"
+    else if (atom_num == 7) atom = "N"
+    else if (atom_num == 8) atom = "O"
+    else if (atom_num == 15) atom = "P"
+    else if (atom_num == 16) atom = "S"
+    else atom = atom_num
+    printf "%-2s %12.6f %12.6f %12.6f\n", atom, $4, $5, $6
+}'
+```
