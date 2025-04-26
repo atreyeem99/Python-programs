@@ -17271,3 +17271,60 @@ awk '{
     printf "%-2s %12.6f %12.6f %12.6f\n", atom, $4, $5, $6
 }'
 ```
+#
+```
+import os
+import numpy as np
+import pandas as pd
+
+def read_xyz(filepath):
+    with open(filepath, 'r') as f:
+        lines = f.readlines()[2:]  # Skip first two lines
+    coords = [list(map(float, line.split()[1:4])) for line in lines]
+    return np.array(coords)
+
+def calculate_rmsd(a, b):
+    if a.shape != b.shape:
+        return np.inf
+    diff = a - b
+    return np.sqrt(np.sum(diff**2) / a.shape[0])
+
+base_dir = "/home/atreyee/THIOL_FINAL/Cys/ORCA_DLPNO-CCSD-VTZ_SP/molecule_int_final"
+folders = sorted([f for f in os.listdir(base_dir)
+                  if os.path.isdir(os.path.join(base_dir, f))])
+
+# Load XYZ files from all folders
+xyz_data = {}
+for folder in folders:
+    xyz_file = os.path.join(base_dir, folder, f"geom_{folder}.xyz")
+    if os.path.exists(xyz_file):
+        xyz_data[folder] = read_xyz(xyz_file)
+
+unclustered = set(xyz_data.keys())
+cluster_num = 1
+summary = []
+
+while unclustered:
+    ref_folder = sorted(unclustered)[0]
+    ref_xyz = xyz_data[ref_folder]
+    cluster = []
+
+    for folder in unclustered:
+        test_xyz = xyz_data[folder]
+        rmsd = calculate_rmsd(ref_xyz, test_xyz)
+        if rmsd < 1.0:
+            cluster.append((folder, rmsd))
+
+    # Save this cluster
+    cluster_df = pd.DataFrame(cluster, columns=["folder_name", "rmsd"])
+    cluster_df.to_csv(f"cluster_{cluster_num:02d}.csv", index=False)
+
+    summary.append((f"cluster_{cluster_num:02d}", len(cluster)))
+    clustered_folders = [f[0] for f in cluster]
+    unclustered -= set(clustered_folders)
+    cluster_num += 1
+
+# Save cluster summary
+summary_df = pd.DataFrame(summary, columns=["cluster_name", "num_molecules"])
+summary_df.to_csv("cluster_summary.csv", index=False)
+```
