@@ -17376,3 +17376,26 @@ for folder in sorted(selected_folders):
 
 print("Selected Gaussian G16 input files created.")
 ```
+#
+```
+import os
+import shutil
+
+base_dir = os.getcwd()  # Use the current directory
+
+for foldername in os.listdir(base_dir):
+    folder_path = os.path.join(base_dir, foldername)
+    if os.path.isdir(folder_path):
+        opt_file = os.path.join(folder_path, "opt.out")
+        source_file = os.path.join(folder_path, "xtb.xyz")
+        target_file = os.path.join(folder_path, f"xtb_{foldername}.xyz")
+
+        if os.path.exists(opt_file):
+            with open(opt_file, 'r') as f:
+                if "ORCA TERMINATED NORMALLY" in f.read():
+                    if os.path.exists(source_file):
+                        shutil.copy2(source_file, target_file)
+                        print(f"Copied: {source_file} → {target_file}")
+                    else:
+                        print(f"xtb.xyz not found in {folder_path}")
+```
