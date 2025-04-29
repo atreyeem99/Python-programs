@@ -17399,3 +17399,27 @@ for foldername in os.listdir(base_dir):
                     else:
                         print(f"xtb.xyz not found in {folder_path}")
 ```
+#
+```
+import os
+import shutil
+
+src_root = "/home/atreyee/THIOL_FINAL/Ac_Cys/g16_OPT_wB97XD_631Gd/molecule_int_final"
+dst_root = "/home/atreyee/THIOL_FINAL/Ac_Cys/ORCA_DLPNO-CCSD-VTZ_SP/molecule_int_final"
+template_file = "/home/atreyee/THIOL_FINAL/Ac_Cys/ORCA_DLPNO-CCSD-VTZ_SP/molecule_int_final/opt.com"
+
+for subdir, _, files in os.walk(src_root):
+    for file in files:
+        if file.endswith("_g16_opt.xyz"):
+            src_xyz_path = os.path.join(subdir, file)
+            rel_path = os.path.relpath(subdir, src_root)
+            dst_folder = os.path.join(dst_root, rel_path)
+
+            os.makedirs(dst_folder, exist_ok=True)
+
+            shutil.copyfile(src_xyz_path, os.path.join(dst_folder, "geom.xyz"))
+            shutil.copyfile(template_file, os.path.join(dst_folder, "opt.com"))
+            print(f"✅ Created folder: {dst_folder} with geom.xyz and opt.com")
+
+print("🎉 All eligible files processed.")
+```
