@@ -17423,3 +17423,66 @@ for subdir, _, files in os.walk(src_root):
 
 print("🎉 All eligible files processed.")
 ```
+#
+```
+import os
+
+# Define the paths
+extrapolate_folder = './extrapolate'
+output_folder = './output_folder'
+
+# Create the output folder if it doesn't exist
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+# Loop through each folder inside extrapolate
+for folder_name in os.listdir(extrapolate_folder):
+    folder_path = os.path.join(extrapolate_folder, folder_name)
+
+    # Check if it is a directory
+    if os.path.isdir(folder_path):
+        xyz_file = os.path.join(folder_path, 'test.xyz')
+
+        # Read the test.xyz file, skipping the first two lines
+        with open(xyz_file, 'r') as xyz:
+            lines = xyz.readlines()[2:]
+
+        # Prepare the input template
+        input_template = '''memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={
+'''
+        # Add coordinates to the geometry section
+        input_template += ''.join(lines)
+        input_template += '''}
+
+basis={
+default,vtz
+set,mp2fit
+default,vtz/mp2fit
+set,jkfit
+default,vtz/jkfit }
+
+hf
+
+{lt-df-lcc2                     !ground state CC2
+eom,-6.1                        !singlet states
+eomprint,popul=-1,loceom=-1 }   !minimize the output
+:
+'''
+
+        # Create the corresponding folder inside output_folder
+        new_folder = os.path.join(output_folder, folder_name)
+        os.makedirs(new_folder, exist_ok=True)
+
+        # Write the input file inside the new folder
+        input_file = os.path.join(new_folder, 'input.com')
+        with open(input_file, 'w') as file:
+            file.write(input_template)
+
+print("Files created successfully!")
+```
