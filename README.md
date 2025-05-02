@@ -17534,3 +17534,33 @@ def find_min_2nd_4th_columns(file_path):
 file_path = "your_file.txt"  # replace with your actual filename
 find_min_2nd_4th_columns(file_path)
 ```
+#
+```
+def find_min_2nd_4th_columns(file_path):
+    col2_vals = []
+    col4_vals = []
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    for i, line in enumerate(lines[1:], start=2):  # skip header
+        parts = line.strip().split()
+        if len(parts) < 2:
+            continue  # skip if fewer than 2 numbers
+
+        try:
+            col2_vals.append(float(parts[1]))  # 2nd column
+        except ValueError:
+            print(f"Line {i}: Invalid number in 2nd column: {parts[1]}")
+
+        try:
+            col4_vals.append(float(parts[-1]))  # last number = 4th column if exists
+        except ValueError:
+            print(f"Line {i}: Invalid number in 4th column: {parts[-1]}")
+
+    min_col2 = min(col2_vals) if col2_vals else None
+    min_col4 = min(col4_vals) if col4_vals else None
+
+    print(f"Lowest value in 2nd column: {min_col2}")
+    print(f"Lowest value in 4th column: {min_col4}")
+```
