@@ -17704,3 +17704,39 @@ with open(output_csv, "w", newline="") as f:
     writer.writerow(["Folder", "SP_Energy_Eh", "Corrected_Energy_Eh", "Relative_Energy_Eh"])
     writer.writerows(data)
 ```
+#
+```
+import pandas as pd
+
+def tbe_to_latex(tbe_file, output_file):
+    # Read the CSV file (assuming no headers)
+    tbe = pd.read_csv(tbe_file, header=None)
+
+    # Add an index column starting from 1 to 12
+    tbe.insert(0, 'Index', range(1, 13))
+
+    # Convert to LaTeX table format with values inside $$
+    latex_rows = tbe.apply(lambda row: ' & '.join([f"${val}$" for val in row]) + ' \\\\', axis=1)
+
+    # Create LaTeX table structure
+    latex_table = [
+        "\\begin{table}[h]",
+        "\\centering",
+        "\\caption{TBE Values in LaTeX Format}",
+        "\\begin{tabular}{c c c c}",
+        "\\hline",
+        "Index & $TBE_1$ & $TBE_2$ & $TBE_3$ \\\\",
+        "\\hline",
+        '\n'.join(latex_rows),
+        "\\hline",
+        "\\end{tabular}",
+        "\\end{table}"
+    ]
+
+    # Write to output file
+    with open(output_file, 'w') as f:
+        f.write('\n'.join(latex_table))
+
+# Example usage
+tbe_to_latex('TBE.csv', 'tbe_table.tex')
+```
