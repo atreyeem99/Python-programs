@@ -17740,3 +17740,51 @@ def tbe_to_latex(tbe_file, output_file):
 # Example usage
 tbe_to_latex('TBE.csv', 'tbe_table.tex')
 ```
+#
+```
+def find_min_2nd_4th_columns(file_path):
+    col2_vals = []
+    col4_vals = []
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+
+    for i, line in enumerate(lines[1:], start=2):  # Skip header (line 1)
+        parts = line.strip().split()
+
+        if len(parts) < 2:
+            continue  # skip if there are fewer than 2 values
+
+        # 2nd column: parts[1]
+        try:
+            val2 = float(parts[1])
+            col2_vals.append(val2)
+        except ValueError:
+            print(f"Line {i}: Invalid number in 2nd column: {parts[1]}")
+        except IndexError:
+            print(f"Line {i}: Missing 2nd column")
+
+        # 4th column: last value on the line (can vary in index)
+        try:
+            val4 = float(parts[-1])
+            col4_vals.append(val4)
+        except ValueError:
+            print(f"Line {i}: Invalid number in 4th column: {parts[-1]}")
+        except IndexError:
+            print(f"Line {i}: Missing 4th column")
+
+    # Print results
+    if col2_vals:
+        print(f"Lowest value in 2nd column: {min(col2_vals)}")
+    else:
+        print("No valid values in 2nd column.")
+
+    if col4_vals:
+        print(f"Lowest value in 4th column: {min(col4_vals)}")
+    else:
+        print("No valid values in 4th column.")
+
+# Example usage
+file_path = "your_file.txt"  # replace with your actual filename
+find_min_2nd_4th_columns(file_path)
+```
