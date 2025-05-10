@@ -17824,3 +17824,24 @@ def tbe_to_latex(tbe_file, output_file):
 # Example usage
 tbe_to_latex('TBE.csv', 'tbe_table.tex')
 ```
+#
+```
+for dir in *; do
+    file=$dir/inp.out
+    if [ -f "$file" ]; then
+        # Extract HOMO and LUMO energies (remove eV and newlines) and format to 3 decimal places
+        HOMO=$(grep "^ HOMO" "$file" | awk '{print $(NF-0)}' | sed 's/eV//' | tr -d '\n' | awk '{printf "%.3f", $1}')
+        LUMO=$(grep "^ LUMO" "$file" | awk '{print $(NF-0)}' | sed 's/eV//' | tr -d '\n' | awk '{printf "%.3f", $1}')
+
+        # Extract S1 and T1 energies and format to 3 decimal places
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1 | tr -d '\n' | awk '{printf "%.3f", $1}')
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -6 | tail -1 | tr -d '\n' | awk '{printf "%.3f", $1}')
+
+        # Calculate STG and format to 3 decimal places
+        STG=$(echo "$S1 $T1" | awk '{printf "%.3f", $1 - $2}')
+
+        # Output everything on the same line
+        echo "$dir,$HOMO,$LUMO,$S1,$T1,$STG"
+    fi
+done
+```
