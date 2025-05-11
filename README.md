@@ -17845,3 +17845,35 @@ for dir in *; do
     fi
 done
 ```
+#
+```
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+
+iX = 3
+iY = 4
+padding = 1
+
+X = np.array(df.iloc[:, [iX, iY]])  # select S1 and T1
+sc = StandardScaler()
+X = sc.fit_transform(X)
+
+ms, cs, f1s = [], [], []
+
+for i in range(20):
+    coeffs, intercept, y_pred = classify(X, y)
+
+    # slope and intercept
+    m = -coeffs[0, 0] / coeffs[0, 1]
+    c = -intercept[0] / coeffs[0, 1]
+    ms.append(m)
+    cs.append(c)
+
+    # weighted f1-score
+    report = classification_report(y, y_pred, output_dict=True)
+    f1_weighted = report['weighted avg']['f1-score']
+    f1s.append(f1_weighted)
+
+    print(f"Run {i+1:2}: Slope={m:.4f}, Intercept={c:.4f}, Weighted F1={f1_weighted:.4f}")
+```
