@@ -17877,3 +17877,40 @@ for i in range(20):
 
     print(f"Run {i+1:2}: Slope={m:.4f}, Intercept={c:.4f}, Weighted F1={f1_weighted:.4f}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the CSV file using pandas, skipping the first column (string column)
+data = pd.read_csv('ladc2_lcc2_104.csv', header=None)
+
+# Extract 4th and 7th columns (index 3 and 6) for plotting
+x = data.iloc[:, 3].values
+y = data.iloc[:, 6].values
+
+# Create square scatter plot
+plt.figure(figsize=(6, 6))
+plt.scatter(x, y, s=10, color='red', alpha=0.7)
+
+# Plot y = x line (black dashed line)
+min_val = min(np.min(x), np.min(y))
+max_val = max(np.max(x), np.max(y))
+plt.plot([min_val, max_val], [min_val, max_val], 'k--', linewidth=1)  # Black dashed line
+
+# Set equal aspect ratio and limits
+plt.gca().set_aspect('equal', adjustable='box')
+plt.xlim(min_val, max_val)
+plt.ylim(min_val, max_val)
+
+# Add grid lines
+plt.grid(True)
+
+# Set axis labels
+plt.xlabel('STG, L-CC2 (eV)')
+plt.ylabel('STG, LADC(2) (eV)')
+
+# Save as PDF
+plt.savefig('scatter_plot.pdf', bbox_inches='tight')
+plt.close()
+```
