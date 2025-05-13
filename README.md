@@ -17914,3 +17914,24 @@ plt.ylabel('STG, LADC(2) (eV)')
 plt.savefig('scatter_plot.pdf', bbox_inches='tight')
 plt.close()
 ```
+#
+```
+indices = [3, 1, 2, 6]
+ref_vals = df.iloc[103, indices].values
+X = df.iloc[:, indices].values - ref_vals
+X = StandardScaler().fit_transform(X)
+
+best_f1 = -1
+
+for i in range(50):
+    coeffs, intercept, y_pred = classify(X, y)
+    f1_weighted = classification_report(y, y_pred, output_dict=True)['weighted avg']['f1-score']
+    
+    if f1_weighted > best_f1:
+        best_f1 = f1_weighted
+        best_coeffs = coeffs[0]
+        best_intercept = intercept[0]
+
+coeff_str = ', '.join(f"{c:.4f}" for c in best_coeffs)
+print(f"Best 4D (S1, HOMO, LUMO, HLGAP): Coeffs=[{coeff_str}], Intercept={best_intercept:.4f}, Weighted F1={best_f1:.4f}")
+```
