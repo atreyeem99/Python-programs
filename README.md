@@ -17983,3 +17983,50 @@ def find_min_2nd_4th_columns(file_path):
 file_path = "your_file.txt"  # replace with your actual filename
 find_min_2nd_4th_columns(file_path)
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import make_interp_spline
+
+reference_energy = -1865.525514144630
+hartree_to_kjmol = 2625.5
+
+data = []
+with open("sp.csv", "r") as csvfile:
+    reader = csv.reader(csvfile)
+    next(reader)  # Skip header
+    for row in reader:
+        if len(row) < 2:  # skip empty or malformed rows
+            continue
+        folder = row[0]
+        energy = float(row[1])
+        delta_energy = (energy - reference_energy) * hartree_to_kjmol
+        data.append((folder, delta_energy))
+
+# Sort numerically by TS1_x
+data.sort(key=lambda x: float(x[0].replace("TS1_", "").replace("_", ".")))
+
+# Prepare x and y for interpolation
+x_vals = np.arange(len(data))
+y_vals = np.array([val[1] for val in data])
+labels = [val[0] for val in data]
+
+# Smooth spline interpolation
+x_smooth = np.linspace(x_vals.min(), x_vals.max(), 500)
+spline = make_interp_spline(x_vals, y_vals, k=3)
+y_smooth = spline(x_smooth)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.plot(x_smooth, y_smooth, color='blue', linewidth=2)
+plt.scatter(x_vals, y_vals, color='red')
+plt.xticks(x_vals, labels, rotation=45)
+plt.xlabel("Structure")
+plt.ylabel("Relative Energy (kJ/mol)")
+plt.title("Transition State Energy Profile (TS1 Series)")
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
+```
