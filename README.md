@@ -18067,3 +18067,51 @@ with open(input_file, 'r') as fin:
     for row in reader:
         print(format_row(row))
 ```
+#
+```
+import os
+
+# Paths
+input_base = "/home/atreyee/THIOL_FINAL/Cys/molecule_int"
+output_base = "/home/atreyee/THIOL_FINAL/Cys/g16_OPT_wB97XD_631Gd/molecule_int"
+final_txt = os.path.join(input_base, "final.txt")
+
+# Gaussian input template (for G16)
+gaussian_template = """%mem=64GB
+%nprocs=16
+#P wB97XD/6-31G(d) SCF(maxcycles=100,verytight) Int(Grid=ultrafine) Opt(calcfc, maxcyc=1000, tight) Freq SCRF=(cpcm, solvent=water)
+
+Test
+
+-3 2
+"""
+
+# Read the folder names from final.txt
+with open(final_txt, "r") as f:
+    selected_folders = [line.strip() for line in f if line.strip()]
+
+# Loop over only selected folders
+for folder in sorted(selected_folders):
+    input_xyz = os.path.join(input_base, folder, f"{folder}_UFF.xyz")
+
+    if not os.path.exists(input_xyz):
+        print(f"Warning: {input_xyz} not found.")
+        continue
+
+    # Read coordinates from XYZ (skip first 2 lines)
+    with open(input_xyz, "r") as xyz_file:
+        lines = xyz_file.readlines()[2:]
+
+    # Create output directory if needed
+    output_folder = os.path.join(output_base, folder)
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Write Gaussian input file
+    output_com = os.path.join(output_folder, "opt.com")
+    with open(output_com, "w") as out_file:
+        out_file.write(gaussian_template)
+        out_file.writelines(lines)
+        out_file.write("\n\n\n\n")  # Four blank lines at the end
+
+print("Selected Gaussian G16 input files created.")
+```
