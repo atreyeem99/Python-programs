@@ -18134,3 +18134,43 @@ with open(homo_lumo_file, "r") as f:
         else:
             print(f"MISSING: {gbw_file}")
 ```
+#
+```
+import os
+
+def check_boron_in_folders(file_list, output_file):
+    with open(file_list, 'r') as f:
+        folders = [line.strip() for line in f.readlines()]
+    
+    bora_folders = []
+    
+    for folder in folders:
+        xyz_path = os.path.join(folder, "geom_DFT_S0.xyz")
+        
+        if os.path.isfile(xyz_path):
+            with open(xyz_path, 'r') as xyz_file:
+                lines = xyz_file.readlines()
+                if len(lines) > 17:  # Ensure at least 15 atoms exist after skipping the first 2 lines
+                    atom = lines[16].split()[0]  # 15th atom in 1-based index (line index 16 after skipping 2 lines)
+                    if atom == "B":
+                        bora_folders.append(folder)
+    
+    with open(output_file, 'w') as f:
+        for folder in bora_folders:
+            f.write(folder + "\n")
+
+def merge_xyz_files(input_file, output_xyz):
+    with open(input_file, 'r') as f:
+        folders = [line.strip() for line in f.readlines()]
+    
+    with open(output_xyz, 'w') as out_f:
+        for folder in folders:
+            xyz_path = os.path.join(folder, "geom_DFT_S0.xyz")
+            if os.path.isfile(xyz_path):
+                with open(xyz_path, 'r') as xyz_file:
+                    out_f.writelines(xyz_file.readlines())
+
+if __name__ == "__main__":
+    check_boron_in_folders("76.txt", "bora_76.txt")
+    merge_xyz_files("bora_76.txt", "bora_76.xyz")
+```
