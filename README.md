@@ -18402,3 +18402,38 @@ eomprint,popul=-1,loceom=-1 }}   !minimize the output"""
 if __name__ == "__main__":
     create_folders_and_files()
 ```
+#
+```
+for dir in Mol_*; do
+  
+    file="$dir/inp.out"
+
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -6 | tail -1)
+
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            # Round S1 and T1 before computing STG
+            S1=$(printf "%.2f" "$S1")
+            T1=$(printf "%.2f" "$T1")
+            STG=$(awk -v s="$S1" -v t="$T1" 'BEGIN {printf "%.2f", s - t}')
+
+            if [[ $(echo "$S1 < 0.0" | bc -l) -eq 1 || $(echo "$T1 < 0.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1 $T1 $STG $PAH      De-excitation prone"
+            elif [[ $(echo "$S1 < 1.0" | bc -l) -eq 1 || $(echo "$T1 < 1.0" | bc -l) -eq 1 ]]; then
+                echo "$dir $S1 $T1 $STG $PAH      Distortion prone"
+            else
+                echo "$dir $S1 $T1 $STG $PAH"
+            fi
+        else
+            echo "$dir $S1 $T1 $STG $PAH      Convergence failed"
+        fi
+    fi
+
+done
+```
