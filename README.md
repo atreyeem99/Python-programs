@@ -18487,3 +18487,28 @@ with open(output_file, "w") as outfile:
                     outfile.write(r"\end{verbatim}" + "\n")
                     outfile.write("}\n")
 ```
+#
+```
+def process_molecules(scs_folder, output_base_folder):
+    """Main process to create inp.com files for all molecules in the source folder."""
+    # List all subdirectories in the source folder (i.e., molecule names) and sort them
+    molecule_names = sorted([name for name in os.listdir(scs_folder) if os.path.isdir(os.path.join(scs_folder, name))])
+
+    for idx, molecule_name in enumerate(molecule_names):
+        scs_molecule_folder = os.path.join(scs_folder, molecule_name)
+        geom_file = os.path.join(scs_molecule_folder, "geom_DFT_S0.xyz")
+
+        if os.path.exists(geom_file):
+            try:
+                coordinates = extract_coordinates(geom_file)
+
+                # Generate sequential folder names: Mol_00001, Mol_00002, ...
+                output_folder_name = f"Mol_{idx+1:05d}"
+                output_folder = os.path.join(output_base_folder, output_folder_name)
+
+                create_inp_file(coordinates, output_folder)
+            except Exception as e:
+                print(f"Error processing {molecule_name}: {e}")
+        else:
+            print(f"Warning: geom_DFT_S0.xyz not found for molecule {molecule_name} in {scs_folder}")
+```
