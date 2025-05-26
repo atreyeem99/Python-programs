@@ -18512,3 +18512,26 @@ def process_molecules(scs_folder, output_base_folder):
         else:
             print(f"Warning: geom_DFT_S0.xyz not found for molecule {molecule_name} in {scs_folder}")
 ```
+#
+```
+#!/bin/bash
+
+index=1
+for dir in Mol_*; do
+    file="$dir/inp.out"
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+        S1=$(grep 'Final LT-DF-LADC(2)-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LADC(2)-Results for state' "$file" | awk '{print $10}' | head -6 | tail -1)
+
+        STG=$(echo "$S1 $T1" | awk '{printf "%.3f", $1 - $2}')
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            printf "%d & %s & \$%.3f\$ & \$%.3f\$ & \$%.3f\$ \\\\\n" "$index" "$PAH" "$S1" "$T1" "$STG"
+            ((index++))
+        fi
+    fi
+done | sort -k5,5n
+```
