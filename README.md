@@ -18535,3 +18535,40 @@ for dir in Mol_*; do
     fi
 done | sort -k5,5n
 ```
+#
+```
+import os
+import shutil
+
+# Define paths
+source_base = "./"  # Base directory where the original folders exist
+destination_base = "./top_119_wB97XD3_def2TZVP_opt_freq"
+candidates_file = "119_candidates.txt"
+geom_file = "geom_DFT.S0.xyz"
+opt_file = os.path.join(destination_base, "opt.com")
+
+# Ensure the destination base exists
+os.makedirs(destination_base, exist_ok=True)
+
+# Read the candidate folder names
+with open(candidates_file, "r") as f:
+    candidate_folders = [line.strip() for line in f if line.strip()]
+
+# Process each folder
+for folder in candidate_folders:
+    source_folder = os.path.join(source_base, folder)
+    destination_folder = os.path.join(destination_base, folder)
+    
+    # Create the new folder inside destination_base
+    os.makedirs(destination_folder, exist_ok=True)
+    
+    # Copy geom_DFT.S0.xyz if it exists
+    source_geom_file = os.path.join(source_folder, geom_file)
+    if os.path.exists(source_geom_file):
+        shutil.copy(source_geom_file, destination_folder)
+    else:
+        print(f"Warning: {geom_file} not found in {source_folder}")
+    
+    # Copy opt.com to the newly created folder
+    shutil.copy(opt_file, destination_folder)
+```
