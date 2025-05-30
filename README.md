@@ -18718,3 +18718,45 @@ $end
 if __name__ == "__main__":
     create_folders_and_files()
 ```
+#
+```
+#!/bin/bash
+  
+echo "\begin{table}[h]"
+echo "\centering"
+echo "\begin{tabular}{c c c c c c c}"
+echo "\hline"
+echo "Index & Folder Name & \# PAH & $E_{{\rm S}_1} (eV)$ & $f_{0,1}$ (a.u.) & $E_{{\rm T}_1} (eV)$ & STG \\\\"
+echo "\hline"
+
+data=""
+
+index=1
+for dir in Mol_*; do
+    file="$dir/inp.out"
+    PAH=$(cat "$dir/PAH_index")
+
+    if [ -f "$file" ]; then
+        S1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -1)
+        T1=$(grep 'Final LT-DF-LCC2-LR-Results for state' "$file" | awk '{print $10}' | head -7 | tail -1)
+        STG=$(awk -v s="$S1" -v t="$T1" 'BEGIN {printf "%.3f", s - t}')
+        f01=$(grep 'DF-LCC2  oszillator strength:  ' "$file" | awk '{printf "%.3f", $4}')
+
+        completed=$(grep -c 'diagnostic completed successfully' "$file")
+
+        if [ "$completed" -eq 2 ]; then
+            data+="$index $dir $PAH $(printf "%.3f" "$S1") $f01 $(printf "%.3f" "$T1") $STG\n"
+            ((index++))
+        fi
+    fi
+done
+
+# Sort by STG and format in Overleaf syntax
+echo -e "$data" | sort -nk7 | awk '{printf "$%d$ & $%s$ & $%s$ & $%s$ & $%s$ & $%s$ & $%s$ \\\\\n", NR, $2, $3, $4, $5, $6, $7}'
+
+echo "\hline"
+echo "\end{tabular}"
+echo "\caption{Sorted Table of LCC2 Values}"
+echo "\label{tab:lcc2}"
+echo "\end{table}"
+```
