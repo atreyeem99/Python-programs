@@ -18834,3 +18834,83 @@ with open(output_file, "w") as outfile:
                     outfile.write(r"\end{verbatim}" + "\n")
                     outfile.write("}\n")
 ```
+#
+```
+import os
+import shutil
+
+def create_folders_and_files():
+    source_dir = "top_119_wB97XD3_def2TZVP_opt_freq"
+    dest_dir = "LADC2_AVDZ_final_72_candidates"
+    missing_file = os.path.join(source_dir, "72candidates_for_AVDZ.txt")
+
+    if not os.path.exists(missing_file):
+        print(f"Error: {missing_file} not found.")
+        return
+
+    with open(missing_file, "r") as f:
+        folder_names = [line.strip() for line in f.readlines() if line.strip()]
+
+    pah_index_base_path = "/home/atreyee/BNPAH/LCC2_VDZ_3953_SCS_negatives"
+
+    for folder in folder_names:
+        source_folder = os.path.join(source_dir, folder)
+        dest_folder = os.path.join(dest_dir, folder)
+        os.makedirs(dest_folder, exist_ok=True)
+
+        source_pah_index = os.path.join(pah_index_base_path, folder, "PAH_index")
+        dest_pah_index = os.path.join(dest_folder, "PAH_index")
+        if os.path.exists(source_pah_index):
+            shutil.copy(source_pah_index, dest_pah_index)
+        else:
+            print(f"Warning: {source_pah_index} not found.")
+
+        geom_file = os.path.join(source_folder, "geom_reopt.xyz")
+        if os.path.exists(geom_file):
+            with open(geom_file, "r") as f:
+                geom_data = f.readlines()
+
+            if len(geom_data) < 3:
+                print(f"Warning: {geom_file} has insufficient data.")
+                continue
+
+            atoms = [line.split() for line in geom_data[2:]]
+            molecule_block = "\n".join(
+                f" {atom[0]:<2} {float(atom[1]):>18.10f} {float(atom[2]):>18.10f} {float(atom[3]):>18.10f}" 
+                for atom in atoms
+            )
+        else:
+            print(f"Error: {geom_file} not found.")
+            continue
+
+        inp_content = f"""$molecule
+  0  1
+{molecule_block}
+$end
+
+$rem
+jobtype             sp
+method              adc(2)
+basis               cc-pVTZ
+aux_basis           rimp2-cc-pVTZ
+mem_total           64000
+mem_static          1000
+maxscf              1000
+cc_symmetry         false
+ee_singlets         3
+ee_triplets         3
+sym_ignore          true
+ADC_DAVIDSON_MAXITER 300
+ADC_DAVIDSON_CONV   5
+$end
+"""
+
+        inp_file_path = os.path.join(dest_folder, "inp.com")
+        with open(inp_file_path, "w") as f:
+            f.write(inp_content)
+
+    print("Task completed successfully.")
+
+if __name__ == "__main__":
+    create_folders_and_files()
+```
