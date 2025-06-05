@@ -18955,3 +18955,43 @@ def correct_csv(input_file, output_file):
 # Example usage
 correct_csv('input.csv', 'corr.csv')
 ```
+# 
+```
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load data (assuming no headers)
+def load_column(filename, col_index=2):
+    return np.loadtxt(filename, delimiter=',', usecols=[col_index])
+
+# Load 3rd column from each file (index 2 in zero-based indexing)
+tbe_x = load_column("TBE.csv")
+adc2_y = load_column("ADC2_AVTZ.csv")
+adc2_tbe_y = load_column("ADC2_AVTZ_TBE_paper.csv")
+cc2_y = load_column("CC2_AVTZ.csv")
+
+# Plot scatter plots
+plt.figure(figsize=(6, 6))  # Square plot
+plt.scatter(tbe_x, adc2_y, label="ADC2_AVTZ", color='r', marker='x', alpha=0.7)
+plt.scatter(tbe_x, adc2_tbe_y, label="ADC2_AVTZ_TBE_paper", color='g', alpha=0.7)
+plt.scatter(tbe_x, cc2_y, label="CC2_AVTZ", color='b', marker='s', alpha=0.7)
+
+# Plot y = x line extending to the corners
+plt.plot([-3.5, 0.0], [-3.5, 0.0], linestyle='--', color='black', label='y = x')
+
+# Set limits
+plt.xlim(-3.5, 0.0)
+plt.ylim(-3.5, 0.0)
+
+# Labels and legend
+plt.xlabel("TBE (3rd column)")
+plt.ylabel("Computed values (3rd column)")
+plt.legend()
+plt.grid(True)
+
+# Save as PDF
+plt.savefig("scatter_plot.pdf")
+
+plt.show()
+```
