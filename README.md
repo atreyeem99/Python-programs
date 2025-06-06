@@ -18995,3 +18995,40 @@ plt.savefig("scatter_plot.pdf")
 
 plt.show()
 ```
+#
+```
+import csv
+
+def format_row(row):
+    # Convert first entry to LaTeX label
+    name_parts = row[0].split('_')
+    ring = ','.join(name_parts[:4])
+    base = name_parts[4].replace('aza', 'azacyclazine')
+    symmetry = name_parts[5].lower()
+    label = f"{ring}-{base} & \\{symmetry}"
+
+    # Format numbers with 3 decimals and LaTeX negative sign
+    formatted_numbers = []
+    for val in row[1:]:
+        try:
+            num = float(val)
+            if num < 0:
+                formatted_numbers.append(f"$-${abs(num):.3f}")
+            else:
+                formatted_numbers.append(f"{num:.3f}")
+        except ValueError:
+            formatted_numbers.append(val)  # keep as-is if not a float
+
+    # Pad with empty columns if needed to align LaTeX table
+    while len(formatted_numbers) < 8:
+        formatted_numbers.insert(3, '')  # insert gap at desired spot
+
+    return label + ' & ' + ' & '.join(formatted_numbers) + r' \\'
+
+input_file = 'negative_sorted.csv'
+
+with open(input_file, 'r') as fin:
+    reader = csv.reader(fin)
+    for row in reader:
+        print(format_row(row))
+```
