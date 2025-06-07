@@ -19032,3 +19032,47 @@ with open(input_file, 'r') as fin:
     for row in reader:
         print(format_row(row))
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Define the energies and custom labels
+data = {
+    'Label': ['a', '2', '3', '4', '6', '8'],
+    'Energy': [
+        -385.691580683,
+        -770.860688368 / 2,
+        -771.336917778 / 2,
+        -771.380824354 / 2,
+        -771.382283738 / 2,
+        -771.382816488 / 2
+    ]
+}
+
+# Create a DataFrame
+df = pd.DataFrame(data)
+
+# Plot the line passing through the first point
+plt.figure(figsize=(10, 6))
+plt.plot([1, len(df)], [df['Energy'][0], df['Energy'][0]], color='r', label='Line through Point a')
+
+# Plot the curve joining the other points
+plt.plot(range(2, len(df) + 1), df['Energy'][1:], marker='o', linestyle='-', color='b', label='Curve through other points')
+
+# Add labels to each point
+for i, row in df.iterrows():
+    plt.text(i + 1, row['Energy'], f'{row["Label"]} ({row["Energy"]:.6f})', fontsize=10, ha='right')
+
+# Add title and labels
+plt.title('Energy Plot')
+plt.xlabel('Index')
+plt.ylabel('Energy')
+plt.legend()
+
+# Save the figure as a PDF
+plt.savefig('energies_plot.pdf')
+
+# Show the plot
+plt.show()
+```
