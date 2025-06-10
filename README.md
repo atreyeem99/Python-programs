@@ -19147,3 +19147,93 @@ def process_molecules(scs_folder, output_base_folder):
         else:
             print(f"Warning: geom_DFT_S0.xyz not found for molecule {molecule_name} in {scs_folder}")
 ```
+#
+```
+import os
+import pandas as pd
+from collections import defaultdict
+
+# Paths
+input_root = "/home/atreyee/INVEST_10_TBE_geom/data_for_SI/all_files_data"
+output_root = "/home/atreyee/INVEST_10_TBE_geom/data_for_SI/per_molecule_data"
+os.makedirs(output_root, exist_ok=True)
+
+# Basis set order
+basis_order = ["VDZ", "VTZ", "AVDZ", "AVTZ"]
+
+# Methods to skip
+skip_methods = {"DSD-PBEB95", "PWPB95"}
+
+# Methods to place last
+tail_methods = ["LADC2", "LCC2"]
+
+# Store: molecule_data[i][method][basis] = [S1, T1, STG]
+molecule_data = [defaultdict(dict) for _ in range(12)]
+
+# Read files
+for folder in os.listdir(input_root):
+    full_folder_path = os.path.join(input_root, folder)
+    if not os.path.isdir(full_folder_path):
+        continue
+
+    for file in os.listdir(full_folder_path):
+        if not file.endswith(".csv"):
+            continue
+
+        file_path = os.path.join(full_folder_path, file)
+
+        try:
+            filename = os.path.splitext(file)[0]
+            parts = filename.split("_")
+
+            method = ""
+            basis = ""
+            for part in parts:
+                if part in basis_order:
+                    basis = part
+                elif part != "Method":
+                    method += part + "_"
+            method = method.rstrip("_")
+
+            if basis not in basis_order or method in skip_methods:
+                continue
+
+            df = pd.read_csv(file_path, header=None)
+            if df.shape[0] < 12:
+                print(f"Skipping {file_path}: less than 12 rows")
+                continue
+
+            for i in range(12):
+                s1 = round(float(df.iloc[i, 0]), 3)
+                t1 = round(float(df.iloc[i, 1]), 3)
+                stg = round(float(df.iloc[i, 2]), 3)
+                molecule_data[i][method][basis] = [s1, t1, stg]
+
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+
+# Write CSVs per molecule
+for i in range(12):
+    rows = []
+
+    all_methods = list(molecule_data[i].keys())
+    regular_methods = sorted([m for m in all_methods if m not in tail_methods])
+    ordered_methods = regular_methods + [m for m in tail_methods if m in all_methods]
+
+    for method in ordered_methods:
+        row = [method]
+        for basis in basis_order:
+            values = molecule_data[i][method].get(basis, ["", "", ""])
+            row.extend(values)
+        rows.append(row)
+
+    # Header
+    columns = ["Method"]
+    for basis in basis_order:
+        columns += [f"{basis}_S1", f"{basis}_T1", f"{basis}_STG"]
+
+    df_out = pd.DataFrame(rows, columns=columns)
+    df_out.to_csv(os.path.join(output_root, f"molecule{i+1}.csv"), index=False)
+
+print("✅ LADC2 and LCC2 now appear at the bottom of each CSV.")
+```
