@@ -19237,3 +19237,39 @@ for i in range(12):
 
 print("✅ LADC2 and LCC2 now appear at the bottom of each CSV.")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Read the CSV files without headers
+a = pd.read_csv('a.csv', header=None)
+b = pd.read_csv('b.csv', header=None)
+
+# Extract the 4th column (index 3)
+x = a.iloc[:, 3]
+y = b.iloc[:, 3]
+
+# Create the plot
+plt.figure(figsize=(6, 6))  # Square figure
+
+# Scatter plot with red dots
+plt.scatter(x, y, color='red', label='Data points')
+
+# Plot y = x line
+min_val = min(x.min(), y.min())
+max_val = max(x.max(), y.max())
+plt.plot([min_val, max_val], [min_val, max_val], 'k--', label='y = x')
+
+# Labels and layout
+plt.xlabel('a.csv Column 4')
+plt.ylabel('b.csv Column 4')
+plt.title('Scatter Plot: Column 4 (a.csv vs b.csv)')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# Save as PDF
+plt.savefig('plot.pdf')
+```
