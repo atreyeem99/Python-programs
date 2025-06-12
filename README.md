@@ -19273,3 +19273,39 @@ plt.tight_layout()
 # Save as PDF
 plt.savefig('plot.pdf')
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Set plot styles
+plt.figure(figsize=(8, 8))  # Square plot
+plt.rcParams.update({'font.size': 18})
+plt.rcParams['font.family'] = 'Arial'
+
+# Read the CSV files without headers
+a = pd.read_csv('scs_pbe_avdz_72.csv', header=None)
+b = pd.read_csv('lcc2_avdz_72.csv', header=None)
+
+# Extract the 4th column (index 3)
+x = a.iloc[:, 3]
+y = b.iloc[:, 3]
+
+# Scatter plot with red dots
+plt.scatter(x, y, color='r', label='Data points')
+
+# Plot y = x line in black dashed style
+min_val = min(x.min(), y.min())
+max_val = max(x.max(), y.max())
+plt.plot([min_val, max_val], [min_val, max_val], linestyle='--', color='black', label='y = x')
+
+# Labels and layout
+plt.xlabel('SCS-PBE-QIDH/AVDZ')
+plt.ylabel('LCC2/AVDZ')
+plt.grid(True)
+plt.tight_layout()
+
+# Save as PDF
+plt.savefig('scspbe_avdz_LCC2_plot.pdf')
+```
