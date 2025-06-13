@@ -19309,3 +19309,44 @@ plt.tight_layout()
 # Save as PDF
 plt.savefig('scspbe_avdz_LCC2_plot.pdf')
 ```
+#
+```
+import numpy as np
+import pandas as pd
+
+# File paths
+ref_file = "pbe_qidh_param.csv"  # 10 reference molecules
+full_file = "pbe_qidh_72.csv"    # 72 molecules (to be scaled)
+
+# Load data (no headers)
+ref_data = pd.read_csv(ref_file, header=None)
+full_data = pd.read_csv(full_file, header=None)
+
+# Extract molecule names
+ref_names = ref_data.iloc[:, 0].values
+full_names = full_data.iloc[:, 0].values
+
+# Match and align x (method) and y (reference) values for the 10 molecules
+matched_data = full_data.set_index(0).loc[ref_names].reset_index()
+
+x_fit = matched_data.iloc[:, 2].values  # Method values (from 72-molecule file)
+y_fit = ref_data.iloc[:, 2].values      # Reference values (from 10-molecule file)
+
+# Fit line: y = ax + b
+a, b = np.polyfit(x_fit, y_fit, 1)
+
+# Scale all 72 molecules
+x_all = full_data.iloc[:, 2].values
+scaled_all = np.round(a * x_all + b, 3)
+
+# Replace column with scaled values
+full_data.iloc[:, 2] = scaled_all
+
+# Save scaled data
+scaled_file = "Scaled_pbe_qidh_72.csv"
+full_data.to_csv(scaled_file, index=False, header=False)
+
+print(f"Scaling complete using 10 reference molecules.")
+print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
+print(f"Scaled CSV saved as: {scaled_file}")
+```
