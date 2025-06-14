@@ -19350,3 +19350,40 @@ print(f"Scaling complete using 10 reference molecules.")
 print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
 print(f"Scaled CSV saved as: {scaled_file}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Set plot styles
+plt.figure(figsize=(8, 8))  # Square plot
+plt.rcParams.update({'font.size': 14})
+plt.rcParams['font.family'] = 'Arial'
+
+# Read the CSV files without headers
+x = pd.read_csv('lcc2_avdz_72.csv', header=None).iloc[:, 3]
+y1 = pd.read_csv('scs_pbe_avdz_72.csv', header=None).iloc[:, 3]
+y2 = pd.read_csv('pbe_qidh_72.csv', header=None).iloc[:, 3]
+y3 = pd.read_csv('Scaled_pbe_qidh_72.csv', header=None).iloc[:, 3]
+
+# Plot each dataset with specified styles
+plt.scatter(x, y1, color='r', marker='x', alpha=1.0, s=100, linewidths=2, label='SCS-PBE-QIDH')
+plt.scatter(x, y2, edgecolor='b', facecolor='None', marker='s', alpha=1.0, s=100, linewidths=1, label='PBE-QIDH')
+plt.scatter(x, y3, edgecolor='g', facecolor='None', marker='o', alpha=1.0, s=100, linewidths=1, label='Scaled PBE-QIDH')
+
+# y = x line
+min_val = min(x.min(), y1.min(), y2.min(), y3.min())
+max_val = max(x.max(), y1.max(), y2.max(), y3.max())
+plt.plot([min_val, max_val], [min_val, max_val], linestyle='--', color='black', label='y = x')
+
+# Labels and layout
+plt.xlabel('S$_1$-T$_1$ gap, L-CC2 (eV)')
+plt.ylabel('S$_1$-T$_1$ gap (eV)')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# Save as PDF
+plt.savefig('LCC2_vs_all_plot.pdf')
+```
