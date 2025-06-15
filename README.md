@@ -19387,3 +19387,37 @@ plt.tight_layout()
 # Save as PDF
 plt.savefig('LCC2_vs_all_plot.pdf')
 ```
+#
+```
+import numpy as np
+import pandas as pd
+
+# File paths
+ref_file = "pbe_qidh_param.csv"  # Reference values (72 molecules)
+full_file = "pbe_qidh_72.csv"    # Method values to be scaled (72 molecules)
+
+# Load data (no headers)
+ref_data = pd.read_csv(ref_file, header=None)
+full_data = pd.read_csv(full_file, header=None)
+
+# Extract x and y (from column 3, index 3)
+x = full_data.iloc[:, 3].values  # Method values
+y = ref_data.iloc[:, 3].values   # Reference values
+
+# Fit line: y = ax + b
+a, b = np.polyfit(x, y, 1)
+
+# Apply scaling
+scaled = np.round(a * x + b, 3)
+
+# Replace original values with scaled values
+full_data.iloc[:, 3] = scaled
+
+# Save the scaled file
+scaled_file = "Scaled_pbe_qidh_72.csv"
+full_data.to_csv(scaled_file, index=False, header=False)
+
+print(f"Scaling complete using all 72 reference molecules.")
+print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
+print(f"Scaled CSV saved as: {scaled_file}")
+```
