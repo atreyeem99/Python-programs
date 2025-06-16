@@ -19421,3 +19421,22 @@ print(f"Scaling complete using all 72 reference molecules.")
 print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
 print(f"Scaled CSV saved as: {scaled_file}")
 ```
+#
+```
+import pandas as pd
+
+# Load CSV
+df = pd.read_csv('your_input.csv')
+
+# Convert Mol_Index to integer for filtering
+df['Mol_Num'] = df['Mol_Index'].str.extract(r'Mol_(\d+)').astype(int)
+
+# Filter out rows with Mol_Index in range 24–2285 (inclusive)
+df = df[(df['Mol_Num'] < 24) | (df['Mol_Num'] > 2285)]
+
+# Reorder columns
+df = df[['Mol_Index', 'PAH', 'S1', 'T1', 'STG']]
+
+# Save new CSV
+df.to_csv('filtered_reordered.csv', index=False)
+```
