@@ -19483,3 +19483,42 @@ while i < len(lines):
 with open(xyz_output, "w") as f:
     f.writelines(output_lines)
 ```
+#
+```
+# File paths
+input_xyz = "all_molecules.xyz"
+output_xyz = "renamed_molecules.xyz"
+
+# Total number of molecules
+num_molecules = 30797
+
+with open(input_xyz, "r") as f:
+    lines = f.readlines()
+
+output_lines = []
+i = 0
+mol_count = 1
+
+while i < len(lines):
+    atom_count_line = lines[i]
+    comment_line = lines[i + 1]
+    
+    # Format new name
+    new_name = f"BNPAH_{mol_count:05d}\n"
+    
+    # Count number of atoms from atom count line
+    num_atoms = int(atom_count_line.strip())
+    
+    # Add the updated block
+    output_lines.append(atom_count_line)
+    output_lines.append(new_name)
+    output_lines.extend(lines[i + 2:i + 2 + num_atoms])
+    
+    # Move to next molecule
+    i += 2 + num_atoms
+    mol_count += 1
+
+# Write output
+with open(output_xyz, "w") as f:
+    f.writelines(output_lines)
+```
