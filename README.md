@@ -19522,3 +19522,46 @@ while i < len(lines):
 with open(output_xyz, "w") as f:
     f.writelines(output_lines)
 ```
+#
+```
+# File paths
+xyz_input = "small_set.xyz"
+xyz_output = "small_set_renamed.xyz"
+mapping_file = "index_mapping.txt"
+
+# Step 1: Load mapping into a dictionary
+mapping = {}
+with open(mapping_file, "r") as f:
+    for line in f:
+        old, new = line.strip().split(",")
+        mapping[old] = new
+
+# Step 2: Process the XYZ file
+with open(xyz_input, "r") as f:
+    lines = f.readlines()
+
+output_lines = []
+i = 0
+
+while i < len(lines):
+    atom_count_line = lines[i]
+    comment_line = lines[i + 1].strip()
+
+    # Extract the old Mol_Index (e.g., Mol_00001)
+    old_index = comment_line.split()[0]  # assumes Mol_XXXXX is the first word
+    new_index = mapping.get(old_index, old_index)  # fallback to old if not found
+
+    # Number of atoms
+    num_atoms = int(atom_count_line.strip())
+
+    # Write new block
+    output_lines.append(atom_count_line)
+    output_lines.append(f"{new_index}\n")
+    output_lines.extend(lines[i + 2:i + 2 + num_atoms])
+
+    i += 2 + num_atoms
+
+# Step 3: Write the output
+with open(xyz_output, "w") as f:
+    f.writelines(output_lines)
+```
