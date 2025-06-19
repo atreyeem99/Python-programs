@@ -19565,3 +19565,29 @@ while i < len(lines):
 with open(xyz_output, "w") as f:
     f.writelines(output_lines)
 ```
+#
+```
+import numpy as np
+
+def compute_errors(file1, file2):
+    # Load only the STG column (index 2)
+    stg1 = np.loadtxt(file1, delimiter=',', usecols=2)
+    stg2 = np.loadtxt(file2, delimiter=',', usecols=2)
+
+    # Compute error metrics
+    error = stg1 - stg2
+    mse = np.mean(error)
+    mae = np.mean(np.abs(error))
+    sde = np.std(error)
+
+    # Method name
+    method = file1.replace('.csv', '')
+
+    # Print Overleaf-formatted table row for STG
+    print("Method & Energy & MSE & MAE & SDE \\\\")
+    print("\\hline")
+    print(f"{method} & STG & {mse:.3f} & {mae:.3f} & {sde:.3f} \\\\")
+
+# Example usage
+compute_errors("LADC2_AVTZ.csv", "TBE.csv")
+```
