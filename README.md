@@ -20009,3 +20009,28 @@ while i < len(lines):
 with open(xyz_output, "w") as f:
     f.writelines(output_lines)
 ```
+#
+```
+# Install MolSym (if available via pip or conda)
+# Define symmetry group and AO set
+from molsym import SymmetryGroup, ProjectionOperator  # pseudo-import
+
+# (1) Define D6h for coronene
+G = SymmetryGroup('D6h')
+
+# (2) List C 𝑝z AOs positions and labels
+positions = [...]  # 24 C coordinates
+labels = [f'C{i}_pz' for i in range(24)]
+
+# (3) Build reducible representation from AO transforms
+Gamma = G.reducible_representation(positions, labels, basis='pz')
+
+# (4) List irreps and use projection operators
+for irrep in G.irreps:
+    P = ProjectionOperator(G, irrep)
+    salcs = P.apply(positions, labels)
+    print(f'{irrep}: {len(salcs)} SALCs generated')
+
+# (5) Compute H matrix elements H_ij = ⟨SALC_i|Ĥ|SALC_j⟩ via Hückel model
+# (6) diagonalize: eigenvalues = MO energies
+```
