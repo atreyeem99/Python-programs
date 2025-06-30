@@ -20129,3 +20129,98 @@ for folder in double_hybrids + hybrids:
         method_label = clean_label(folder).replace("B3LYP", "B3LYP").replace("CAMB3LYP", "CAM-B3LYP")
         print(f"{method_label} & ${mse:.3f}$ & ${mae:.3f}$ & ${sde:.3f}$ \\\\")
 ```
+#
+```
+import os
+import numpy as np
+
+# Define method groups
+double_hybrids = [
+    "SCS-PBE-QIDH_AVDZ_72", "SCS-RSX-QIDH_AVDZ_72", "PBE-QIDH_AVDZ_72",
+    "RSX-QIDH_AVDZ_72", "SOS-PBE-QIDH_AVDZ_72", "SOS-RSX-QIDH_AVDZ_72"
+]
+
+hybrids = [
+    "CAMB3LYP_AVDZ_72", "B3LYP_AVDZ_72", "PBE0_AVDZ_72",
+    "LC-PBE_AVDZ_72", "LC-BLYP_AVDZ_72", "wB97XD3_AVDZ_72"
+]
+
+reference_file = "LCC2_AVDZ_final_72_candidates/lcc2_avdz_72.csv"
+
+def extract_data(folder):
+    output_lines = []
+    mol_dirs = sorted([d for d in os.listdir(folder) if d.startswith("Mol_")])
+    for mol in mol_dirs:
+        tddft_path = os.path.join(folder, mol, "tddft.out")
+        if not os.path.isfile(tddft_path):
+            continue
+
+        try:
+            with open(tddft_path) as f:
+                lines = f.readlines()
+
+            singlets = [line for i, line in enumerate(lines)
+                        if 'STATE ' in line and '<S**2> =   0' in ''.join(lines[i:i+20])]
+            singlets.sort(key=lambda x: float(x.split()[5]) if len(x.split()) > 5 else 1e6)
+            S1 = float(singlets[0].split()[5]) if singlets else None
+
+            triplets = [line for i, line in enumerate(lines)
+                        if 'STATE ' in line and '<S**2> =   2' in ''.join(lines[i:i+20])]
+            triplets.sort(key=lambda x: float(x.split()[5]) if len(x.split()) > 5 else 1e6)
+            T1 = float(triplets[0].split()[5]) if triplets else None
+
+            if S1 is not None and T1 is not None:
+                STG = S1 - T1
+                output_lines.append(f"{mol},{S1:.3f},{T1:.3f},{STG:.3f}")
+        except:
+            continue
+
+    return output_lines
+
+def compute_errors(predicted_csv, reference_csv):
+    try:
+        stg1 = np.loadtxt(predicted_csv, delimiter=',', usecols=3)
+        stg2 = np.loadtxt(reference_csv, delimiter=',', usecols=3)
+        if len(stg1) != 72:
+            return None
+        error = stg1 - stg2
+        mse = np.mean(error)
+        mae = np.mean(np.abs(error))
+        sde = np.std(error)
+        return mse, mae, sde
+    except:
+        return None
+
+def clean_label(name):
+    return name.replace("_AVDZ_72", "").replace("-", "").replace("LC", "LC-").replace("RSX", "RSX-").replace("SCS", "SCS-").replace("SOS", "SOS-")
+
+results = {}
+
+# Process all folders
+for folder in double_hybrids + hybrids:
+    if not os.path.isdir(folder):
+        continue
+
+    lines = extract_data(folder)
+    if len(lines) != 72:
+        continue
+
+    out_csv = os.path.join(folder, f"{folder}.csv")
+    with open(out_csv, "w") as f:
+        f.writelines(line + '\n' for line in lines)
+
+    metrics = compute_errors(out_csv, reference_file)
+    if metrics:
+        mse, mae, sde = metrics
+        results[folder] = (mse, mae, sde)
+
+# Print table in order
+print("Method & MSE & MAE & SDE \\\\")
+print("\\hline")
+
+for folder in double_hybrids + hybrids:
+    if folder in results:
+        mse, mae, sde = results[folder]
+        method_label = clean_label(folder).replace("B3LYP", "B3LYP").replace("CAMB3LYP", "CAM-B3LYP")
+        print(f"{method_label} & ${mse:.3f}$ & ${mae:.3f}$ & ${sde:.3f}$ \\\\")
+```
