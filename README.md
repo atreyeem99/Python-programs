@@ -20362,3 +20362,27 @@ print(f"Scaling complete using all 72 reference molecules.")
 print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
 print(f"Scaled CSV saved as: {scaled_file}")
 ```
+#
+```
+input_file = "input.csv"
+output_file = "output.csv"
+
+# Read the file and split into 5 column groups at "break"
+with open(input_file, 'r') as f:
+    lines = [line.strip() for line in f if line.strip()]
+
+columns = [[]]
+for line in lines:
+    if line.lower() == "break":
+        columns.append([])
+    else:
+        columns[-1].append(line)
+
+# Transpose rows (assumes all columns have equal length)
+rows = list(zip(*columns))
+
+# Write to output CSV
+with open(output_file, 'w') as f:
+    for row in rows:
+        f.write(','.join(row) + '\n')
+```
