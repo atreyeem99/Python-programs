@@ -20427,3 +20427,31 @@ print(f"Scaling complete using 10 reference molecules.")
 print(f"Coefficients: a = {a:.4f}, b = {b:.4f}")
 print(f"Scaled CSV saved as: {scaled_file}")
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+
+# Read the second column from file1.csv
+y_values = []
+with open('file1.csv', 'r') as f1:
+    reader = csv.reader(f1)
+    for row in reader:
+        if len(row) > 1:
+            y_values.append(float(row[1]))  # second column
+
+# Read the second column from file2.csv
+x_values = []
+with open('file2.csv', 'r') as f2:
+    reader = csv.reader(f2)
+    for row in reader:
+        if len(row) > 1:
+            x_values.append(float(row[1]))  # second column
+
+# Plotting
+plt.scatter(x_values, y_values)
+plt.xlabel('Second column of file2')
+plt.ylabel('Second column of file1')
+plt.title('Scatter Plot')
+plt.show()
+```
