@@ -20455,3 +20455,56 @@ plt.ylabel('Second column of file1')
 plt.title('Scatter Plot')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+from matplotlib.ticker import FormatStrFormatter
+
+# Load CSV
+df = pd.read_csv("your_file.csv")
+
+# Rename columns to pretty labels
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+
+# Drop non-numeric column
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+column_names = df_numeric.columns
+
+# Set Arial font
+plt.rcParams.update({'font.size': 14, 'font.family': 'Arial'})
+
+# Create base scatter matrix
+axes = scatter_matrix(df_numeric, alpha=0.7, figsize=(10, 10), diagonal='hist')
+
+# Reformat axes and recolor plots
+n = len(column_names)
+for i in range(n):
+    for j in range(n):
+        ax = axes[i, j]
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+        if i == j:
+            # Diagonal: Green histogram
+            ax.clear()
+            ax.hist(df_numeric[column_names[i]], bins=15, color='green', alpha=0.8)
+            ax.set_title(column_names[i])
+        elif i > j:
+            # Lower triangle: Blue scatter
+            ax.clear()
+            ax.plot(df_numeric[column_names[j]], df_numeric[column_names[i]],
+                    'o', color='blue', alpha=0.6, markersize=4)
+            ax.set_xlabel(column_names[j])
+            ax.set_ylabel(column_names[i])
+
+# Save to PDF
+plt.savefig("scatter_matrix_green_hist_blue_scatter.pdf", bbox_inches='tight')
+plt.show()
+```
