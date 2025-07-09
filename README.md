@@ -20508,3 +20508,81 @@ for i in range(n):
 plt.savefig("scatter_matrix_green_hist_blue_scatter.pdf", bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+from matplotlib.ticker import FormatStrFormatter
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+# === Load and prepare data ===
+df = pd.read_csv("all_methods_104_data.csv")
+
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+col_names = df_numeric.columns
+n = len(col_names)
+
+# === Set font ===
+plt.rcParams.update({'font.size': 14, 'font.family': 'Arial'})
+
+# === Create scatter matrix ===
+axes = scatter_matrix(
+    df_numeric,
+    alpha=0.7,
+    figsize=(10, 10),
+    diagonal='hist',
+    hist_kwds={'color': '#27AE60'}  # greenish histograms
+)
+
+# === Define colors ===
+scatter_color = '#2980B9'  # strong blue
+text_color = 'black'
+
+# === Annotate each subplot ===
+for i in range(n):
+    for j in range(n):
+        ax = axes[i, j]
+        if i != j:
+            # Blue scatter plots
+            for artist in ax.collections:
+                artist.set_color(scatter_color)
+
+            # Compute regression-based R²: predict y from x
+            x_vals = df_numeric[col_names[j]].values.reshape(-1, 1)
+            y_vals = df_numeric[col_names[i]].values
+
+            model = LinearRegression().fit(x_vals, y_vals)
+            r2 = model.score(x_vals, y_vals)
+
+            ax.text(0.05, 0.85, f"$R^2$ = {r2:.2f}",
+                    transform=ax.transAxes,
+                    fontsize=11,
+                    color=text_color,
+                    ha='left', va='center')
+        else:
+            # Optional: add black edges to hist bars
+            for patch in ax.patches:
+                patch.set_edgecolor('black')
+                patch.set_linewidth(0.5)
+
+# === Format ticks ===
+for ax_row in axes:
+    for ax in ax_row:
+        if ax is not None:
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+            ax.tick_params(axis='both', which='major', labelsize=10)
+
+# === Save and display ===
+plt.savefig("scatter_matrix_with_regression_r2.pdf", bbox_inches='tight')
+plt.show()
+```
