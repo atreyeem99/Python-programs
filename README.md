@@ -20586,3 +20586,18 @@ for ax_row in axes:
 plt.savefig("scatter_matrix_with_regression_r2.pdf", bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Load the CSV file
+df = pd.read_csv("your_file.csv")  # Replace with your actual filename
+
+# Filter molecules where EOM-CCSD < LCC2
+filtered_df = df[df["EOM-CCSD"] < df["LCC2"]]
+
+# Print the molecule names
+print("Molecules where EOM-CCSD is more negative than LCC2:")
+for name in filtered_df["Molecule"]:
+    print(name)
+```
