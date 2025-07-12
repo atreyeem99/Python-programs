@@ -20650,3 +20650,38 @@ for i in range(n):
 plt.savefig("scatter_matrix_purple_hist_blue_scatter.pdf", bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import os
+import shutil
+
+# Define paths
+source_base = "./extrapolate"
+destination_base = "./SCS-PBE-QIDH_VTZ"
+template_file = os.path.join(destination_base, "tddft.com")
+
+# Ensure destination base exists
+os.makedirs(destination_base, exist_ok=True)
+
+# Loop through all subfolders in extrapolate
+for folder in os.listdir(source_base):
+    source_folder = os.path.join(source_base, folder)
+    if os.path.isdir(source_folder):
+        source_xyz = os.path.join(source_folder, "test.xyz")
+        destination_folder = os.path.join(destination_base, folder)
+
+        # Create destination subfolder
+        os.makedirs(destination_folder, exist_ok=True)
+
+        # Copy test.xyz if it exists
+        if os.path.exists(source_xyz):
+            shutil.copy(source_xyz, destination_folder)
+        else:
+            print(f"Warning: test.xyz not found in {source_folder}")
+
+        # Copy tddft.com to destination subfolder
+        if os.path.exists(template_file):
+            shutil.copy(template_file, destination_folder)
+        else:
+            print(f"Error: tddft.com not found in {destination_base}")
+```
