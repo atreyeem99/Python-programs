@@ -20685,3 +20685,52 @@ for folder in os.listdir(source_base):
         else:
             print(f"Error: tddft.com not found in {destination_base}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+from matplotlib.ticker import FormatStrFormatter
+
+# Load CSV
+df = pd.read_csv("your_file.csv")
+
+# Rename columns to pretty labels
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+
+# Drop non-numeric column
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+
+# Set Arial font
+plt.rcParams.update({'font.size': 14, 'font.family': 'Arial'})
+
+# Create base scatter matrix (we will override colors manually)
+axes = scatter_matrix(df_numeric, alpha=0.7, figsize=(10, 10), diagonal='hist')
+
+# Format axes and apply color customization
+n = len(df_numeric.columns)
+for i in range(n):
+    for j in range(n):
+        ax = axes[i, j]
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+        if i == j:
+            # Diagonal histogram — make purple
+            ax.cla()
+            ax.hist(df_numeric.iloc[:, i], bins=15, color='purple', alpha=0.8)
+        elif i > j:
+            # Scatter plot — make blue
+            ax.cla()
+            ax.plot(df_numeric.iloc[:, j], df_numeric.iloc[:, i],
+                    'o', color='blue', alpha=0.6, markersize=4)
+
+# Save as PDF
+plt.savefig("scatter_matrix_purple_hist_blue_scatter.pdf", bbox_inches='tight')
+plt.show()
+```
