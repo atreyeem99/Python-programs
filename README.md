@@ -20991,3 +20991,64 @@ with open('tddft_summary.csv', 'w', newline='') as csvfile:
             homo, lumo, hlgap = extract_orbitals(file)
             writer.writerow([dirname, homo, lumo, s1, t1, stg, hlgap])
 ```
+#
+```
+import os
+import re
+import csv
+
+def extract_from_file(filepath):
+    with open(filepath, 'r', errors='ignore') as f:
+        content = f.read()
+
+    # Extract S1 and T1 energies (in eV)
+    s_singlets = re.findall(r'STATE\s+(\S+).+?<S\*\*2>\s+=\s+0.*?([\d.]+)\s*eV', content, re.DOTALL)
+    s_triplets = re.findall(r'STATE\s+(\S+).+?<S\*\*2>\s+=\s+2.*?([\d.]+)\s*eV', content, re.DOTALL)
+
+    try:
+        S1 = min(float(x[1]) for x in s_singlets)
+    except ValueError:
+        S1 = None
+
+    try:
+        T1 = min(float(x[1]) for x in s_triplets)
+    except ValueError:
+        T1 = None
+
+    STG = round(S1 - T1, 3) if S1 is not None and T1 is not None else None
+
+    # Extract HOMO and LUMO
+    orbital_block = re.search(r'ORBITAL ENERGIES\s*-+\s*NO\s+OCC\s+E\(Eh\)\s+E\(eV\)(.*?)\n\s*\n', content, re.DOTALL)
+    HOMO, LUMO = None, None
+    if orbital_block:
+        lines = orbital_block.group(1).strip().splitlines()
+        orbitals = []
+        for line in lines:
+            parts = line.split()
+            if len(parts) == 4:
+                occ = float(parts[1])
+                ev = float(parts[3])
+                orbitals.append((occ, ev))
+        if orbitals:
+            homo_candidates = [ev for occ, ev in orbitals if occ > 0]
+            lumo_candidates = [ev for occ, ev in orbitals if occ == 0]
+            if homo_candidates:
+                HOMO = homo_candidates[-1]
+            if lumo_candidates:
+                LUMO = lumo_candidates[0]
+
+    hlgap = round(LUMO - HOMO, 3) if HOMO is not None and LUMO is not None else None
+
+    return HOMO, LUMO, S1, T1, STG, hlgap
+
+# Write output to CSV
+with open('tddft_summary.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Mol', 'HOMO', 'LUMO', 'S1', 'T1', 'STG', 'hlgap'])
+
+    for dirname in sorted(os.listdir()):
+        file = os.path.join(dirname, "tddft.out")
+        if os.path.isdir(dirname) and os.path.isfile(file):
+            HOMO, LUMO, S1, T1, STG, hlgap = extract_from_file(file)
+            writer.writerow([dirname, HOMO, LUMO, S1, T1, STG, hlgap])
+```
