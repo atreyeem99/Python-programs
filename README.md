@@ -21052,3 +21052,100 @@ with open('tddft_summary.csv', 'w', newline='') as csvfile:
             HOMO, LUMO, S1, T1, STG, hlgap = extract_from_file(file)
             writer.writerow([dirname, HOMO, LUMO, S1, T1, STG, hlgap])
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from pandas.plotting import scatter_matrix
+from matplotlib.ticker import FormatStrFormatter
+from sklearn.metrics import r2_score
+
+# Read CSV
+df = pd.read_csv("all_methods_104_data.csv")
+
+# Rename columns
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+
+# Drop non-numeric column
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+col_names = df_numeric.columns
+n = len(col_names)
+
+# Set general font
+plt.rcParams.update({
+    'font.family': 'Arial',
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10
+})
+
+# Create scatter matrix
+axes = scatter_matrix(
+    df_numeric,
+    alpha=0.7,
+    figsize=(11, 11),
+    diagonal='hist',
+    hist_kwds={'color': '#27AE60', 'edgecolor': 'black', 'linewidth': 0.5}
+)
+
+# Define colors
+blue_color = '#2980B9'   # blue for scatter
+text_color = 'black'
+line_color = 'gray'
+min_val, max_val = -0.2, 0.8
+
+# Loop through all subplots
+for i in range(n):
+    for j in range(n):
+        ax = axes[i, j]
+
+        # Adjust scatter plots
+        if i != j:
+            ax.set_xlim(min_val, max_val)
+            ax.set_ylim(min_val, max_val)
+
+            for artist in ax.collections:
+                artist.set_color(blue_color)
+                artist.set_edgecolor('black')
+                artist.set_linewidth(0.3)
+
+            # y = x dotted line
+            ax.plot([min_val, max_val], [min_val, max_val],
+                    linestyle=':', color=line_color, linewidth=1)
+
+            # R² text
+            x = df_numeric[col_names[j]].values
+            y = df_numeric[col_names[i]].values
+            r2 = r2_score(y, x)
+            ax.text(0.05, 0.85, f"$R^2$ = {r2:.2f}",
+                    transform=ax.transAxes,
+                    fontsize=11,
+                    color=text_color,
+                    ha='left', va='center')
+        else:
+            for patch in ax.patches:
+                patch.set_edgecolor('black')
+                patch.set_linewidth(0.5)
+
+        # Light grid
+        ax.grid(True, linestyle='--', linewidth=0.3, alpha=0.5)
+
+        # Set tick format
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+
+# Set axis label font size
+label_fontsize = 16
+for i, label in enumerate(col_names):
+    axes[i, 0].set_ylabel(label, fontsize=label_fontsize, labelpad=10)
+    axes[-1, i].set_xlabel(label, fontsize=label_fontsize, labelpad=10)
+
+# Tight layout and save
+plt.tight_layout()
+plt.savefig("scatter_matrix_with_r2.png", dpi=300, bbox_inches='tight')
+plt.show()
+```
