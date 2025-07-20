@@ -21149,3 +21149,36 @@ plt.tight_layout()
 plt.savefig("scatter_matrix_with_r2.png", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
+from scipy.interpolate import make_interp_spline
+import csv
+
+# Conversion factor
+HARTREE_TO_KCAL = 627.509474
+
+# === Load energy-only CSVs ===
+def load_energy(file_path):
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # skip header
+        return np.array([float(row[0]) for row in reader])
+
+# Load and convert
+forward_energy = load_energy("for_energies.csv") * HARTREE_TO_KCAL
+backward_energy = load_energy("back_energies.csv") * HARTREE_TO_KCAL
+
+# === Plotting ===
+plt.figure(figsize=(6, 4))
+plt.plot(forward_energy, label="Forward", color='blue')
+plt.plot(backward_energy, label="Backward", color='red')
+plt.ylabel("Energy (kcal/mol)")
+plt.xlabel("Scan Step")
+plt.legend()
+plt.tight_layout()
+plt.savefig("TS_CH3ClF.png", dpi=300)
+plt.show()
+```
