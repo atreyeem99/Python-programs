@@ -21182,3 +21182,67 @@ plt.tight_layout()
 plt.savefig("TS_CH3ClF.png", dpi=300)
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# === Read and prepare data ===
+df = pd.read_csv("all_methods_104_data.csv")
+df = df.rename(columns={'ADC2': 'ADC(2)', 'LADC2': 'L-ADC(2)', 'LCC2': 'L-CC2', 'EOM-CCSD': 'EOM-CCSD'})
+
+# === Set up plot ===
+methods = ['ADC(2)', 'L-ADC(2)', 'L-CC2', 'EOM-CCSD']
+colors = {
+    'ADC(2)': 'tab:red',
+    'L-ADC(2)': 'tab:blue',
+    'L-CC2': 'tab:purple',
+    'EOM-CCSD': 'black'
+}
+dx = 0.2
+ft = 16
+
+fig, ax = plt.subplots(figsize=(8, 6))
+
+# === Define color scheme for gap ranges ===
+def gap_to_color(gap):
+    if gap < -0.2:
+        return 'red'
+    elif gap <= -0.15:
+        return '#FFA500'  # bright orange
+    elif gap <= -0.1:
+        return 'green'
+    else:
+        return 'blue'
+
+# === Plot each method ===
+for i, method in enumerate(methods):
+    gaps = df[method] - df['Expt']
+    for j, gap in enumerate(gaps):
+        x = i + 1
+        color = gap_to_color(gap)
+        ax.hlines(y=gap, xmin=x - dx / 2, xmax=x + dx / 2, color=color, linewidth=2)
+        ax.text(x + 0.05, gap + 0.002, df['Name'][j], fontsize=ft - 8, ha='left', va='center')
+
+# === Add custom horizontal lines for 1,3 and 1,9 biaza ===
+custom_x = 3.0
+ax.hlines(y=-0.125, xmin=custom_x - dx / 2, xmax=custom_x + dx / 2, color='forestgreen', linewidth=3)
+ax.text(custom_x + 0.18, -0.125 + 0.004, '1,3-biaza', va='bottom', fontsize=ft - 8, color='forestgreen')
+
+ax.hlines(y=-0.126, xmin=custom_x - dx / 2, xmax=custom_x + dx / 2, color='forestgreen', linewidth=3)
+ax.text(custom_x + 0.18, -0.126 - 0.004, '1,9-biaza', va='top', fontsize=ft - 8, color='forestgreen')
+
+# === Formatting ===
+ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
+ax.set_xticks(range(1, len(methods) + 1))
+ax.set_xticklabels(methods, fontsize=ft)
+ax.set_ylabel("Theory - Expt (eV)", fontsize=ft)
+ax.tick_params(axis='y', labelsize=ft - 2)
+ax.set_xlim(0.5, len(methods) + 0.5)
+ax.set_ylim(-0.3, 0.15)
+ax.grid(True, linestyle=':', linewidth=0.6)
+
+plt.tight_layout()
+plt.savefig("gap_plot_cleaned.pdf")
+plt.show()
+```
