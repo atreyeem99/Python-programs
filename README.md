@@ -21354,3 +21354,67 @@ plt.subplots_adjust(wspace=0.1, hspace=0.1)
 plt.savefig("scatter_matrix_all_methods_updated.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
+from scipy.interpolate import make_interp_spline
+import csv
+
+# Conversion factor
+hartree_to_kcal = 627.509
+
+# === Load energy-only CSVs ===
+def load_energy(file_path):
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader)  # skip header
+        return np.array([float(row[0]) for row in reader])
+
+# Load and convert
+forward_energy = load_energy("energies_for.csv") * hartree_to_kcal
+backward_energy = load_energy("energies_back.csv") * hartree_to_kcal
+
+# Reverse backward path so it's Reactant → TS
+backward_energy = backward_energy[::-1]
+
+# Combine and normalize to Reactant = 0 kcal/mol
+energy_combined = np.concatenate((backward_energy[:-1], forward_energy))  # avoid TS double-counting
+energy_combined -= energy_combined[0]
+
+# Create reaction coordinate
+reaction_coord = np.linspace(0, 1, len(energy_combined))
+
+# === Savitzky-Golay filter ===
+n_points = len(energy_combined)
+window_length = min(11, n_points) if n_points % 2 == 1 else min(11, n_points - 1)
+polyorder = 3 if window_length >= 5 else 2
+
+smoothed_energy = savgol_filter(energy_combined, window_length=window_length, polyorder=polyorder)
+
+# === Spline interpolation ===
+spline = make_interp_spline(reaction_coord, smoothed_energy, k=3)
+x_smooth = np.linspace(reaction_coord.min(), reaction_coord.max(), 300)
+y_smooth = spline(x_smooth)
+
+# === Save smoothed data ===
+with open("irc_smoothed_final.csv", 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Reaction_Coordinate', 'Smoothed_Energy'])
+    for x, y in zip(x_smooth, y_smooth):
+        writer.writerow([x, y])
+
+# === Plot ===
+plt.figure(figsize=(8, 5))
+plt.plot(x_smooth, y_smooth, label=f'Smoothed IRC (window={window_length}, poly={polyorder})',
+         color='darkorange', linewidth=2)
+plt.axvline(x=reaction_coord[len(backward_energy)-1], color='gray', linestyle='--', label='TS')
+plt.xlabel('Reaction Coordinate')
+plt.ylabel('Relative Energy (kcal/mol)')
+plt.title('Smoothed IRC Path for HEN Reaction')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
