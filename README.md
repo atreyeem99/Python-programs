@@ -21740,3 +21740,98 @@ plt.tight_layout()
 plt.savefig("gap_plot_cleaned.pdf")
 plt.show()
 ```
+#
+```
+import os
+import csv
+import re
+
+def extract_s1_t1(filepath):
+    with open(filepath, 'r', errors='ignore') as f:
+        lines = f.readlines()
+
+    state_blocks = []
+    current_block = []
+    capture = False
+
+    for line in lines:
+        if 'STATE ' in line:
+            if current_block:
+                state_blocks.append(current_block)
+            current_block = [line]
+            capture = True
+            continue
+        if capture and len(current_block) < 20:
+            current_block.append(line)
+        elif capture:
+            state_blocks.append(current_block)
+            current_block = []
+            capture = False
+
+    s1_list = []
+    t1_list = []
+
+    for block in state_blocks:
+        for line in block:
+            if '<S**2> =   0' in line:
+                parts = line.split()
+                if len(parts) >= 6:
+                    try:
+                        s1_list.append(float(parts[5]))
+                    except:
+                        pass
+            elif '<S**2> =   2' in line:
+                parts = line.split()
+                if len(parts) >= 6:
+                    try:
+                        t1_list.append(float(parts[5]))
+                    except:
+                        pass
+
+    s1 = min(s1_list) if s1_list else None
+    t1 = min(t1_list) if t1_list else None
+    stg = round(s1 - t1, 3) if s1 is not None and t1 is not None else None
+
+    return s1, t1, stg
+
+def extract_orbitals(filepath):
+    with open(filepath, 'r', errors='ignore') as f:
+        content = f.read()
+
+    orbital_block = re.search(r'ORBITAL ENERGIES\s*-+\s*NO\s+OCC\s+E\(Eh\)\s+E\(eV\)(.*?)\n\s*\n', content, re.DOTALL)
+    HOMO, LUMO = None, None
+    if orbital_block:
+        lines = orbital_block.group(1).strip().splitlines()
+        orbitals = []
+        for line in lines:
+            parts = line.split()
+            if len(parts) == 4:
+                try:
+                    occ = float(parts[1])
+                    ev = float(parts[3])
+                    orbitals.append((occ, ev))
+                except:
+                    continue
+        if orbitals:
+            homo_candidates = [ev for occ, ev in orbitals if occ > 0]
+            lumo_candidates = [ev for occ, ev in orbitals if occ == 0]
+            if homo_candidates:
+                HOMO = homo_candidates[-1]
+            if lumo_candidates:
+                LUMO = lumo_candidates[0]
+
+    hlgap = round(LUMO - HOMO, 3) if HOMO is not None and LUMO is not None else None
+    return HOMO, LUMO, hlgap
+
+# Write results to CSV
+with open('tddft_summary.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Mol', 'HOMO', 'LUMO', 'S1', 'T1', 'STG', 'hlgap'])
+
+    for dirname in sorted(os.listdir()):
+        file = os.path.join(dirname, "tddft.out")
+        if os.path.isdir(dirname) and os.path.isfile(file):
+            s1, t1, stg = extract_s1_t1(file)
+            homo, lumo, hlgap = extract_orbitals(file)
+            writer.writerow([dirname, homo, lumo, s1, t1, stg, hlgap])
+```
