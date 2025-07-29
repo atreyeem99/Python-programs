@@ -21835,3 +21835,41 @@ with open('tddft_summary.csv', 'w', newline='') as csvfile:
             homo, lumo, hlgap = extract_orbitals(file)
             writer.writerow([dirname, homo, lumo, s1, t1, stg, hlgap])
 ```
+#
+```
+import csv
+
+# Input files and corresponding method names in the desired order
+files = [
+    ('all_lcc2.csv', 'LCC2'),
+    ('all_ladc2.csv', 'LADC2'),
+    ('all_adc2.csv', 'ADC2'),
+    ('eom_all_data.csv', 'EOM-CCSD')
+]
+
+# Read molecule names from first column of the first file
+with open(files[0][0], 'r') as f:
+    reader = csv.reader(f)
+    rows = [row for row in reader if row]
+    mol_names = [row[0] for row in rows]
+
+# Read values (fourth column, index 3) from each file
+data_columns = []
+for filename, _ in files:
+    with open(filename, 'r') as f:
+        reader = csv.reader(f)
+        data = [row[3] for row in reader if len(row) > 3]
+        data_columns.append(data)
+
+# Combine all into rows
+merged_rows = list(zip(mol_names, *data_columns))
+
+# Write the merged file
+output_file = 'merged_methods_with_names.csv'
+with open(output_file, 'w', newline='') as fout:
+    writer = csv.writer(fout)
+    writer.writerow(['Molecule'] + [method for _, method in files])
+    writer.writerows(merged_rows)
+
+print(f"Merged file written to: {output_file}")
+```
