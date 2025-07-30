@@ -21873,3 +21873,91 @@ with open(output_file, 'w', newline='') as fout:
 
 print(f"Merged file written to: {output_file}")
 ```
+#
+```
+import os
+import csv
+import re
+
+# File paths
+txt_file = 'subfolders.txt'
+csv_file = 'merged_all_104.csv'
+output_file = 'all_coords.txt'
+
+# Symmetry folders
+symmetry_folders = ['D3h', 'C3h', 'C2v', 'Cs']
+
+# Read subfolder names
+with open(txt_file, 'r') as f:
+    folder_names = [line.strip() for line in f if line.strip()]
+
+# Read energy data into a dictionary
+energy_data = {}
+with open(csv_file, 'r') as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    for row in reader:
+        name = row[0].strip()
+        energy_data[name] = row[1:]
+
+# Method list
+methods = ['LCC2', 'LADC2', 'ADC2', 'EOM-CCSD']
+
+# Write LaTeX output
+with open(output_file, 'w') as out:
+    for folder in folder_names:
+        # Clean the molecule name
+        mol_name = folder.replace('_', ',')
+        match = re.search(r'(.*?aza)', mol_name)
+        if match:
+            mol_name = match.group(1)
+
+        # Locate the test.xyz file
+        found = False
+        coords = ''
+        for sym in symmetry_folders:
+            xyz_path = os.path.join(sym, 'extrapolate', folder, 'test.xyz')
+            if os.path.isfile(xyz_path):
+                with open(xyz_path, 'r') as xyz:
+                    coords = xyz.read().strip()
+                found = True
+                break
+
+        if not found:
+            print(f"Warning: test.xyz not found for {folder}")
+            continue
+
+        # Write MOLECULE line
+        out.write(f"MOLECULE: {mol_name}\n\n")
+
+        # Coordinates block
+        out.write("\\singlespacing\n\\footnotesize\n{\n")
+        out.write("\\begin{verbatim}\n")
+        out.write("CARTESIAN COORDINATES\n")
+        out.write("---------------------\n")
+        out.write(coords + "\n")
+        out.write("\\end{verbatim}\n")
+        out.write("}\n\n")
+
+        # Energy table
+        if folder in energy_data:
+            vals = energy_data[folder]
+            out.write("\\begin{center}\n")
+            out.write("\\begin{tabular}{lccc}\n")
+            out.write("\\hline\n")
+            out.write("Method & S1 & T1 & STG \\\\\n")
+            out.write("\\hline\n")
+            for i, method in enumerate(methods):
+                s1, t1, stg = vals[i*3:(i+1)*3]
+                out.write(f"{method} & {s1} & {t1} & {stg} \\\\\n")
+            out.write("\\hline\n")
+            out.write("\\end{tabular}\n")
+            out.write("\\end{center}\n\n")
+        else:
+            out.write("Energy data not found.\n\n")
+
+        # Page break
+        out.write("\\clearpage\n\n")
+
+print("✅ all_coords.txt generated with formatted molecule names.")
+```
