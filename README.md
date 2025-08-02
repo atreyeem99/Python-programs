@@ -22152,3 +22152,37 @@ plt.tight_layout()
 plt.savefig("scatter_matrix_spearman.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# === Load and prepare data ===
+df = pd.read_csv("all_methods_104_data.csv")
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+
+# === Styling ===
+sns.set(style="whitegrid", font="Arial", font_scale=1.2)
+
+# === Plot with seaborn ===
+plot = sns.pairplot(
+    df_numeric,
+    kind="scatter",
+    diag_kind="hist",
+    plot_kws={"edgecolor": "dodgerblue", "facecolors": "none", "s": 30, "linewidth": 1, "alpha": 1},
+    diag_kws={"color": "crimson", "edgecolor": "black", "alpha": 1, "bins": 10}
+)
+
+# === Adjust plot ===
+plot.fig.set_size_inches(12, 12)
+plt.tight_layout()
+plt.savefig("scatter_matrix.pdf", dpi=300, bbox_inches='tight')
+plt.show()
+```
