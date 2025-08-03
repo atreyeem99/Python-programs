@@ -22186,3 +22186,43 @@ plt.tight_layout()
 plt.savefig("scatter_matrix.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import csv
+
+# Input file names
+file_lcc2 = 'all_lcc2.csv'
+file_ladc2 = 'all_ladc2.csv'
+file_adc2 = 'all_adc2.csv'
+file_eom = 'eom_all_data.csv'
+output_file = 'merged_all.csv'
+
+# Header names (customize as needed)
+header = [
+    'Molecule', 'LCC2_Val1', 'LCC2_Val2', 'LCC2_Val3',
+    'LADC2_Val1', 'LADC2_Val2', 'LADC2_Val3',
+    'ADC2_Val1', 'ADC2_Val2', 'ADC2_Val3',
+    'EOM-CCSD_Val1', 'EOM-CCSD_Val2', 'EOM-CCSD_Val3'
+]
+
+with open(file_lcc2, 'r') as f_lcc2, \
+     open(file_ladc2, 'r') as f_ladc2, \
+     open(file_adc2, 'r') as f_adc2, \
+     open(file_eom, 'r') as f_eom, \
+     open(output_file, 'w', newline='') as fout:
+    
+    reader_lcc2 = csv.reader(f_lcc2)
+    reader_ladc2 = csv.reader(f_ladc2)
+    reader_adc2 = csv.reader(f_adc2)
+    reader_eom = csv.reader(f_eom)
+    writer = csv.writer(fout)
+
+    # Write the header first
+    writer.writerow(header)
+
+    for row_lcc2, row_ladc2, row_adc2, row_eom in zip(reader_lcc2, reader_ladc2, reader_adc2, reader_eom):
+        merged_row = row_lcc2 + row_ladc2[1:4] + row_adc2[1:4] + row_eom[1:4]
+        writer.writerow(merged_row)
+
+print(f"Merged file written to: {output_file}")
+```
