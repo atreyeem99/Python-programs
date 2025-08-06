@@ -22335,3 +22335,55 @@ with open(file_lcc2, 'r') as f_lcc2, \
 
 print(f"Merged file written to: {output_file}")
 ```
+#
+```
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+
+# === Load and prepare data ===
+df = pd.read_csv("all_methods_104_data.csv")
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+col_names = df_numeric.columns
+
+# === Styling ===
+sns.set(style="whitegrid", font="Arial", font_scale=1.2)
+
+# === Pairplot ===
+plot = sns.pairplot(
+    df_numeric,
+    kind="scatter",
+    diag_kind="hist",
+    plot_kws={"edgecolor": "black", "facecolors": "none", "s": 40, "linewidth": 0.5},
+    diag_kws={"color": "#27AE60", "edgecolor": "black"},
+    corner=False  # keep full matrix
+)
+
+# === Add R² values to upper triangle only ===
+for i, y_var in enumerate(col_names):
+    for j, x_var in enumerate(col_names):
+        if i < j:  # upper triangle
+            ax = plot.axes[i, j]
+            x = df_numeric[x_var]
+            y = df_numeric[y_var]
+            try:
+                r2 = r2_score(y, x)
+                ax.text(0.05, 0.85, f"$R^2$ = {r2:.2f}", transform=ax.transAxes,
+                        fontsize=10, color="black")
+            except Exception:
+                pass
+
+# === Final touches ===
+plot.fig.suptitle("Pairwise Scatter Plots with $R^2$ Values", y=1.02, fontsize=16)
+plot.fig.set_size_inches(12, 12)
+plt.tight_layout()
+plt.savefig("scatter_matrix_seaborn_with_r2.pdf", dpi=300, bbox_inches='tight')
+plt.show()
+```
