@@ -22508,6 +22508,70 @@ print(" & ".join(header) + " \\\\")
 
 # Print rows
 print(" & ".join(row_mse) + " \\\\")
-print(" & ".join(row_mae) + " \\\\")
+#print(" & ".join(row_mae) + " \\\\")
 print(" & ".join(row_sde) + " \\\\")
+```
+#
+```
+import numpy as np
+import pandas as pd
+import os
+
+def error_metrics(file1, file2):
+    """Return (MSE, MAE, SDE) for file1 vs file2, col 3."""
+    stg1 = np.loadtxt(file1, delimiter=',', usecols=2)
+    stg2 = np.loadtxt(file2, delimiter=',', usecols=2)
+    err = stg1 - stg2
+    mse = np.mean(err)
+    mae = np.mean(np.abs(err))
+    sde = np.std(err)
+    return mse, mae, sde
+
+# Reference file
+ref_file = "../csv_files/TBE.csv"
+y_ref = pd.read_csv(ref_file, header=None).iloc[:, 2].values
+
+# Methods: (original path, method name)
+methods = [
+    ("../csv_files/AVDZ/B2GP-PLYP_AVDZ.csv", "B2GP-PLYP"),
+    ("../csv_files/AVDZ/PBE-QIDH_AVDZ.csv", "PBE-QIDH"),
+    ("../csv_files/AVDZ/LADC2_AVDZ.csv", "L-ADC(2)"),
+    ("../csv_files/AVDZ/LCC2_AVDZ.csv", "L-CC2")
+]
+
+scaled_paths = {}
+coeffs = {}
+
+# Scale and save
+for orig_path, method in methods:
+    x_orig = pd.read_csv(orig_path, header=None).iloc[:, 2].values
+    a, b = np.polyfit(x_orig, y_ref, 1)
+    coeffs[method] = (a, b)
+
+    scaled_x = np.round(a * x_orig + b, 3)
+    scaled_data = pd.read_csv(orig_path, header=None)
+    scaled_data.iloc[:, 2] = scaled_x
+    scaled_name = f"{method.replace(' ', '').replace('(', '').replace(')', '')}_scaled.csv"
+    scaled_data.to_csv(scaled_name, index=False, header=False)
+    scaled_paths[method] = scaled_name
+
+# Print coefficients
+print("Scaling Coefficients:")
+for method, (a, b) in coeffs.items():
+    print(f"{method}: a = {a:.4f}, b = {b:.4f}")
+
+# Build error DataFrame
+rows = []
+for orig_path, method in methods:
+    mse_o, mae_o, sde_o = error_metrics(orig_path, ref_file)
+    mse_s, mae_s, sde_s = error_metrics(scaled_paths[method], ref_file)
+    rows.append([method, mse_o, mae_o, sde_o, mse_s, mae_s, sde_s])
+
+errors_df = pd.DataFrame(rows, columns=[
+    "Method", "MSE_before", "MAE_before", "SDE_before",
+    "MSE_after", "MAE_after", "SDE_after"
+])
+
+print("\nError Summary:")
+print(errors_df.to_string(index=False))
 ```
