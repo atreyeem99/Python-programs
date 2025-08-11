@@ -22658,3 +22658,70 @@ print(" & ".join(row_sde) + " \\\\")
 print("\\end{tabular}")
 print("\\end{threeparttable}")
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+
+x_vals = []
+y_vals = []
+colors = []
+
+with open('input.csv', 'r') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        try:
+            x = float(row['LCC2'].strip())
+            y = float(row['EOM-CCSD'].strip())
+            topo = row['topo'].strip().lower()
+            color = 'blue' if topo == 'r' else 'red' if topo == 'n' else 'gray'
+
+            x_vals.append(x)
+            y_vals.append(y)
+            colors.append(color)
+        except Exception as e:
+            print("Skipping row due to error:", e)
+            continue
+
+if not x_vals or not y_vals:
+    print("Error: No valid data points found. Check column names and values.")
+else:
+    all_vals = x_vals + y_vals
+    vmin = min(all_vals)
+    vmax = max(all_vals)
+    margin = 0.05 * (vmax - vmin)
+    vmin -= margin
+    vmax += margin
+
+    plt.figure(figsize=(6, 6))
+    plt.scatter(x_vals, y_vals, c=colors)
+
+    # y = x line
+    plt.plot([vmin, vmax], [vmin, vmax], color='black', linestyle='--', linewidth=1)
+
+    # Labels with increased font size
+    plt.xlabel('LCC2', fontname='Arial', fontsize=14)
+    plt.ylabel('EOM-CCSD', fontname='Arial', fontsize=14)
+    plt.title('EOM-CCSD vs LCC2 (colored by topo)', fontname='Arial', fontsize=16)
+    plt.xticks(fontname='Arial', fontsize=14)
+    plt.yticks(fontname='Arial', fontsize=14)
+
+    # Limits and aspect
+    plt.xlim(vmin, vmax)
+    plt.ylim(vmin, vmax)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.grid(True, linestyle='--', alpha=0.5)
+
+    # Legend with larger font
+    legend_elements = [
+        Patch(facecolor='blue', edgecolor='black', label='topo = r'),
+        Patch(facecolor='red', edgecolor='black', label='topo = n')
+    ]
+    plt.legend(handles=legend_elements, loc='upper left', frameon=True, fontsize=14)
+
+    plt.tight_layout()
+    plt.savefig('scatter_plot.pdf')
+    plt.close()
+    print("Plot saved as scatter_plot.pdf")
+```
