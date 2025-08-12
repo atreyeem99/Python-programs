@@ -22725,3 +22725,28 @@ else:
     plt.close()
     print("Plot saved as scatter_plot.pdf")
 ```
+#
+```
+import csv
+
+# Input and output file names
+input_file = 'input.csv'
+output_file = 'output.csv'
+
+# Read the input CSV
+with open(input_file, 'r', newline='') as infile:
+    reader = csv.reader(infile)
+    rows = list(reader)
+
+# Swap 2nd and 4th columns (index 1 and 3) for all rows
+for row in rows:
+    if len(row) >= 4:  # Ensure there are at least 4 columns
+        row[1], row[3] = row[3], row[1]
+
+# Write the modified CSV to a new file
+with open(output_file, 'w', newline='') as outfile:
+    writer = csv.writer(outfile)
+    writer.writerows(rows)
+
+print(f"Swapped 2nd and 4th columns. Output written to '{output_file}'.")
+```
