@@ -22750,3 +22750,18 @@ with open(output_file, 'w', newline='') as outfile:
 
 print(f"Swapped 2nd and 4th columns. Output written to '{output_file}'.")
 ```
+#
+```
+import numpy as np, matplotlib.pyplot as plt
+wl = np.linspace(400,700,300)
+peak = 470   # change: pyrene≈470, perylene≈475, anthracene≈430
+width = 25   # change for broader/narrower peak
+I = np.exp(-0.5*((wl-peak)/width)**2)
+
+plt.figure(figsize=(5,3))
+plt.plot(wl, I, linewidth=2)
+plt.fill_between(wl, I, alpha=0.3)
+plt.xlabel("Wavelength (nm)"); plt.ylabel("Fluorescence Intensity")
+plt.title("Schematic Fluorescence Spectrum"); plt.xlim(400,700); plt.ylim(0,1.1)
+plt.tight_layout(); plt.savefig("spectrum.png", dpi=300, transparent=True)
+```
