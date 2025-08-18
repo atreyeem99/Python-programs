@@ -23004,3 +23004,32 @@ for dirpath, _, filenames in os.walk(root_dir):
 for f in matching_files:
     print(f)
 ```
+#
+```
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import rdMolDraw2D
+from IPython.display import SVG
+from io import StringIO
+
+# Your SMILES representation of the molecule
+smiles = "CCO"
+
+# Generate RDKit molecule object from SMILES
+mol = Chem.MolFromSmiles(smiles)
+
+# Create a drawing object
+drawer = rdMolDraw2D.MolDraw2DSVG(300, 300)
+
+# Draw the molecule
+drawer.DrawMolecule(mol)
+
+# Finish drawing
+drawer.FinishDrawing()
+
+# Get the SVG representation
+svg = drawer.GetDrawingText()
+
+# Display SVG in Jupyter Notebook
+SVG(svg)
+```
