@@ -23161,3 +23161,53 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import csv
+import numpy as np
+import matplotlib.pyplot as plt
+
+# === Conversion factor ===
+hartree_to_kcal = 627.509
+
+# === Load data from CSV ===
+def load_path(filepath):
+    energies = []
+    coordinates = []
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip header
+        for row in reader:
+            if len(row) < 2:
+                continue  # Skip rows with missing data
+            try:
+                energy = float(row[0]) * hartree_to_kcal
+                coord = float(row[1])
+                energies.append(energy)
+                coordinates.append(coord)
+            except ValueError:
+                continue  # Skip rows with non-numeric data
+    return np.array(energies), np.array(coordinates)
+
+# Load data
+backward_energy, backward_coord = load_path("path_back.csv")
+forward_energy, forward_coord = load_path("path_for.csv")
+
+# === Plot both paths ===
+plt.figure(figsize=(8, 5))
+
+# Plot backward
+plt.plot(backward_coord, backward_energy, '-o', label='Backward Path', color='royalblue')
+
+# Plot forward
+plt.plot(forward_coord, forward_energy, '-o', label='Forward Path', color='darkorange')
+
+# Labels and formatting
+plt.xlabel("Reaction Coordinate", fontsize=13)
+plt.ylabel("Energy (kcal/mol)", fontsize=13)
+plt.title("Potential Energy Surface", fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
