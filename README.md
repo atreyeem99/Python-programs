@@ -23245,3 +23245,52 @@ plt.tight_layout()
 plt.savefig("scatter_matrix.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import csv
+import numpy as np
+import matplotlib.pyplot as plt
+
+# === Conversion factor ===
+hartree_to_kcal = 627.509
+
+# === Load energies from CSV ===
+def load_energy(filepath):
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip header
+        return np.array([float(row[0]) for row in reader])
+
+# Load and convert to kcal/mol
+forward_energy = load_energy("energies_for.csv") * hartree_to_kcal
+backward_energy = load_energy("energies_back.csv") * hartree_to_kcal
+
+# Reverse backward to go from Reactant → TS
+backward_energy = backward_energy[::-1]
+
+# Combine: Reactant → TS → Product (remove duplicate TS)
+pes_energies = np.concatenate((backward_energy[:-1], forward_energy))
+
+# Normalize so Reactant = 0
+pes_energies -= pes_energies[0]
+
+# Reaction coordinate
+reaction_coord = np.linspace(0, 1, len(pes_energies))
+
+# === Plot PES ===
+plt.figure(figsize=(8, 5))
+plt.plot(reaction_coord, pes_energies, '-o', color='darkorange', linewidth=2, markersize=4)
+
+# Mark TS
+ts_index = len(backward_energy) - 1
+plt.axvline(x=reaction_coord[ts_index], color='gray', linestyle='--', label='TS')
+
+# Labels and formatting
+plt.xlabel("Reaction Coordinate", fontsize=13)
+plt.ylabel("Relative Energy (kcal/mol)", fontsize=13)
+plt.title("Potential Energy Surface (HEN)", fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
