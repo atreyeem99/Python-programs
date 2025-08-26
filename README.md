@@ -23358,3 +23358,45 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Conversion factor: Hartree to kcal/mol
+hartree_to_kcal = 627.509
+
+# === Read data with headers ===
+forward = pd.read_csv("energies_for.csv", header=0)
+backward = pd.read_csv("energies_back.csv", header=0)
+
+# Convert from Hartree to kcal/mol
+forward_kcal = forward.iloc[:, 0] * hartree_to_kcal
+backward_kcal = backward.iloc[:, 0] * hartree_to_kcal
+
+# Extract energy values
+E_reactant = forward_kcal.iloc[0]
+E_TS = forward_kcal.iloc[1]
+E_product = forward_kcal.iloc[2]
+
+# Normalize to Reactant = 0
+E0 = E_reactant
+energies = [E_reactant - E0, E_TS - E0, E_product - E0]
+labels = ["Reactant", "TS", "Product"]
+positions = [0, 1, 2]
+
+# === Plotting ===
+plt.figure(figsize=(8, 5))
+plt.plot(positions, energies, '-o', color="darkgreen", linewidth=2, markersize=8)
+
+# Add energy labels
+for x, y, label in zip(positions, energies, labels):
+    plt.text(x, y + 0.5, f"{label}\n{y:.2f} kcal/mol", ha='center', fontsize=12)
+
+plt.xticks(positions, labels, fontsize=12)
+plt.ylabel("Relative Energy (kcal/mol)", fontsize=13)
+plt.title("Forward Reaction Energy Profile (HEN)", fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.tight_layout()
+plt.show()
+```
