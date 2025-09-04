@@ -23741,3 +23741,141 @@ plt.grid(True, linestyle='--', alpha=0.5)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+import csv
+
+# === Input CSV File with energies ===
+energy_csv = "energies.csv"
+
+# === Point group folders ===
+main_folders = ['C2v_d', 'D3h_d']
+point_group_map = {'C2v_d': 'C2v', 'D3h_d': 'D3h'}
+
+# === LaTeX Titles ===
+latex_titles = ['$S_1$ (eV)', '$T_1$ (eV)', '$\\Delta_{ST}$ (eV)']
+methods = ['L-CC2/cc-pVTZ', 'L-ADC(2)/cc-pVTZ', 'ADC(2)/cc-pVTZ', 'EOM-CCSD/cc-pVTZ']
+
+# === Read Energy Data ===
+energy_data = {}
+with open(energy_csv, 'r') as f:
+    reader = csv.reader(f)
+    header = next(reader)  # skip header
+    for row in reader:
+        if not row or len(row) < 13:
+            continue
+        name = row[0].strip()
+        try:
+            energy_data[name] = [float(x) for x in row[1:]]
+        except ValueError:
+            print(f"Skipping row with invalid float values: {row}")
+            continue
+
+# === Write Output ===
+with open("all_coords_table.txt", "w") as out:
+    for folder in main_folders:
+        extrapolate_path = os.path.join(folder, 'extrapolate')
+        if not os.path.exists(extrapolate_path):
+            continue
+        point_group = point_group_map[folder]
+
+        for mol_folder in sorted(os.listdir(extrapolate_path)):
+            mol_path = os.path.join(extrapolate_path, mol_folder)
+            xyz_file = os.path.join(mol_path, "test.xyz")
+
+            if not os.path.isfile(xyz_file) or mol_folder not in energy_data:
+                continue
+
+            # Read coordinates
+            with open(xyz_file, 'r') as f:
+                lines = f.readlines()
+
+            out.write(lines[0])  # Number of atoms
+            out.write(f"{mol_folder} {point_group}\n")  # Molecule name and PG
+
+            for line in lines[2:]:
+                out.write(line)
+
+            # Write table
+            out.write("\n\\begin{tabular}{lccc}\n")
+            out.write("Method & " + " & ".join(latex_titles) + " \\\\\n")
+            out.write("\\hline\n")
+
+            energies = energy_data[mol_folder]
+            for i, method in enumerate(methods):
+                s1 = f"{energies[3*i]:.4f}"
+                t1 = f"{energies[3*i+1]:.4f}"
+                stg = f"{energies[3*i+2]:.4f}"
+                out.write(f"{method} & {s1} & {t1} & {stg} \\\\\n")
+
+            out.write("\\end{tabular}\n\n\n")
+```
+import os
+import csv
+
+# === Input CSV File with energies ===
+energy_csv = "energies.csv"
+
+# === Point group folders ===
+main_folders = ['C2v_d', 'D3h_d']
+point_group_map = {'C2v_d': 'C2v', 'D3h_d': 'D3h'}
+
+# === LaTeX Titles ===
+latex_titles = ['$S_1$ (eV)', '$T_1$ (eV)', '$\\Delta_{ST}$ (eV)']
+methods = ['L-CC2/cc-pVTZ', 'L-ADC(2)/cc-pVTZ', 'ADC(2)/cc-pVTZ', 'EOM-CCSD/cc-pVTZ']
+
+# === Read Energy Data ===
+energy_data = {}
+with open(energy_csv, 'r') as f:
+    reader = csv.reader(f)
+    header = next(reader)  # skip header
+    for row in reader:
+        if not row or len(row) < 13:
+            continue
+        name = row[0].strip()
+        try:
+            energy_data[name] = [float(x) for x in row[1:]]
+        except ValueError:
+            print(f"Skipping row with invalid float values: {row}")
+            continue
+
+# === Write Output ===
+with open("all_coords_table.txt", "w") as out:
+    for folder in main_folders:
+        extrapolate_path = os.path.join(folder, 'extrapolate')
+        if not os.path.exists(extrapolate_path):
+            continue
+        point_group = point_group_map[folder]
+
+        for mol_folder in sorted(os.listdir(extrapolate_path)):
+            mol_path = os.path.join(extrapolate_path, mol_folder)
+            xyz_file = os.path.join(mol_path, "test.xyz")
+
+            if not os.path.isfile(xyz_file) or mol_folder not in energy_data:
+                continue
+
+            # Read coordinates
+            with open(xyz_file, 'r') as f:
+                lines = f.readlines()
+
+            out.write(lines[0])  # Number of atoms
+            out.write(f"{mol_folder} {point_group}\n")  # Molecule name and PG
+
+            for line in lines[2:]:
+                out.write(line)
+
+            # Write table
+            out.write("\n\\begin{tabular}{lccc}\n")
+            out.write("Method & " + " & ".join(latex_titles) + " \\\\\n")
+            out.write("\\hline\n")
+
+            energies = energy_data[mol_folder]
+            for i, method in enumerate(methods):
+                s1 = f"{energies[3*i]:.4f}"
+                t1 = f"{energies[3*i+1]:.4f}"
+                stg = f"{energies[3*i+2]:.4f}"
+                out.write(f"{method} & {s1} & {t1} & {stg} \\\\\n")
+
+            out.write("\\end{tabular}\n\n\n")
+```
