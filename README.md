@@ -24086,3 +24086,55 @@ with open(output_file, 'w') as out:
 
 print("✅ all_coords.txt successfully generated.")
 ```
+#
+```
+import os
+import csv
+
+# Read energy data
+energy_file = 'merged_all_104.csv'
+energy_data = {}
+with open(energy_file, 'r') as f:
+    reader = csv.reader(f)
+    headers = next(reader)
+    for row in reader:
+        folder = row[0]
+        energy_data[folder] = row[1:]
+
+methods = ['L-CC2', 'L-ADC(2)', 'ADC(2)', 'EOM-CCSD']
+
+# Open output LaTeX file
+with open('report_output.tex', 'w') as out:
+    for folder in sorted(os.listdir()):
+        path = os.path.join(folder, 'final_opt.xyz')
+        if os.path.isdir(folder) and os.path.isfile(path):
+            # Write coordinates block
+            out.write("\\singlespacing\n\\footnotesize\n{\\begin{verbatim}\n")
+            with open(path, 'r') as xyz_file:
+                lines = xyz_file.readlines()
+                if len(lines) >= 2:
+                    out.write(lines[0])  # First line: number of atoms
+                    # Second line: Replace with folder name
+                    out.write(folder + "\n")
+                    for line in lines[2:]:
+                        out.write(line)
+            out.write("\\end{verbatim}}\n\n")
+
+            # Write energy table
+            if folder in energy_data:
+                vals = energy_data[folder]
+                out.write("\\begin{center}\n")
+                out.write("\\footnotesize\n")
+                out.write("\\begin{tabular}{lccc}\n")
+                out.write("\\hline\n")
+                out.write("Method & S1 & T1 & STG \\\\\n")
+                out.write("\\hline\n")
+                for i, method in enumerate(methods):
+                    s1, t1, stg = vals[i*3:(i+1)*3]
+                    out.write(f"{method} & {s1} & {t1} & {stg} \\\\\n")
+                out.write("\\hline\n")
+                out.write("\\end{tabular}\n")
+                out.write("\\end{center}\n\n")
+
+            out.write("\\clearpage\n")
+```
