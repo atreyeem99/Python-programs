@@ -24190,3 +24190,51 @@ plt.tight_layout()
 plt.savefig("scatter_matrix_seaborn_with_r2.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Set seaborn style
+sns.set(style="whitegrid")
+
+# Pairplot
+plot = sns.pairplot(
+    df_numeric,
+    kind="scatter",
+    diag_kind="hist",
+    plot_kws={"edgecolor": "blue", "facecolors": "none", "s": 40, "linewidth": 0.5},
+    diag_kws={"color": "#27AE60", "edgecolor": "black"},
+    corner=False
+)
+
+# Make inner tick labels smaller
+for ax in plot.axes.flatten():
+    if ax:
+        ax.tick_params(labelsize=8)  # smaller ticks
+
+# Make outer axis labels (variable names) larger
+for i, label in enumerate(plot.fig.axes[-len(df_numeric.columns):]):
+    label.set_xlabel(label.get_xlabel(), fontsize=14)
+    label.set_ylabel(label.get_ylabel(), fontsize=14)
+
+# Add R² values in upper triangle
+col_names = df_numeric.columns
+for i in range(len(col_names)):
+    for j in range(len(col_names)):
+        if i < j:
+            x = df_numeric[col_names[j]].values.reshape(-1, 1)
+            y = df_numeric[col_names[i]].values
+            model = LinearRegression().fit(x, y)
+            r2 = r2_score(y, model.predict(x))
+            ax = plot.axes[i, j]
+            ax.text(0.05, 0.9, f"$R^2$ = {r2:.2f}", transform=ax.transAxes,
+                    fontsize=10, color="red", ha="left", va="top")
+
+plt.tight_layout()
+plt.show()
+```
