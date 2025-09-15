@@ -24457,3 +24457,109 @@ plt.subplots_adjust(wspace=0.1, hspace=0.1)
 plt.savefig("scatter_matrix_all_methods_fixed.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
+from sklearn.metrics import r2_score
+import numpy as np
+
+# === Read and prepare data ===
+df = pd.read_csv("all_methods_104_data.csv")
+
+# Rename columns
+df = df.rename(columns={
+    'ADC2': 'ADC(2)',
+    'LADC2': 'L-ADC(2)',
+    'LCC2': 'L-CC2',
+    'EOM-CCSD': 'EOM-CCSD'
+})
+
+# Drop non-numeric column and round
+df_numeric = df.drop(columns=["Molecule"]).round(4)
+col_names = df_numeric.columns
+n = len(col_names)
+
+# === Global settings ===
+plt.rcParams.update({
+    'font.family': 'Arial',
+    'xtick.labelsize': 11,  # larger tick numbers inside plots
+    'ytick.labelsize': 11
+})
+
+# Scatter plot range
+min_val, max_val = -0.2, 0.8
+tick_spacing = 0.2
+scatter_ticks = np.arange(min_val, max_val + 0.01, tick_spacing)
+
+# === Create subplots ===
+fig, axes = plt.subplots(nrows=n, ncols=n, figsize=(2.4 * n, 2.4 * n))
+
+for i in range(n):
+    for j in range(n):
+        ax = axes[i, j]
+        x = df_numeric[col_names[j]]
+        y = df_numeric[col_names[i]]
+
+        if i == j:
+            # === Histogram ===
+            ax.hist(x, bins='auto', color='#27AE60', edgecolor='black', linewidth=0.6)
+            ax.set_facecolor('white')
+            ax.set_yticks([])
+            ax.grid(False)
+            ax.set_aspect('auto')
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+
+            # Set dynamic tick range
+            hist_min, hist_max = x.min(), x.max()
+            hist_ticks = np.linspace(hist_min, hist_max, 5)
+            ax.set_xticks(np.round(hist_ticks, 2))
+
+        else:
+            # === Scatter plot ===
+            ax.scatter(x, y, facecolors='none', edgecolor='blue', linewidth=0.3, s=18)
+            ax.plot([min_val, max_val], [min_val, max_val], linestyle=':', color='gray', linewidth=1)
+
+            r2 = r2_score(y, x)
+            ax.text(0.05, 0.85, f"$R^2$ = {r2:.2f}", transform=ax.transAxes, fontsize=9)
+
+            ax.set_xlim(min_val, max_val)
+            ax.set_ylim(min_val, max_val)
+            ax.set_xticks(scatter_ticks)
+            ax.set_yticks(scatter_ticks)
+            ax.set_aspect('equal')
+            ax.grid(True, linestyle='--', linewidth=0.6, alpha=0.8)
+            ax.set_facecolor('white')
+
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+
+        ax.set_axisbelow(True)
+
+        # Hide inner tick labels
+        if i != n - 1:
+            ax.set_xticklabels([])
+        if j != 0:
+            ax.set_yticklabels([])
+
+# === Rotate ticks on edges ===
+for i in range(n):
+    for label in axes[-1, i].get_xticklabels():
+        label.set_rotation(90)
+        label.set_horizontalalignment('center')
+
+    for label in axes[i, 0].get_yticklabels():
+        label.set_rotation(0)
+        label.set_horizontalalignment('right')
+
+# === Axis labels on outer edges only ===
+for i, label in enumerate(col_names):
+    axes[i, 0].set_ylabel(label, fontsize=9, labelpad=6)      # smaller outer y-label
+    axes[-1, i].set_xlabel(label, fontsize=9, labelpad=6)     # smaller outer x-label
+
+# === Layout and save ===
+plt.subplots_adjust(wspace=0.1, hspace=0.1)
+plt.savefig("scatter_matrix_all_methods_fixed_labels.pdf", dpi=300, bbox_inches='tight')
+plt.show()
+```
