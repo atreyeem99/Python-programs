@@ -24611,3 +24611,53 @@ for i in range(len(col_names)):
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+import numpy as np
+
+# Function to calculate distance between two points
+def calculate_distance(coord1, coord2):
+    return np.linalg.norm(coord1 - coord2)
+
+# File to store results
+output_file = "distances.txt"
+
+with open(output_file, "w") as f:
+    # Add folders 0001 to 02285 with distance = 0
+    for i in range(1, 2286):
+        folder_name = f"Mol_{i:05d}"
+        f.write(f"{folder_name} 0\n")
+
+    # Process folders 02286 to 33059
+    for i in range(2286, 33060):
+        folder_name = f"Mol_{i:05d}"
+        file_path = os.path.join(folder_name, "geom_DFT_S0.xyz")
+
+        if not os.path.exists(file_path):
+            print(f"File not found: {file_path}")
+            continue
+
+        with open(file_path, "r") as xyz_file:
+            lines = xyz_file.readlines()
+
+        # Extract coordinates
+        coordinates = []
+        for line in lines[2:]:  # Skip first two lines of XYZ
+            parts = line.split()
+            if len(parts) < 4:
+                continue
+            atom = parts[0]
+            x, y, z = map(float, parts[1:])
+            coordinates.append((atom, np.array([x, y, z])))
+
+        # Find B and N coordinates
+        b_coords = next((coord for atom, coord in coordinates if atom == "B"), None)
+        n_coords = next((coord for atom, coord in coordinates if atom == "N"), None)
+
+        if b_coords is not None and n_coords is not None:
+            distance = calculate_distance(b_coords, n_coords)
+            f.write(f"{folder_name} {distance:.6f}\n")
+        else:
+            print(f"B or N atom not found in {file_path}")
+```
