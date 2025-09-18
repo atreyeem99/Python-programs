@@ -24661,3 +24661,14 @@ with open(output_file, "w") as f:
         else:
             print(f"B or N atom not found in {file_path}")
 ```
+#
+```
+plot = sns.pairplot(
+    df_numeric,
+    kind="scatter",
+    diag_kind="hist",
+    plot_kws={"edgecolor": "blue", "facecolors": "none", "s": 30, "linewidth": 0.5},
+    diag_kws={"color": "#27AE60", "edgecolor": "black", "bins": 10},
+    corner=False
+)
+```
