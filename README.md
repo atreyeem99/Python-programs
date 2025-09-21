@@ -24724,3 +24724,9 @@ plt.tight_layout()
 plt.savefig("scatter_matrix_seaborn_with_r2.pdf", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+corner=False,   # optional: keeps full matrix
+sharex=False,
+sharey=False
+```
