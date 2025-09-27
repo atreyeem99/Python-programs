@@ -25085,3 +25085,31 @@ with open(file_lcc2, 'r') as f_lcc2, \
 
 print(f"Merged file written to: {output_file}")
 ```
+#
+```
+import os
+
+# Values to search for
+targets = ['-0.220', '-0.126', '-0.098']
+
+# Start from current directory
+root_dir = '.'
+
+# List to collect matching files
+matching_files = []
+
+for dirpath, _, filenames in os.walk(root_dir):
+    for filename in filenames:
+        filepath = os.path.join(dirpath, filename)
+        try:
+            with open(filepath, 'r', errors='ignore') as f:
+                content = f.read()
+                if all(val in content for val in targets):
+                    matching_files.append(filepath)
+        except:
+            continue  # Skip unreadable files
+
+# Print result
+for f in matching_files:
+    print(f)
+```
