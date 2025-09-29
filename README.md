@@ -25159,3 +25159,42 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# === Read data ===
+forward = pd.read_csv("energies_for.csv", header=None)
+backward = pd.read_csv("energies_back.csv", header=None)
+
+# === Extract energy values ===
+# Assuming CSVs have only one column of energies
+E_reactant = forward.iloc[0, 0]
+E_TS = forward.iloc[1, 0]
+E_product = forward.iloc[2, 0]
+
+# Optional: sanity check
+assert abs(E_TS - backward.iloc[1, 0]) < 1e-3, "TS energies differ in forward/backward"
+
+# Normalize to Reactant = 0
+E0 = E_reactant
+energies = [E_reactant - E0, E_TS - E0, E_product - E0]
+labels = ["Reactant", "TS", "Product"]
+positions = [0, 1, 2]
+
+# === Plot ===
+plt.figure(figsize=(8, 5))
+plt.plot(positions, energies, '-o', color="darkred", linewidth=2, markersize=8)
+
+# Add energy labels
+for x, y, label in zip(positions, energies, labels):
+    plt.text(x, y + 0.2, f"{label}\n{y:.2f} kcal/mol", ha='center', fontsize=12)
+
+plt.xticks(positions, labels, fontsize=12)
+plt.ylabel("Relative Energy (kcal/mol)", fontsize=13)
+plt.title("Energy Profile Diagram (HEN)", fontsize=14)
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.tight_layout()
+plt.show()
+```
