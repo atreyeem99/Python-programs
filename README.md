@@ -25264,3 +25264,38 @@ plt.gca().set_aspect('equal', adjustable='box')  # square axes
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# === Read CSV (no headers assumed) ===
+data = pd.read_csv("your_file.csv", header=None)
+
+# === Extract needed columns ===
+x = data.iloc[:, 3]  # 4th column
+y = data.iloc[:, 4]  # 5th column
+
+# === Keep only rows where x is negative ===
+mask = x < 0
+x_filtered = x[mask]
+y_filtered = y[mask]
+
+# === Plot ===
+plt.figure(figsize=(6, 6))  # square plot
+plt.scatter(x_filtered, y_filtered, color="blue", s=40, alpha=0.7)
+
+plt.xlabel("4th column (X-axis)", fontsize=14)
+plt.ylabel("5th column (Y-axis)", fontsize=14)
+plt.title("Scatter Plot (Negative 4th Column)", fontsize=16)
+plt.grid(True)
+
+# Set the x-axis range you specified
+plt.xlim(-0.25, 0.15)
+
+plt.gca().set_aspect('equal', adjustable='box')  # square axes
+plt.tight_layout()
+plt.show()
+```
