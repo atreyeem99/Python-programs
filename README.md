@@ -25299,3 +25299,49 @@ plt.gca().set_aspect('equal', adjustable='box')  # square axes
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+
+def extract_zmat(base_dir="extrapolated_geom", output_dir="ex_zmat"):
+    base_path = os.path.abspath(base_dir)
+    output_path = os.path.join(base_path, output_dir)
+
+    # Make output folder
+    os.makedirs(output_path, exist_ok=True)
+
+    for subfolder in os.listdir(base_path):
+        subfolder_path = os.path.join(base_path, subfolder)
+        test_com = os.path.join(subfolder_path, "test.com")
+
+        if not os.path.isdir(subfolder_path) or subfolder == output_dir:
+            continue
+
+        if os.path.exists(test_com):
+            with open(test_com, "r") as f:
+                lines = f.readlines()
+
+            keep = []
+            inside_geom = False
+            for line in lines:
+                if "geometry={" in line:
+                    inside_geom = True
+                    keep.append(line)  # include "geometry={" line
+                    continue
+                if "basis=" in line:
+                    break
+                if inside_geom:
+                    keep.append(line)
+
+            # Save to subfolder.zmat in output folder
+            output_file = os.path.join(output_path, f"{subfolder}.zmat")
+            with open(output_file, "w") as f:
+                f.writelines(keep)
+
+            print(f"Extracted Z-matrix → {output_file}")
+        else:
+            print(f"No test.com in {subfolder_path}")
+
+if __name__ == "__main__":
+    extract_zmat()
+```
