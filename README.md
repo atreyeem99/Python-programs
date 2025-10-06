@@ -25434,3 +25434,56 @@ with open(file_lcc2, 'r') as f_lcc2, \
 
 print(f"Merged file written to: {output_file}")
 ```
+#
+```
+import os
+
+extrapolate_folder = './extrapolate'
+output_folder = './LCC2_AVDZ'
+
+os.makedirs(output_folder, exist_ok=True)
+
+for folder_name in os.listdir(extrapolate_folder):
+    folder_path = os.path.join(extrapolate_folder, folder_name)
+    if os.path.isdir(folder_path):
+        xyz_file = os.path.join(folder_path, 'test.xyz')
+        if not os.path.isfile(xyz_file):
+            print(f"Skipping {folder_name}: test.xyz not found")
+            continue
+        with open(xyz_file, 'r') as xyz:
+            lines = xyz.readlines()[2:]
+
+        input_template = f'''memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={{
+{''.join(lines)}
+}}
+
+basis={{
+default,avdz
+set,mp2fit
+default,avdz/mp2fit
+set,jkfit
+default,avdz/jkfit }}
+
+df-hf
+
+{{lt-df-lcc2                     !ground state CC2
+eom,-3.1,triplet=1              !triplet
+eomprint,popul=-1,loceom=-1 }}   !minimize the output
+
+'''
+        new_folder = os.path.join(output_folder, folder_name)
+        os.makedirs(new_folder, exist_ok=True)
+
+        input_file = os.path.join(new_folder, 'inp.com')
+        with open(input_file, 'w') as file:
+            file.write(input_template)
+        print(f"Created {input_file}")
+
+print("Files created successfully!")
+```
