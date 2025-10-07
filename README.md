@@ -25487,3 +25487,51 @@ eomprint,popul=-1,loceom=-1 }}   !minimize the output
 
 print("Files created successfully!")
 ```
+#
+```
+import numpy as np
+
+def compute_metrics(method_file, ref_file):
+    data_method = np.loadtxt(method_file, delimiter=',', usecols=(1,2,3))
+    data_ref = np.loadtxt(ref_file, delimiter=(1,2,3))
+    error = data_method - data_ref
+
+    return {
+        "MSE": np.mean(error, axis=0),
+        "MAE": np.mean(np.abs(error), axis=0),
+        "SDE": np.std(error, axis=0),
+        "minE": np.min(error, axis=0),
+        "maxE": np.max(error, axis=0)
+    }
+
+def main():
+    ref_file = "TBE.csv"
+    method_files = ["method1.csv", "method2.csv", "method3.csv", "method4.csv"]
+    method_names = [f.replace(".csv","") for f in method_files]
+    energies = ["S1","T1","STG"]
+    metrics = ["MSE","MAE","SDE","minE","maxE"]
+
+    # Compute metrics
+    results = {m: compute_metrics(m, ref_file) for m in method_files}
+
+    with open("errors_table.txt","w") as f:
+        # Header row: method energies
+        header = []
+        for m in method_names:
+            for e in energies:
+                header.append(f"{m} {e}")
+        f.write(" & ".join(["Metric"] + header) + " \\\\\n")
+        f.write("\\hline\n")
+
+        # For each metric
+        for metric in metrics:
+            row = [metric]
+            for m in method_files:
+                row += [f"${results[m][metric][i]:.3f}$" for i in range(len(energies))]
+            f.write(" & ".join(row) + " \\\\\n")
+
+    print("✅ Table written to errors_table.txt")
+
+if __name__ == "__main__":
+    main()
+```
