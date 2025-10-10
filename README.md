@@ -25671,3 +25671,36 @@ with open(output_file, "w") as f:
         else:
             print(f"B or N atom not found in {file_path}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# === Read CSV with header ===
+data = pd.read_csv("your_file.csv")
+
+# === Extract needed columns and convert to numeric ===
+x = pd.to_numeric(data.iloc[:, 3], errors="coerce")  # 4th column
+y = pd.to_numeric(data.iloc[:, 4], errors="coerce")  # 5th column
+
+# === Drop NaN rows (if any) ===
+mask = x < 0
+x_filtered = x[mask]
+y_filtered = y[mask]
+
+# === Plot ===
+plt.figure(figsize=(6, 6))  # square plot
+plt.scatter(x_filtered, y_filtered, color="blue", s=40, alpha=0.7)
+
+plt.xlabel(data.columns[3], fontsize=14)  # use column name for x-axis
+plt.ylabel(data.columns[4], fontsize=14)  # use column name for y-axis
+plt.title("Scatter Plot (Negative 4th Column)", fontsize=16)
+plt.grid(True)
+
+# Set the x-axis range you specified
+plt.xlim(-0.25, 0.15)
+
+plt.gca().set_aspect('equal', adjustable='box')  # square axes
+plt.tight_layout()
+plt.show()
+```
