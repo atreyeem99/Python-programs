@@ -25796,3 +25796,49 @@ plt.gca().set_aspect('equal', adjustable='box')  # square axes
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+
+base_dir = "extrapolate"
+output_base = "CBS_energy"
+
+for root, dirs, files in os.walk(base_dir):
+    if "test.com" in files:
+        test_com_path = os.path.join(root, "test.com")
+        rel_path = os.path.relpath(root, base_dir)
+        output_dir = os.path.join(output_base, rel_path)
+        os.makedirs(output_dir, exist_ok=True)
+        energy_com_path = os.path.join(output_dir, "energy.com")
+
+        with open(test_com_path, "r") as f:
+            lines = f.readlines()
+
+        new_lines = []
+        skip_next_hf = False
+
+        for i, line in enumerate(lines):
+            if skip_next_hf:
+                skip_next_hf = False
+                if line.strip().lower().startswith("hf"):
+                    continue  # skip the original hf line
+
+            if "basis=STO-3G" in line:
+                new_lines.append("basis=cc-pVTZ\n\n")
+                new_lines.append("proc cbs34\n")
+                new_lines.append("hf\n")
+                new_lines.append("ccsd(t)\n")
+                new_lines.append("extrapolate,basis=vtz:vqz\n")
+                new_lines.append("endproc\n\n")
+                new_lines.append("cbs34\n")
+                skip_next_hf = True  # signal to skip next hf
+            elif "put,XYZ,test.xyz" in line:
+                continue  # remove this line
+            else:
+                new_lines.append(line)
+
+        with open(energy_com_path, "w") as f:
+            f.writelines(new_lines)
+
+        print(f"Created: {energy_com_path}")
+```
