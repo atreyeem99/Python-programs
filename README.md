@@ -25842,3 +25842,44 @@ for root, dirs, files in os.walk(base_dir):
 
         print(f"Created: {energy_com_path}")
 ```
+#
+```
+import os
+
+base_dir = "extrapolate"
+output_base = "CBS_energy"
+
+for root, dirs, files in os.walk(base_dir):
+    if "test.com" in files:
+        # Define paths
+        test_com_path = os.path.join(root, "test.com")
+        rel_path = os.path.relpath(root, base_dir)
+        output_dir = os.path.join(output_base, rel_path)
+        os.makedirs(output_dir, exist_ok=True)
+        energy_com_path = os.path.join(output_dir, "energy.com")
+
+        # Read test.com
+        with open(test_com_path, "r") as f:
+            lines = f.readlines()
+
+        new_lines = []
+        for line in lines:
+            if "basis=STO-3G" in line:
+                new_lines.append("basis=cc-pVTZ\n\n")
+                new_lines.append("proc cbs34\n")
+                new_lines.append("hf\n")
+                new_lines.append("ccsd(t)\n")
+                new_lines.append("extrapolate,basis=vtz:vqz\n")
+                new_lines.append("endproc\n\n")
+                new_lines.append("cbs34\n")
+            elif "put,XYZ,test.xyz" in line:
+                continue  # skip this line
+            else:
+                new_lines.append(line)
+
+        # Write the new file
+        with open(energy_com_path, "w") as f:
+            f.writelines(new_lines)
+
+        print(f"Created: {energy_com_path}")
+```
