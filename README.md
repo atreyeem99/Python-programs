@@ -25883,3 +25883,46 @@ for root, dirs, files in os.walk(base_dir):
 
         print(f"Created: {energy_com_path}")
 ```
+#
+```
+import os
+import re
+
+# Conversion factor
+au2kjm = 2625.499618335386
+
+# Paths to the main folders
+high_symm_folder = "CBS_Energy_high_symm"
+low_symm_folder = "CBS_Energy_low_symm"
+
+# Get sorted list of subfolders (assumes same names in both folders)
+subfolders = sorted(os.listdir(high_symm_folder))
+
+def get_energy(file_path):
+    """Extract CCSD(T)/cc-pVTZ:cc-pVQZ energy from energy.out"""
+    with open(file_path, "r") as f:
+        for line in f:
+            if "CCSD(T)/cc-pVTZ:cc-pVQZ energy=" in line:
+                # Extract the last number on the line
+                return float(line.strip().split()[-1])
+    return None
+
+print("Subfolder    E_high_symm (au)    E_low_symm (au)    DeltaE (kJ/mol)")
+print("---------------------------------------------------------------")
+
+for sub in subfolders:
+    high_energy_file = os.path.join(high_symm_folder, sub, "energy.out")
+    low_energy_file = os.path.join(low_symm_folder, sub, "energy.out")
+
+    if os.path.exists(high_energy_file) and os.path.exists(low_energy_file):
+        E_high = get_energy(high_energy_file)
+        E_low = get_energy(low_energy_file)
+
+        if E_high is not None and E_low is not None:
+            deltaE = (E_low - E_high) * au2kjm
+            print(f"{sub:12} {E_high:16.8f} {E_low:16.8f} {deltaE:14.1f}")
+        else:
+            print(f"{sub:12} Error reading energies")
+    else:
+        print(f"{sub:12} energy.out missing in one of the folders")
+```
