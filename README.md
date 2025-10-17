@@ -25926,3 +25926,32 @@ for sub in subfolders:
     else:
         print(f"{sub:12} energy.out missing in one of the folders")
 ```
+#
+```
+#!/bin/bash
+
+au2kjm=2625.49962
+
+echo "Molecule   ΔE (kJ/mol)"
+echo "------------------------"
+
+for folder in CBS_high/*; do
+    mol=$(basename "$folder")
+    high_file="CBS_high/$mol/energy.out"
+    low_file="CBS_low/$mol/energy.out"
+
+    # Skip if either file missing
+    [[ -f "$high_file" && -f "$low_file" ]] || continue
+
+    # Extract the *last* energy line (final CBS energy)
+    high_energy=$(grep 'CCSD(T)/cc-pVTZ:cc-pVQZ energy=' "$high_file" | tail -n 1 | awk '{print $3}')
+    low_energy=$(grep 'CCSD(T)/cc-pVTZ:cc-pVQZ energy=' "$low_file" | tail -n 1 | awk '{print $3}')
+
+    # Skip if energies missing
+    [[ -n "$high_energy" && -n "$low_energy" ]] || continue
+
+    # ΔE = (low - high) × conversion
+    diff=$(awk -v high="$high_energy" -v low="$low_energy" -v conv="$au2kjm" 'BEGIN {printf "%8.2f", (low - high) * conv}')
+    echo "$mol  $diff"
+done
+```
