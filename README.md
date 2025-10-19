@@ -25998,3 +25998,55 @@ for sub in subfolders:
     else:
         print(f"{sub:12} energy.out missing in one of the folders")
 ```
+#
+```
+#!/usr/bin/env bash
+set -euo pipefail
+
+# conversion factor
+au2kjm=2625.499618335386
+
+# paths to the energy output files
+d3h_out="CBS_energy_D3h/energy.out"
+c3h_out="CBS_energy_C3h/energy.out"
+
+# simple existence checks
+if [[ ! -f "$d3h_out" ]]; then
+  echo "ERROR: $d3h_out not found." >&2
+  exit 1
+fi
+if [[ ! -f "$c3h_out" ]]; then
+  echo "ERROR: $c3h_out not found." >&2
+  exit 1
+fi
+
+# function: extract the last matching energy token from a file
+extract_energy() {
+  local file="$1"
+  # look for the line, take the last occurrence (in case multiple), then grab 3rd field
+  local line
+  line=$(grep -F "CCSD(T)/cc-pVTZ:cc-pVQZ energy=" "$file" || true)
+  if [[ -z "$line" ]]; then
+    echo "nan"
+    return
+  fi
+  echo "$line" | tail -n1 | awk '{print $3}'
+}
+
+D3h=$(extract_energy "$d3h_out")
+C3h=$(extract_energy "$c3h_out")
+
+echo "CCSD(T)/VTZ:VQZ"
+echo "D3h: $D3h"
+echo "C3h: $C3h"
+
+# verify numeric values before computing
+if [[ "$D3h" == "nan" || "$C3h" == "nan" ]]; then
+  echo "ERROR: one or both energies are missing or the grep pattern did not match." >&2
+  exit 2
+fi
+
+# compute difference (C3h - D3h) in kJ/mol
+diff_kj=$(awk -v d="$D3h" -v c="$C3h" -v conv="$au2kjm" 'BEGIN {printf "%7.3f", (c - d) * conv}')
+echo "C3h - D3h = $diff_kj kJ/mol"
+```
