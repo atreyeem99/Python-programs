@@ -26138,3 +26138,60 @@ plt.tight_layout()
 plt.savefig("13_134.pdf", format='pdf', bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Use Arial font
+plt.rcParams['font.family'] = 'Arial'
+
+# Read CSV (no header)
+df = pd.read_csv("4_mols.csv", header=None)
+
+molecules = df[0]
+S1_values = df[1]
+T1_values = df[2]
+
+# X positions
+x_spacing = 1.0  # spacing between molecules
+line_width = 1.5
+offset = 0.2     # horizontal line width per energy level
+
+x_positions = []
+x_labels = []
+pos = 0
+
+for mol in molecules:
+    x_positions.append(pos)
+    x_positions.append(pos)
+    x_labels.append(f"{mol}\nS1")
+    x_labels.append(f"{mol}\nT1")
+    pos += x_spacing
+
+# Y values
+y_values = []
+colors = []
+for s, t in zip(S1_values, T1_values):
+    y_values.extend([s, t])
+    colors.extend(['blue', 'red'])  # S1 = blue, T1 = red
+
+# Plot
+plt.figure(figsize=(7,4))
+for x, y, c in zip(x_positions, y_values, colors):
+    plt.hlines(y, x - offset, x + offset, colors=c, linewidth=line_width)
+
+# Custom molecule names
+custom_labels = ["1AP", "1-aza", "1,4-biaza", "1,4,7-triaza"]
+
+# Formatting
+plt.xticks([i for i in range(len(molecules))], custom_labels, fontsize=14)
+plt.yticks([1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6], fontsize=13)
+plt.ylim(1.0, 2.8)
+plt.ylabel("Energy (eV)", fontsize=14)
+
+plt.tight_layout()
+plt.savefig("4_mols.pdf", format='pdf', bbox_inches='tight')
+plt.show()
+```
