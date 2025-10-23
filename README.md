@@ -26195,3 +26195,41 @@ plt.tight_layout()
 plt.savefig("4_mols.pdf", format='pdf', bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import numpy as np
+
+def print_csv_values(files):
+    all_data = []
+    for file in files:
+        data = np.loadtxt(file, delimiter=',', usecols=(1,2,3))
+        all_data.append(data)
+
+    # Print header
+    header = []
+    for f in files:
+        name = f.replace(".csv", "")
+        header += [f"{name} S1", f"{name} T1", f"{name} STG"]
+    print(" & ".join(["Mol"] + header) + " \\\\")
+    print("\\hline")
+
+    # Assume same number of molecules in all
+    n = all_data[0].shape[0]
+    for i in range(n):
+        row = [f"{i+1}"]
+        for data in all_data:
+            row += [f"${data[i, j]:.3f}$" for j in range(3)]
+        print(" & ".join(row) + " \\\\")
+
+def main():
+    files = [
+        "LCC2_AVDZ_CCSDT_VTZ_geom.csv",
+        "lcc2_avdz_b3lyp_geom.csv",
+        "lcc2_avdz_wB97xd_geom.csv",
+        "lcc2_avdz_mp2_geom.csv"
+    ]
+    print_csv_values(files)
+
+if __name__ == "__main__":
+    main()
+```
