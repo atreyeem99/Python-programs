@@ -26233,3 +26233,60 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import os
+import shutil
+
+base_dir = os.getcwd()
+folders_file = os.path.join(base_dir, "a.txt")
+opt_wb_dir = os.path.join(base_dir, "opt_wB")
+sources = ["D3h", "d3h_dis", "C2v", "Cs"]
+
+# Read folder names
+with open(folders_file, "r") as f:
+    folder_names = [line.strip() for line in f if line.strip()]
+
+# Subfolders inside opt_wB (e.g. CCSD_VDZ, CCSD_VTZ, CCSDT_VDZ)
+opt_subfolders = [d for d in os.listdir(opt_wb_dir)
+                  if os.path.isdir(os.path.join(opt_wb_dir, d))]
+
+for name in folder_names:
+    # Handle 1AP strictly from d3h_dis only
+    if name.lower() == "1ap":
+        src_xyz = os.path.join(base_dir, "d3h_dis", "extrapolate", name, "test.xyz")
+    else:
+        # Search in D3h, C2v, Cs, and (if needed) d3h_dis for others
+        src_xyz = None
+        for src in sources:
+            # Skip d3h_dis for others (so only 1AP comes from there)
+            if src == "d3h_dis":
+                continue
+            path = os.path.join(base_dir, src, "extrapolate", name, "test.xyz")
+            if os.path.exists(path):
+                src_xyz = path
+                break
+
+    if not src_xyz or not os.path.exists(src_xyz):
+        print(f"⚠️ test.xyz not found for {name}")
+        continue
+
+    # Copy into each folder in opt_wB
+    for opt_sub in opt_subfolders:
+        opt_sub_path = os.path.join(opt_wb_dir, opt_sub)
+        opt_com_path = os.path.join(opt_sub_path, "opt.com")
+        dest_folder = os.path.join(opt_sub_path, name)
+
+        os.makedirs(dest_folder, exist_ok=True)
+
+        # Copy test.xyz
+        shutil.copy(src_xyz, os.path.join(dest_folder, "test.xyz"))
+
+        # Copy opt.com
+        if os.path.exists(opt_com_path):
+            shutil.copy(opt_com_path, os.path.join(dest_folder, "opt.com"))
+        else:
+            print(f"⚠️ opt.com not found in {opt_sub_path}")
+
+        print(f"✅ Copied {name} → {opt_sub}/{name}")
+```
