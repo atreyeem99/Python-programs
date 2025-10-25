@@ -26290,3 +26290,36 @@ for name in folder_names:
 
         print(f"✅ Copied {name} → {opt_sub}/{name}")
 ```
+#
+```
+import os
+import re
+
+root_dir = "."
+pattern = re.compile(r"\s*\d+:\s+[-]?\d+\.\d+\s+cm\*\*-1")
+
+for folder, _, files in os.walk(root_dir):
+    if "opt.out" in files:
+        opt_path = os.path.join(folder, "opt.out")
+        with open(opt_path, "r") as f:
+            lines = f.readlines()
+
+        # Collect all frequency blocks
+        blocks = []
+        current_block = []
+        for line in lines:
+            if pattern.match(line):
+                current_block.append(line.strip())
+            elif current_block:
+                # End of current block
+                blocks.append(current_block)
+                current_block = []
+        if current_block:
+            blocks.append(current_block)
+
+        if blocks:
+            last_block = blocks[-1]  # Take the last frequency block
+            print(f"\n--- {opt_path} ---")
+            for line in last_block[:8]:  # Print only first 8 frequencies
+                print(line)
+```
