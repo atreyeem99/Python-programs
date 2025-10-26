@@ -26323,3 +26323,23 @@ for folder, _, files in os.walk(root_dir):
             for line in last_block[:8]:  # Print only first 8 frequencies
                 print(line)
 ```
+#
+```
+import os
+import re
+
+# Root folder (current directory)
+root_dir = "."
+
+# Pattern to match frequency lines
+pattern = re.compile(r"\s*\d+:\s+[-]?\d+\.\d+\s+cm\*\*-1")
+
+for folder, subfolders, files in os.walk(root_dir):
+    if "opt.out" in files:
+        opt_path = os.path.join(folder, "opt.out")
+        print(f"\n--- {opt_path} ---")
+        with open(opt_path, "r") as f:
+            for line in f:
+                if pattern.match(line):
+                    print(line.strip())
+```
