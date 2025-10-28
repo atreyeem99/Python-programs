@@ -26394,3 +26394,44 @@ for _, row in combined.iterrows():
 latex_table = "\n".join(latex_rows)
 print(latex_table)
 ```
+#
+```
+import pandas as pd
+
+# Read the CSV files
+a = pd.read_csv("a.csv")
+b = pd.read_csv("b.csv")
+c = pd.read_csv("c.csv")
+d = pd.read_csv("d.csv")
+
+# Reorder a, b, and c according to the order of 'd'
+order = d["Mol"]
+a = a.set_index("Mol").loc[order].reset_index()
+b = b.set_index("Mol").loc[order].reset_index()
+c = c.set_index("Mol").loc[order].reset_index()
+
+# Combine them side by side
+combined = pd.DataFrame()
+combined["Mol"] = d["Mol"]
+
+# Add all columns from a, b, c, and d (S1, T1, STG) with suffixes
+for name, df in zip(["a", "b", "c", "d"], [a, b, c, d]):
+    combined[[f"S1_{name}", f"T1_{name}", f"STG_{name}"]] = df[["S1", "T1", "STG"]]
+
+# Calculate new columns
+combined["S1_new"] = (combined["S1_c"] - combined["S1_a"]) + combined["S1_d"]
+combined["T1_new"] = (combined["T1_c"] - combined["T1_a"]) + combined["T1_d"]
+combined["STG_new"] = combined["S1_new"] - combined["T1_new"]
+
+# Format all numerical values to 3 decimal places
+for col in combined.columns[1:]:
+    combined[col] = combined[col].apply(lambda x: f"${x:.3f}$")
+
+# Convert to LaTeX table format
+latex_rows = []
+for _, row in combined.iterrows():
+    latex_rows.append(" & ".join(str(v) for v in row.values) + " \\\\")
+
+latex_table = "\n".join(latex_rows)
+print(latex_table)
+```
