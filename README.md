@@ -26476,3 +26476,31 @@ for _, row in combined.iterrows():
 latex_table = "\n".join(latex_rows)
 print(latex_table)
 ```
+#
+```
+import pandas as pd
+
+# Read both CSVs (with headers)
+a = pd.read_csv("00_energies_eV_2.csv")
+b = pd.read_csv("vertical_dft.csv")
+
+# Subtract 2nd and 3rd columns directly (row by row)
+S1_new = a.iloc[:, 1] - b.iloc[:, 1]
+T1_new = a.iloc[:, 2] - b.iloc[:, 2]
+
+# Compute S1 - T1
+S1_minus_T1 = S1_new - T1_new
+
+# Round to 5 decimal places
+out = pd.DataFrame({
+    a.columns[0]: a.iloc[:, 0],
+    "S1_new": S1_new.round(5),
+    "T1_new": T1_new.round(5),
+    "S1_minus_T1": S1_minus_T1.round(5)
+})
+
+# Save
+out.to_csv("subtracted_values.csv", index=False)
+
+print(out)
+```
