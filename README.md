@@ -26551,3 +26551,47 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import pandas as pd
+
+# Conversion factor
+hartree_to_ev = 27.211386
+
+# Read CSVs (ignore headers where necessary)
+S1_total = pd.read_csv("S1_total_energies.csv", header=None, skiprows=1)
+T1_total = pd.read_csv("T1_total_energies.csv", header=None, skiprows=1)
+vert_S1 = pd.read_csv("vertical_energies_au_S1_geom.csv", header=None, skiprows=1)
+vert_T1 = pd.read_csv("vertical_energies_au_T1_geom.csv", header=None, skiprows=1)
+
+# Read S0 energies (with header)
+S0_total = pd.read_csv("S0_total_energies.csv")
+
+# Compute adiabatic energies in Hartree
+S1_ad_h = S1_total[1] + vert_S1[1]
+T1_ad_h = T1_total[1] + vert_T1[2]
+
+# Convert S0 to eV
+S0_eV = S0_total.iloc[:, 1] * hartree_to_ev
+
+# Convert to eV and round to 3 decimals
+S1_ad = (S1_ad_h * hartree_to_ev - S0_eV).round(3)
+T1_ad = (T1_ad_h * hartree_to_ev - S0_eV).round(3)
+diff = (S1_ad - T1_ad).round(3)
+
+# Print LaTeX table format
+print("\\begin{tabular}{lccc}")
+print("\\hline")
+print("Molecule & S1$_{ad}$ - S0 (eV) & T1$_{ad}$ - S0 (eV) & Δ(S1 - T1) (eV) \\\\")
+print("\\hline")
+
+for i in range(len(S1_total)):
+    mol = S1_total.iloc[i, 0]
+    s1 = f"${S1_ad.iloc[i]:.3f}$"
+    t1 = f"${T1_ad.iloc[i]:.3f}$"
+    d = f"${diff.iloc[i]:.3f}$"
+    print(f"{mol} & {s1} & {t1} & {d} \\\\")
+
+print("\\hline")
+print("\\end{tabular}")
+```
