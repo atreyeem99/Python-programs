@@ -26700,3 +26700,56 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Morse-like potential (for schematic)
+def morse(R, De, a, Re):
+    return De * (1 - np.exp(-a * (R - Re)))**2
+
+# R grid
+R = np.linspace(0.5, 6, 500)
+
+# Define three potentials (schematic)
+V_S0 = morse(R, 1.0, 1.2, 2.0)
+V_S1 = morse(R, 1.0, 1.0, 2.5) + 2.0   # excited singlet
+V_T1 = morse(R, 1.0, 0.9, 3.0) + 1.5   # triplet
+
+# Plot potentials
+plt.figure(figsize=(8, 5))
+plt.plot(R, V_S0, color='black', lw=2)
+plt.plot(R, V_S1, color='black', lw=2)
+plt.plot(R, V_T1, color='black', lw=2)
+
+# Function to draw horizontal levels
+def add_levels(V, R, n_levels, offset=0.0):
+    E_min = V.min()
+    E_max = V.max()
+    levels = np.linspace(E_min + 0.1, E_min + 0.9, n_levels)
+    for E in levels:
+        plt.hlines(E + offset, R.min()+0.3, R.max()-0.3, color='black', lw=1)
+
+# Add levels for each surface
+add_levels(V_S0, R, 6, 0.0)
+add_levels(V_S1, R, 5, 2.0)
+add_levels(V_T1, R, 5, 1.5)
+
+# Labels
+plt.text(1.4, 0.5, r'$S_0$', fontsize=14)
+plt.text(2.3, 2.7, r'$S_1$', fontsize=14)
+plt.text(3.1, 2.2, r'$T_1$', fontsize=14)
+
+# Style
+plt.xlabel('R')
+plt.ylabel('Energy')
+plt.xlim(0.5, 6)
+plt.ylim(-0.2, 3.5)
+plt.axis('off')
+plt.tight_layout()
+
+# Save or show
+plt.savefig("anharmonic_pes.png", dpi=300, bbox_inches='tight')
+plt.show()
+```
