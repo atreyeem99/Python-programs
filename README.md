@@ -26753,3 +26753,43 @@ plt.tight_layout()
 plt.savefig("anharmonic_pes.png", dpi=300, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Morse-like potential function
+def morse(R, De, a, Re):
+    return De * (1 - np.exp(-a * (R - Re)))**2
+
+# Grid for bond length
+R = np.linspace(0.5, 6, 800)
+
+# All wells same depth & shape, just shifted
+De, a = 2.5, 1.1
+V_S0 = morse(R, De, a, 2.0)                   # Ground state
+V_S1 = morse(R, De, a, 2.6) + 3.0             # Excited singlet, shifted up
+V_T1 = morse(R, De, a, 3.2) + 5.8             # Triplet, higher & right-shifted
+
+# Plot
+plt.figure(figsize=(7, 5))
+
+plt.plot(R, V_S0, color='black', lw=2)
+plt.plot(R, V_S1, color='black', lw=2)
+plt.plot(R, V_T1, color='black', lw=2)
+
+# Labels
+plt.text(1.4, 0.3, r'$S_0$', fontsize=16)
+plt.text(2.4, 3.3, r'$S_1$', fontsize=16)
+plt.text(3.2, 6.1, r'$T_1$', fontsize=16)
+
+# Style adjustments
+plt.xlim(0.5, 6)
+plt.ylim(-0.5, 7.5)
+plt.axis('off')
+plt.tight_layout()
+
+# Save figure
+plt.savefig("PES_equal_depth.png", dpi=600, bbox_inches='tight')
+plt.show()
+```
