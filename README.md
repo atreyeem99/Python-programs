@@ -26793,3 +26793,40 @@ plt.tight_layout()
 plt.savefig("PES_equal_depth.png", dpi=600, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Read both CSVs
+c00 = pd.read_csv("00_energies_eV_2.csv")
+v_dft = pd.read_csv("vertical_dft.csv")
+
+# Merge by first column (position-based)
+merged = pd.merge(
+    c00, v_dft,
+    left_on=c00.columns[0],
+    right_on=v_dft.columns[0]
+)
+
+# Convert 2nd and 3rd columns in both CSVs to numeric
+for i in [1, 2, 3, 4]:
+    merged.iloc[:, i] = pd.to_numeric(merged.iloc[:, i], errors="coerce")
+
+# Subtract 2nd & 3rd columns of v_dft from 2nd & 3rd of c00
+merged["S1_new"] = merged.iloc[:, 1] - merged.iloc[:, 3]
+merged["T1_new"] = merged.iloc[:, 2] - merged.iloc[:, 4]
+
+# Compute S1 - T1
+merged["S1_minus_T1"] = merged["S1_new"] - merged["T1_new"]
+
+# Round to 5 decimal places
+merged = merged.round(5)
+
+# Keep only first column + results
+output = merged[[merged.columns[0], "S1_new", "T1_new", "S1_minus_T1"]]
+
+# Save to CSV
+output.to_csv("subtracted_values.csv", index=False)
+
+print(output)
+```
