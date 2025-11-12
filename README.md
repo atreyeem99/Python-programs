@@ -26987,3 +26987,153 @@ out.to_csv("subtracted_values.csv", index=False)
 
 print(out)
 ```
+#
+```
+#!/usr/bin/env python3
+import subprocess, os, csv, time, sys, math, tempfile, shutil, re
+
+# ---------------- user settings ----------------
+method_comment = "wB97X-D3/cc-pVDZ"
+mem = "2GB"
+nproc = 8
+gauss_cmd = "g16"   # change if you run gaussian differently (e.g. "g16 < infile.com > outfile.log")
+workdir = os.path.abspath(".")
+outfolder = os.path.join(workdir, "gauss_runs")
+os.makedirs(outfolder, exist_ok=True)
+
+# iteration parameters
+R0 = 0.9            # initial R (Angstrom)
+h = 0.0001          # step for numerical derivatives (Angstrom) -- your screenshot used 1e-4
+tol = 1e-6          # convergence on |Rn+1 - Rn|
+maxiter = 20
+
+# Gaussian template
+gjf_template = """%mem={mem}
+%nprocshared={nproc}
+#p {method} SP
+
+H3plus single-point R = {R:.6f}
+
++1 1
+H
+H 1 {R:.6f}
+H 2 {R:.6f} 1 180.0
+
+"""
+
+# -----------------------------------------------
+
+def write_gjf(R, tag):
+    fname = os.path.join(outfolder, f"R_{tag:.6f}.com")
+    with open(fname, "w") as f:
+        f.write(gjf_template.format(mem=mem, nproc=nproc, method=method_comment, R=R))
+    return fname
+
+def run_gaussian(input_com, out_log):
+    # Run gaussian and write output to out_log
+    # If your gaussian invocation differs, adjust here.
+    # This uses: g16 < input_com > out_log
+    cmd = f"{gauss_cmd} < {input_com} > {out_log}"
+    print("RUN:", cmd)
+    ret = subprocess.run(cmd, shell=True)
+    if ret.returncode != 0:
+        raise RuntimeError(f"Gaussian failed for {input_com} (rc={ret.returncode})")
+    return out_log
+
+def parse_energy_from_log(logfile):
+    # Search for "SCF Done:" line and extract the energy float after '='
+    # Use the last occurrence
+    energy = None
+    with open(logfile, "r", errors="ignore") as f:
+        for line in f:
+            if "SCF Done:" in line:
+                # typical: " SCF Done:  E(RB3LYP) = -100.407633137500     A.U. after    10 cycles"
+                m = re.search(r"=\s*([-\d\.Eed+]+)", line)
+                if m:
+                    energy = float(m.group(1))
+    if energy is None:
+        # Try alternative: look for "Energy=" or "Total Energy" lines
+        with open(logfile, "r", errors="ignore") as f:
+            txt = f.read()
+        m = re.search(r"^\s*E\(.*\)\s*=\s*([-\d\.Eed+]+)", txt, re.M)
+        if m:
+            energy = float(m.group(1))
+    if energy is None:
+        raise RuntimeError(f"Couldn't parse energy from {logfile}")
+    return energy
+
+# CSV header like your screenshot
+csvfile = os.path.join(workdir, "iteration_table.csv")
+header = ["n","Rn","En(Rn)","Rn-h","En(Rn-h)","Rn+h","En(Rn+h)","Vn (dE/dR)","Vn-1","Rn+1","|Rn+1-Rn|"]
+
+rows = []
+
+Rn = R0
+Vprev = None
+
+for n in range(maxiter):
+    print(f"\n=== Iter {n}: R = {Rn:.8f} ===")
+    # prepare inputs for R, R-h, R+h
+    R_minus = Rn - h
+    R_plus  = Rn + h
+
+    # write .com files
+    com_R = write_gjf(Rn, Rn)
+    com_minus = write_gjf(R_minus, R_minus)
+    com_plus  = write_gjf(R_plus, R_plus)
+
+    # run them sequentially (wait for each to finish)
+    log_R = com_R.replace(".com", ".log")
+    log_minus = com_minus.replace(".com", ".log")
+    log_plus = com_plus.replace(".com", ".log")
+
+    run_gaussian(com_R, log_R)
+    E_R = parse_energy_from_log(log_R)
+
+    run_gaussian(com_minus, log_minus)
+    E_minus = parse_energy_from_log(log_minus)
+
+    run_gaussian(com_plus, log_plus)
+    E_plus = parse_energy_from_log(log_plus)
+
+    # numerical derivatives
+    dE_dR = (E_plus - E_minus) / (2.0 * h)
+    d2E = (E_plus + E_minus - 2.0 * E_R) / (h**2)
+
+    # handle small second derivative
+    if abs(d2E) < 1e-12:
+        print("Warning: small second derivative; stopping to avoid division by zero.")
+        Rnext = Rn
+    else:
+        Rnext = Rn - dE_dR / d2E
+
+    row = [n,
+           Rn, E_R,
+           R_minus, E_minus,
+           R_plus, E_plus,
+           dE_dR, Vprev if Vprev is not None else "",
+           Rnext, abs(Rnext - Rn)]
+    rows.append(row)
+
+    # print summary
+    print(f" E(R) = {E_R:.12f}  E(R-h) = {E_minus:.12f}  E(R+h) = {E_plus:.12f}")
+    print(f" dE/dR = {dE_dR:.6e}   d2E/dR2 = {d2E:.6e}")
+    print(f" R_next = {Rnext:.12f}  |ΔR| = {abs(Rnext-Rn):.6e}")
+
+    # convergence?
+    if abs(Rnext - Rn) < tol:
+        print("Converged by delta R.")
+        break
+
+    Vprev = dE_dR
+    Rn = Rnext
+
+# write CSV
+with open(csvfile, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    for r in rows:
+        writer.writerow(r)
+
+print("\nDone. Iteration table in:", csvfile)
+```
