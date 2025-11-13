@@ -27137,3 +27137,42 @@ with open(csvfile, "w", newline="") as f:
 
 print("\nDone. Iteration table in:", csvfile)
 ```
+#
+```
+import pandas as pd
+
+# Conversion factor
+hartree_to_ev = 27.211386
+
+# Read CSVs (ignore headers where necessary)
+S1_total = pd.read_csv("S1_total_energies.csv", header=None, skiprows=1)
+T1_total = pd.read_csv("T1_total_energies.csv", header=None, skiprows=1)
+vert_S1 = pd.read_csv("vertical_energies_au_S1_geom.csv", header=None, skiprows=1)
+vert_T1 = pd.read_csv("vertical_energies_au_T1_geom.csv", header=None, skiprows=1)
+
+# Read S0 energies (with header)
+S0_total = pd.read_csv("S0_total_energies.csv")
+
+# Compute adiabatic energies in Hartree
+S1_ad_h = S1_total[1] + vert_S1[1]
+T1_ad_h = T1_total[1] + vert_T1[2]
+
+# Convert S0 to eV
+S0_eV = S0_total.iloc[:, 1] * hartree_to_ev
+
+# Convert to eV (no rounding)
+S1_ad = S1_ad_h * hartree_to_ev - S0_eV
+T1_ad = T1_ad_h * hartree_to_ev - S0_eV
+diff = S1_ad - T1_ad
+
+# Combine into final DataFrame
+final = pd.DataFrame({
+    "Molecule": S1_total[0],
+    "S1_ad - S0 (eV)": S1_ad,
+    "T1_ad - S0 (eV)": T1_ad,
+    "Δ(S1 - T1) (eV)": diff
+})
+
+# Save to CSV
+final.to_csv("adiabatic_energies_eV.csv", index=False)
+```
