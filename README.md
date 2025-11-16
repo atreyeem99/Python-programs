@@ -27260,3 +27260,54 @@ plt.tight_layout()
 plt.savefig("PES_extended.png", dpi=600, bbox_inches='tight')
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Read the CSV files
+a = pd.read_csv("a.csv")
+b = pd.read_csv("b.csv")
+c = pd.read_csv("c.csv")
+d = pd.read_csv("d.csv")
+
+# Reorder a, b, c to match the order of d
+order = d["Mol"]
+a = a.set_index("Mol").loc[order].reset_index()
+b = b.set_index("Mol").loc[order].reset_index()
+c = c.set_index("Mol").loc[order].reset_index()
+
+# Combine into one DataFrame
+combined = pd.DataFrame()
+combined["Mol"] = d["Mol"]
+
+# Add all columns with suffixes
+for name, df in zip(["a", "b", "c", "d"], [a, b, c, d]):
+    combined[[f"S1_{name}", f"T1_{name}", f"STG_{name}"]] = df[["S1", "T1", "STG"]]
+
+# Calculate new columns
+combined["S1_new"] = (combined["S1_c"] - combined["S1_a"]) + combined["S1_d"]
+combined["T1_new"] = (combined["T1_c"] - combined["T1_a"]) + combined["T1_d"]
+combined["STG_new"] = combined["S1_new"] - combined["T1_new"]
+
+# Format values in LaTeX math mode
+for col in combined.columns[1:]:
+    combined[col] = combined[col].apply(lambda x: f"${x:.3f}$")
+
+# Build LaTeX-style rows with && between each set
+latex_rows = []
+for _, row in combined.iterrows():
+    parts = [row["Mol"]]
+    sets = [
+        [row["S1_a"], row["T1_a"], row["STG_a"]],
+        [row["S1_b"], row["T1_b"], row["STG_b"]],
+        [row["S1_c"], row["T1_c"], row["STG_c"]],
+        [row["S1_d"], row["T1_d"], row["STG_d"]],
+        [row["S1_new"], row["T1_new"], row["STG_new"]],
+    ]
+    row_str = " && ".join([" & ".join(s) for s in sets])
+    latex_rows.append(f"{parts[0]} & {row_str} \\\\")
+
+# Print the LaTeX table
+latex_table = "\n".join(latex_rows)
+print(latex_table)
+```
