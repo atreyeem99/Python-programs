@@ -27352,3 +27352,47 @@ for _, row in combined.iterrows():
 latex_table = "\n".join(latex_rows)
 print(latex_table)
 ```
+#
+```
+# python program to read a xyz file and calculate the distance between the coordinates of the 6th atom and all the atoms
+```
+import math
+
+def read_xyz_file(file_path):
+    atoms = []
+    with open(file_path, 'r') as file:
+        num_atoms = int(file.readline())
+        file.readline()  # Skip the comment line
+
+        for _ in range(num_atoms):
+            line = file.readline().split()
+            atom_symbol, x, y, z = line[0], float(line[1]), float(line[2]), float(line[3])
+            atoms.append((atom_symbol, (x, y, z)))
+
+    return atoms
+
+def calculate_distance(atom1, atom2):
+    x1, y1, z1 = atom1[1]
+    x2, y2, z2 = atom2[1]
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+    return distance
+
+def main():
+    file_path = 'your_xyz_file.xyz'  # Replace with the path to your XYZ file
+    atoms = read_xyz_file(file_path)
+
+    if len(atoms) >= 6:
+        sixth_atom = atoms[5]  # 0-based index, so the 6th atom is at index 5
+        print(f"Coordinates of the 6th atom: {sixth_atom[1]}")
+
+        for i, atom in enumerate(atoms):
+            if i != 5:  # Skip the 6th atom
+                distance = calculate_distance(sixth_atom, atom)
+                print(f"Distance between the 6th atom and atom {i + 1}: {distance:.3f}")
+
+    else:
+        print("Not enough atoms in the file.")
+
+if __name__ == "__main__":
+    main()
+```
