@@ -27447,3 +27447,43 @@ for _, row in combined.iterrows():
 latex_table = "\n".join(latex_rows)
 print(latex_table)
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+def morse(R, De, a, Re):
+    return De * (1 - np.exp(-a * (R - Re)))**2
+
+# Grid
+R = np.linspace(0.5, 6, 800)
+
+# Deeper wells
+V_S0 = morse(R, 2.5, 1.2, 2.0)                # Ground state
+V_S1 = morse(R, 2.2, 1.0, 2.4) + 3.2           # Excited singlet (shifted up more)
+V_T1 = morse(R, 2.0, 0.9, 3.0) + 2.7           # Triplet (slightly lower but extended)
+
+# Slight crossing adjustment
+V_T1 = np.where(R > 2.6, V_T1 + 0.1*(R-2.6), V_T1)
+
+plt.figure(figsize=(7.2, 5.2))
+
+# Plot PES curves
+plt.plot(R, V_S0, color='black', lw=2)
+plt.plot(R, V_S1, color='black', lw=2)
+plt.plot(R, V_T1, color='black', lw=2)
+
+# Labels
+plt.text(1.5, 0.3, r'$S_0$', fontsize=16)
+plt.text(2.3, 3.8, r'$S_1$', fontsize=16)
+plt.text(3.3, 3.2, r'$T_1$', fontsize=16)
+
+# Style
+plt.xlim(0.5, 6)
+plt.ylim(-0.5, 4.8)   # Extended upward to show more of S1 and T1
+plt.axis('off')
+plt.tight_layout()
+
+plt.savefig("PES_extended.png", dpi=600, bbox_inches='tight')
+plt.show()
+```
