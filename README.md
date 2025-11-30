@@ -27787,3 +27787,50 @@ final = pd.DataFrame({
 # Save to CSV
 final.to_csv("adiabatic_energies_eV.csv", index=False)
 ```
+#
+```
+import numpy as np
+
+def print_and_save_csv_values(files, outfile):
+    all_data = []
+    mol_names = None
+
+    for file in files:
+        data = np.loadtxt(file, delimiter=',', dtype=str)
+        if mol_names is None:
+            mol_names = data[:, 0]  # first column = molecule names
+        numeric = data[:, 1:4].astype(float)
+        all_data.append(numeric)
+
+    header = []
+    for f in files:
+        name = f.replace(".csv", "")
+        header += [f"{name} S1", f"{name} T1", f"{name} STG"]
+
+    with open(outfile, "w") as f:
+        # Header row
+        f.write(" & ".join(["Molecule"] + header) + " \\\\\n")
+        f.write("\\hline\n")
+
+        # Each molecule row
+        n = len(mol_names)
+        for i in range(n):
+            row = [mol_names[i]]
+            for data in all_data:
+                row += [f"${data[i, j]:.3f}$" for j in range(3)]
+            f.write(" & ".join(row) + " \\\\\n")
+
+    print(f"✅ Table saved to {outfile}")
+
+def main():
+    files = [
+        "lcc2_avdz_b3lyp_geom.csv",
+        "lcc2_avdz_wB97xd_geom.csv",
+        "lcc2_avdz_mp2_geom.csv",
+        "LCC2_AVDZ_CCSDT_VTZ_geom.csv"
+    ]
+    print_and_save_csv_values(files, "values_table.txt")
+
+if __name__ == "__main__":
+    main()
+```
