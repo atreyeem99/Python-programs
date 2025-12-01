@@ -27834,3 +27834,42 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+#
+```
+import csv
+
+# Input files
+file1 = "S0_total_energies.csv"
+file2 = "s0_zpe_values.csv"
+output_file = "S0_total_plus_zpe.csv"
+
+# Read second file into a dictionary for quick lookup
+zpe_dict = {}
+with open(file2, "r") as f2:
+    reader = csv.reader(f2)
+    next(reader)  # skip header
+    for row in reader:
+        if len(row) >= 2:
+            zpe_dict[row[0].strip()] = float(row[1])
+
+# Read first file, add values, and maintain order
+result = []
+with open(file1, "r") as f1:
+    reader = csv.reader(f1)
+    header = next(reader)
+    for row in reader:
+        if len(row) >= 2:
+            folder = row[0].strip()
+            total_energy = float(row[1])
+            zpe_value = zpe_dict.get(folder, 0.0)
+            added_value = total_energy + zpe_value
+            result.append([folder, added_value])
+
+# Write output CSV
+with open(output_file, "w", newline="") as out:
+    writer = csv.writer(out)
+    writer.writerow(["Folder", "Total+ZPE"])
+    writer.writerows(result)
+
+print(f"Output written to {output_file}")
+```
