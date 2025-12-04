@@ -27930,3 +27930,32 @@ output.to_csv("subtracted_values.csv", index=False)
 
 print(output)
 ```
+#
+```
+import pandas as pd
+
+# Read CSVs with headers
+c00 = pd.read_csv("00_c.csv")
+v_dft = pd.read_csv("v_dft.csv")
+
+# Match rows by folder name (first column)
+merged = pd.merge(c00, v_dft, on=c00.columns[0], suffixes=("_c", "_v"))
+
+# Subtract columns: (00_c - v_dft) for both S1 and T1
+merged["S1_new"] = merged.iloc[:, 1] - merged.iloc[:, 3]
+merged["T1_new"] = merged.iloc[:, 2] - merged.iloc[:, 4]
+
+# Calculate S1 - T1
+merged["S1_minus_T1"] = merged["S1_new"] - merged["T1_new"]
+
+# Round to 5 decimal places
+merged = merged.round(5)
+
+# Select output columns
+output = merged[[merged.columns[0], "S1_new", "T1_new", "S1_minus_T1"]]
+
+# Save to new CSV
+output.to_csv("subtracted_values.csv", index=False)
+
+print(output)
+```
