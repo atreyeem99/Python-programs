@@ -28017,3 +28017,32 @@ output.to_csv("subtracted_values.csv", index=False)
 
 print(output)
 ```
+#
+```
+import pandas as pd
+
+# Read both CSVs (with headers)
+c00 = pd.read_csv("00_energies_eV_2.csv")
+v_dft = pd.read_csv("vertical_dft.csv")
+
+# Merge using the first column (folder names)
+merged = pd.merge(c00, v_dft, on=c00.columns[0])
+
+# Subtract 2nd & 3rd columns of v_dft from 2nd & 3rd of c00
+merged["S1_new"] = merged.iloc[:, 1] - merged.iloc[:, 3]
+merged["T1_new"] = merged.iloc[:, 2] - merged.iloc[:, 4]
+
+# Compute S1 - T1
+merged["S1_minus_T1"] = merged["S1_new"] - merged["T1_new"]
+
+# Round to 5 decimal places
+merged = merged.round(5)
+
+# Keep only folder name + results
+output = merged[[merged.columns[0], "S1_new", "T1_new", "S1_minus_T1"]]
+
+# Save to CSV
+output.to_csv("subtracted_values.csv", index=False)
+
+print(output)
+```
