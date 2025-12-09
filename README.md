@@ -28074,3 +28074,42 @@ out.to_csv("subtracted_values.csv", index=False)
 
 print(out)
 ```
+#
+```
+import os
+import shutil
+
+source_root = "/PATH/TO/SOURCE"          # <-- replace
+destination_root = "/PATH/TO/DESTINATION"  # <-- replace
+
+for set_folder in os.listdir(source_root):
+    set_path = os.path.join(source_root, set_folder)
+    if not os.path.isdir(set_path):
+        continue
+
+    # create set folder inside destination
+    dest_set_path = os.path.join(destination_root, set_folder)
+    os.makedirs(dest_set_path, exist_ok=True)
+
+    # now go inside molecule folders
+    for mol_folder in os.listdir(set_path):
+        mol_path = os.path.join(set_path, mol_folder)
+        if not os.path.isdir(mol_path):
+            continue
+
+        # create molecule folder inside destination
+        dest_mol_path = os.path.join(dest_set_path, mol_folder)
+        os.makedirs(dest_mol_path, exist_ok=True)
+
+        # copy geom_DFT_S0.xyz (if exists)
+        xyz_file = os.path.join(mol_path, "geom_DFT_S0.xyz")
+        if os.path.exists(xyz_file):
+            shutil.copy(xyz_file, os.path.join(dest_mol_path, "geom_DFT_S0.xyz"))
+
+        # copy tddft.com (if exists)
+        com_file = os.path.join(mol_path, "tddft.com")
+        if os.path.exists(com_file):
+            shutil.copy(com_file, os.path.join(dest_mol_path, "tddft.com"))
+
+print("Done.")
+```
