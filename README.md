@@ -28113,3 +28113,67 @@ for set_folder in os.listdir(source_root):
 
 print("Done.")
 ```
+#
+```
+import os
+import shutil
+
+# --- User paths (edit these if needed) ---
+root_dirs = ["C2v", "Cs"]    # The main symmetry folders
+target_parent = "LCC2_AVDZ"
+dest_parent = "LCC2_AVDZ_Fosc"
+negative_file = "negative_folders.txt"
+
+# --- Read the negative folder list ---
+with open(negative_file, "r") as f:
+    negative_folders = [line.strip() for line in f if line.strip()]
+
+# --- Replacement blocks ---
+old_block = """{lt-df-lcc2                     !ground state CC2
+eom,-6.1,triplet=1              !triplet
+eomprint,popul=-1,loceom=-1 }   !minimize the output"""
+
+new_block = """{lt-df-lcc2                     !ground state CC2
+eom,-6.1,triplet=1, tranes=-2.1,propes=-2.1               !triplet states and oscillator strength only for first excited state
+eomprint,popul=-1,loceom=-1 }   !minimize the output"""
+
+# --- Main process ---
+for sym in root_dirs:
+    parent_path = os.path.join(sym, target_parent)
+    dest_path = os.path.join(sym, dest_parent)
+
+    # Create destination parent folder if missing
+    os.makedirs(dest_path, exist_ok=True)
+
+    # Loop through folders inside negative_folders.txt
+    for folder in negative_folders:
+        src_folder = os.path.join(parent_path, folder)
+        if not os.path.isdir(src_folder):
+            print(f"Skipping {src_folder} (not found)")
+            continue
+
+        src_inp = os.path.join(src_folder, "inp.com")
+        if not os.path.isfile(src_inp):
+            print(f"No inp.com in {src_folder}")
+            continue
+
+        # Read inp.com
+        with open(src_inp, "r") as f:
+            text = f.read()
+
+        # Replace block
+        new_text = text.replace(old_block, new_block)
+
+        # Create new destination folder
+        new_folder = os.path.join(dest_path, folder)
+        os.makedirs(new_folder, exist_ok=True)
+
+        # Write new inp.com
+        dest_inp = os.path.join(new_folder, "inp.com")
+        with open(dest_inp, "w") as f:
+            f.write(new_text)
+
+        print(f"Created: {dest_inp}")
+
+print("Done.")
+```
