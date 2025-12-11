@@ -28177,3 +28177,19 @@ for sym in root_dirs:
 
 print("Done.")
 ```
+#
+```
+import pandas as pd
+
+df = pd.read_csv("input.csv")
+
+# Sort by STG (ascending → most negative to most positive)
+df_sorted = df.sort_values(by="STG", ascending=True)
+
+# Print with 3 decimal places (S1, T1, STG)
+pd.options.display.float_format = "{:.3f}".format
+print(df_sorted)
+
+# Save to a new CSV
+df_sorted.to_csv("sorted_by_STG.csv", index=False)
+```
