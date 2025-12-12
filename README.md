@@ -28193,3 +28193,25 @@ print(df_sorted)
 # Save to a new CSV
 df_sorted.to_csv("sorted_by_STG.csv", index=False)
 ```
+#
+```
+import csv
+
+input_file = "input.csv"
+output_file = "output.csv"
+
+with open(input_file, "r") as f_in, open(output_file, "w", newline="") as f_out:
+    reader = csv.reader(f_in)
+    writer = csv.writer(f_out)
+
+    header = next(reader)
+    header.append("AbsDiff_5_6")     # new column name
+    writer.writerow(header)
+
+    for row in reader:
+        c5 = float(row[4])
+        c6 = float(row[5])
+        diff = abs(c5 - c6)
+        row.append(f"{diff:.3f}")    # round to 3 decimals
+        writer.writerow(row)
+```
