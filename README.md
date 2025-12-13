@@ -28215,3 +28215,86 @@ with open(input_file, "r") as f_in, open(output_file, "w", newline="") as f_out:
         row.append(f"{diff:.3f}")    # round to 3 decimals
         writer.writerow(row)
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Sharp display in Jupyter
+%config InlineBackend.figure_format = 'retina'
+
+# Font and DPI
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['savefig.dpi'] = 300
+
+# Read CSVs (no header)
+ref  = pd.read_csv("CC2_AVTZ_corr_errata.csv", header=None)
+avdz = pd.read_csv("LCC2_AVDZ.csv", header=None)
+avtz = pd.read_csv("LCC2_AVTZ.csv", header=None)
+
+# ---------------- Panel (a): S1 & T1 ----------------
+x2 = ref.iloc[:, 0]
+x3 = ref.iloc[:, 1]
+
+y2_avdz = avdz.iloc[:, 0]
+y3_avdz = avdz.iloc[:, 1]
+y2_avtz = avtz.iloc[:, 0]
+y3_avtz = avtz.iloc[:, 1]
+
+all_vals_1 = pd.concat([x2, x3, y2_avdz, y3_avdz, y2_avtz, y3_avtz])
+pad1 = 0.05 * (all_vals_1.max() - all_vals_1.min())
+vmin1 = all_vals_1.min() - pad1
+vmax1 = all_vals_1.max() + pad1
+
+# ---------------- Panel (b): STG ----------------
+x_stg = ref.iloc[:, 2]
+y_stg_avdz = avdz.iloc[:, 2]
+y_stg_avtz = avtz.iloc[:, 2]
+
+all_vals_2 = pd.concat([x_stg, y_stg_avdz, y_stg_avtz])
+pad2 = 0.05 * (all_vals_2.max() - all_vals_2.min())
+vmin2 = all_vals_2.min() - pad2
+vmax2 = all_vals_2.max() + pad2
+
+# ---------------- Figure ----------------
+fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+
+# ===== Left panel =====
+ax = axes[0]
+ax.scatter(x2, y2_avdz, s=45, label="S$_1$ (L-CC2/aug-cc-pVDZ)", alpha=0.8)
+ax.scatter(x3, y3_avdz, s=45, label="T$_1$ (L-CC2/aug-cc-pVDZ)", alpha=0.8)
+ax.scatter(x2, y2_avtz, s=45, label="S$_1$ (L-CC2/aug-cc-pVTZ)", alpha=0.8)
+ax.scatter(x3, y3_avtz, s=45, label="T$_1$ (L-CC2/aug-cc-pVTZ)", alpha=0.8)
+
+ax.plot([vmin1, vmax1], [vmin1, vmax1], '--', color='black', linewidth=1.5)
+
+ax.set_xlabel("CC2/aug-cc-pVTZ (reference)", fontsize=14)
+ax.set_ylabel("L-CC2", fontsize=14)
+ax.set_xlim(vmin1, vmax1)
+ax.set_ylim(vmin1, vmax1)
+ax.set_aspect('equal', adjustable='box')
+ax.tick_params(labelsize=12)
+ax.legend(frameon=False, fontsize=9)
+ax.text(0.05, 0.95, "(a)", transform=ax.transAxes, fontsize=14, va='top')
+
+# ===== Right panel =====
+ax = axes[1]
+ax.scatter(x_stg, y_stg_avdz, s=55, label="STG (L-CC2/aug-cc-pVDZ)", alpha=0.9)
+ax.scatter(x_stg, y_stg_avtz, s=55, label="STG (L-CC2/aug-cc-pVTZ)", alpha=0.9)
+
+ax.plot([vmin2, vmax2], [vmin2, vmax2], '--', color='black', linewidth=1.5)
+
+ax.set_xlabel("CC2/aug-cc-pVTZ (reference)", fontsize=14)
+ax.set_ylabel("L-CC2", fontsize=14)
+ax.set_xlim(vmin2, vmax2)
+ax.set_ylim(vmin2, vmax2)
+ax.set_aspect('equal', adjustable='box')
+ax.tick_params(labelsize=12)
+ax.legend(frameon=False, fontsize=9)
+ax.text(0.05, 0.95, "(b)", transform=ax.transAxes, fontsize=14, va='top')
+
+plt.tight_layout()
+plt.savefig("scatter_2panel.pdf")
+plt.show()
+```
