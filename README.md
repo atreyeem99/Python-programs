@@ -28298,3 +28298,28 @@ plt.tight_layout()
 plt.savefig("scatter_2panel.pdf")
 plt.show()
 ```
+#
+```
+from PyPDF2 import PdfReader, PdfWriter
+
+r1 = PdfReader("plot1.pdf")
+r2 = PdfReader("plot2.pdf")
+
+p1 = r1.pages[0]
+p2 = r2.pages[0]
+
+w1, h1 = p1.mediabox.width, p1.mediabox.height
+w2, h2 = p2.mediabox.width, p2.mediabox.height
+
+writer = PdfWriter()
+page = writer.add_blank_page(
+    width=w1 + w2,
+    height=max(h1, h2)
+)
+
+page.merge_page(p1)
+page.merge_translated_page(p2, tx=w1, ty=0)
+
+with open("figure_2panel.pdf", "wb") as f:
+    writer.write(f)
+```
