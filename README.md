@@ -28323,3 +28323,28 @@ page.merge_translated_page(p2, tx=w1, ty=0)
 with open("figure_2panel.pdf", "wb") as f:
     writer.write(f)
 ```
+#
+```
+import numpy as np
+
+# load CSV (no header)
+data = np.loadtxt("check.csv", delimiter=",")
+
+# copy data
+new_data = data.copy()
+
+# constants
+ref = -565.523945864958
+Eh_to_eV = 27.2114
+
+# operate on 2nd column
+new_data[:, 1] = (data[:, 1] - ref) * Eh_to_eV
+
+# save new CSV
+np.savetxt(
+    "check_shifted_eV.csv",
+    new_data,
+    delimiter=",",
+    fmt="%.8f"
+)
+```
