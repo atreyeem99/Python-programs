@@ -28380,3 +28380,22 @@ with open(out_file, "w") as out:
 
 print("Merged XYZ written to all_molecules.xyz")
 ```
+#
+```
+import csv
+
+# names present in negative_sorted.csv
+present = set()
+with open("negative_sorted.csv", newline="") as f:
+    for row in csv.reader(f):
+        present.add(row[0])
+
+# read a.csv and print rows:
+#  - value in 4th column is negative
+#  - name NOT in negative_sorted.csv
+with open("a.csv", newline="") as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if float(row[3]) < 0 and row[0] not in present:
+            print(",".join(row))
+```
