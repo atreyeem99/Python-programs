@@ -28399,3 +28399,59 @@ with open("a.csv", newline="") as f:
         if float(row[3]) < 0 and row[0] not in present:
             print(",".join(row))
 ```
+#
+```
+import os
+import csv
+import re
+
+ENERGY_PATTERN = re.compile(r"FINAL SINGLE POINT ENERGY\s+(-?\d+\.\d+)")
+
+def extract_energies(base_dir, output_csv):
+    rows = []
+
+    for method_type in sorted(os.listdir(base_dir)):
+        method_type_path = os.path.join(base_dir, method_type)
+        if not os.path.isdir(method_type_path):
+            continue
+
+        for method in sorted(os.listdir(method_type_path)):
+            if not method.startswith("Method_"):
+                continue
+
+            method_path = os.path.join(method_type_path, method)
+
+            for molecule in sorted(os.listdir(method_path)):
+                mol_path = os.path.join(method_path, molecule)
+                sp_out = os.path.join(mol_path, "sp.out")
+
+                if not os.path.isfile(sp_out):
+                    continue
+
+                energy = None
+                with open(sp_out, "r") as f:
+                    for line in f:
+                        match = ENERGY_PATTERN.search(line)
+                        if match:
+                            energy = float(match.group(1))  # keep last match
+
+                if energy is not None:
+                    rows.append([method_type, method, molecule, energy])
+
+    with open(output_csv, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["MethodType", "Method", "Molecule", "Energy"])
+        writer.writerows(rows)
+
+
+# -------- run for both folders --------
+extract_energies(
+    "AP13_ex_SP_high_sym",
+    "AP13_ex_SP_high_sym_energies.csv"
+)
+
+extract_energies(
+    "AP13_ex_SP_low_sym",
+    "AP13_ex_SP_low_sym_energies.csv"
+)
+```
