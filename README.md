@@ -28455,3 +28455,38 @@ extract_energies(
     "AP13_ex_SP_low_sym_energies.csv"
 )
 ```
+#
+```
+import os
+
+sym_folders = ["C2v", "C3h", "D3h", "Cs"]
+
+with open("subfolders.txt") as f:
+    molecules = [line.strip() for line in f if line.strip()]
+
+out_file = "all_molecules.xyz"
+
+with open(out_file, "w") as out:
+    for sym in sym_folders:
+        for mol in molecules:
+            xyz_path = os.path.join(sym, "extrapolate", mol, "test.xyz")
+
+            if not os.path.isfile(xyz_path):
+                continue
+
+            with open(xyz_path") as xyz:
+                lines = xyz.readlines()
+
+            # first line: number of atoms
+            natoms = lines[0].strip()
+
+            # coordinates start from line 3
+            coords = lines[2:]
+
+            out.write(f"{natoms}\n")
+            out.write(f"{mol}\n")   # molecule name as comment line
+            for line in coords:
+                out.write(line)
+
+print("Merged XYZ written to all_molecules.xyz")
+```
