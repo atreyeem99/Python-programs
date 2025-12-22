@@ -28567,3 +28567,22 @@ for root, dirs, files in os.walk("."):
             except:
                 pass  # skips binary/unreadable files
 ```
+#
+```
+import os
+
+for root, dirs, files in os.walk("."):
+    # check if any parent directory ends with _2021
+    if any(part.endswith("_2021") for part in root.split(os.sep)):
+        for fname in files:
+            path = os.path.join(root, fname)
+            try:
+                with open(path, "r") as f:
+                    content = f.read()
+                if "_2021" in content:
+                    content = content.replace("_2021", "/2021")
+                    with open(path, "w") as f:
+                        f.write(content)
+            except:
+                pass  # skips binary/unreadable files
+```
