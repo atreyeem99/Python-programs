@@ -28586,3 +28586,61 @@ for root, dirs, files in os.walk("."):
             except:
                 pass  # skips binary/unreadable files
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+
+def read_csv(fname):
+    with open(fname) as f:
+        return {row[0]: float(row[3]) for row in csv.reader(f)}
+
+# Read data
+a = read_csv("a.csv")
+b = read_csv("b.csv")
+c = read_csv("c.csv")
+
+# Align by common names
+names = [n for n in a if n in b and n in c]
+
+xa = [a[n] for n in names]
+yb = [b[n] for n in names]
+yc = [c[n] for n in names]
+
+# Global style
+plt.rcParams.update({
+    "font.family": "Arial",
+    "font.size": 12,
+    "axes.linewidth": 1.2,
+})
+
+fig, ax = plt.subplots(figsize=(6, 6))
+
+# Scatter
+ax.scatter(xa, yb, s=45, alpha=0.8, label="b.csv")
+ax.scatter(xa, yc, s=45, alpha=0.8, label="c.csv")
+
+# y = x line
+minv = min(xa + yb + yc)
+maxv = max(xa + yb + yc)
+ax.plot([minv, maxv], [minv, maxv], linestyle="--", linewidth=1)
+
+# Labels
+ax.set_xlabel("a.csv (4th column)")
+ax.set_ylabel("b.csv / c.csv (4th column)")
+
+# Square plot
+ax.set_aspect("equal", adjustable="box")
+ax.set_xlim(minv, maxv)
+ax.set_ylim(minv, maxv)
+
+# Legend & ticks
+ax.legend(frameon=False)
+ax.tick_params(direction="in", length=6, width=1)
+
+plt.tight_layout()
+
+# Save as PDF
+plt.savefig("scatter_comparison.pdf")
+plt.close()
+```
