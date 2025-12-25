@@ -28663,3 +28663,30 @@ for root, dirs, files in os.walk("."):
             except:
                 pass  # skips binary/unreadable files
 ```
+#
+```
+import csv
+
+input_csv = "input.csv"
+output_txt = "sorted_by_MAE_S1T1.txt"
+
+with open(input_csv, newline="") as f:
+    reader = csv.DictReader(f)
+    rows = [r for r in reader if r["MAE_S1T1"].strip() != ""]
+    rows.sort(key=lambda x: float(x["MAE_S1T1"].strip()))
+    headers = reader.fieldnames
+
+# compute max width of each column
+widths = {}
+for h in headers:
+    widths[h] = max(len(h), max(len(r[h].strip()) for r in rows))
+
+with open(output_txt, "w") as f:
+    # header
+    f.write("  ".join(h.ljust(widths[h]) for h in headers) + "\n")
+    f.write("  ".join("-" * widths[h] for h in headers) + "\n")
+
+    # rows
+    for r in rows:
+        f.write("  ".join(r[h].strip().ljust(widths[h]) for h in headers) + "\n")
+```
