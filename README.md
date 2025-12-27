@@ -28717,3 +28717,46 @@ with open(output_txt, "w") as f:
     for r in rows:
         f.write("  ".join(r[h].strip().ljust(widths[h]) for h in headers) + "\n")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import glob
+
+hartree2kcalmol = 627.509
+
+def plot_all_csvs(bold_csvs, pattern="*.csv"):
+    plt.figure()
+
+    for csv_file in glob.glob(pattern):
+        df = pd.read_csv(csv_file)
+
+        x = df.iloc[:, 0].astype(float).to_numpy()      # DNC
+        energy = df.iloc[:, 1].astype(float).to_numpy()
+        energy = (energy - np.min(energy)) * hartree2kcalmol
+
+        if csv_file in bold_csvs:
+            plt.plot(x, energy, linewidth=2.5, linestyle='-',
+                     label=csv_file)
+        else:
+            plt.plot(x, energy, linewidth=1.5, linestyle=':',
+                     label=csv_file)
+
+    plt.xlabel("DNC")
+    plt.ylabel("E [kcal/mol]")
+    plt.title("Scan plot of energies")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("Scan_energy_all.pdf")
+    plt.show()
+
+
+# ---- USAGE ----
+bold_csvs = [
+    "file1.csv",
+    "file2.csv"
+]
+
+plot_all_csvs(bold_csvs)
+```
