@@ -28803,3 +28803,21 @@ bold_csvs = [
 
 plot_all_csvs(bold_csvs)
 ```
+#
+```
+ax.scatter(xa, yb, s=55, marker='o',
+           facecolors='none', edgecolors='tab:blue',
+           linewidths=1.2, label="b.csv")
+
+ax.scatter(xa, yc, s=55, marker='s',
+           facecolors='none', edgecolors='tab:orange',
+           linewidths=1.2, label="c.csv")
+
+ax.scatter(xa, yd, s=65, marker='*',
+           color='tab:green',
+           linewidths=1.0, label="d.csv")
+
+ax.scatter(xa, ye, s=55, marker='^',
+           facecolors='none', edgecolors='tab:red',
+           linewidths=1.2, label="e.csv")
+```
