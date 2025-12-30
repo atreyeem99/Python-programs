@@ -28821,3 +28821,35 @@ ax.scatter(xa, ye, s=55, marker='^',
            facecolors='none', edgecolors='tab:red',
            linewidths=1.2, label="e.csv")
 ```
+#
+```
+import csv
+import matplotlib.pyplot as plt
+
+def read_csv(fname):
+    with open(fname) as f:
+        return {row[0]: float(row[3]) for row in csv.reader(f)}
+
+a = read_csv("a.csv")
+b = read_csv("b.csv")
+c = read_csv("c.csv")
+
+# common names only
+names = [n for n in a if n in b and n in c]
+
+xa = [a[n] for n in names]
+yb = [b[n] for n in names]
+yc = [c[n] for n in names]
+
+plt.figure(figsize=(6,6))
+plt.scatter(xa, yb, label="b.csv")
+plt.scatter(xa, yc, label="c.csv")
+
+minv = min(xa + yb + yc)
+maxv = max(xa + yb + yc)
+plt.plot([minv, maxv], [minv, maxv])
+
+plt.axis("equal")
+plt.legend()
+plt.show()
+```
