@@ -28853,3 +28853,21 @@ plt.axis("equal")
 plt.legend()
 plt.show()
 ```
+#
+```
+import os
+import shutil
+
+src_root = "B3LYP"
+dst_root = "sym_B3LYP"
+
+os.makedirs(dst_root, exist_ok=True)
+
+for sub in os.listdir(src_root):
+    sub_path = os.path.join(src_root, sub)
+    if os.path.isdir(sub_path):
+        src_xyz = os.path.join(sub_path, "geom_DFT_S0.xyz")
+        if os.path.isfile(src_xyz):
+            dst_xyz = os.path.join(dst_root, f"{sub}.xyz")
+            shutil.copy(src_xyz, dst_xyz)
+```
