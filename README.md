@@ -28871,3 +28871,21 @@ for sub in os.listdir(src_root):
             dst_xyz = os.path.join(dst_root, f"{sub}.xyz")
             shutil.copy(src_xyz, dst_xyz)
 ```
+#
+```
+import csv
+
+input_file = "input.csv"
+output_file = "output.csv"
+
+with open(input_file, newline='') as fin, open(output_file, "w", newline='') as fout:
+    reader = csv.reader(fin)
+    writer = csv.writer(fout)
+
+    header = next(reader)
+    writer.writerow(header)
+
+    for row in reader:
+        row[3] = f"{float(row[3]):.3f}"
+        writer.writerow(row)
+```
