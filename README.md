@@ -28889,3 +28889,31 @@ with open(input_file, newline='') as fin, open(output_file, "w", newline='') as 
         row[3] = f"{float(row[3]):.3f}"
         writer.writerow(row)
 ```
+#
+```
+import os
+
+# Directory containing all your folders
+base_dir = "."
+
+folders_with_C3V = []
+
+# Walk through all subdirectories
+for root, dirs, files in os.walk(base_dir):
+    if "symm.log" in files:
+        filepath = os.path.join(root, "symm.log")
+        with open(filepath, "r") as f:
+            for line in f:
+                if "Full point group" in line:
+                    parts = line.split()
+                    if len(parts) >= 4 and parts[3] == "C3V":
+                        folders_with_C3V.append(root)
+                    break  # stop reading after finding the line
+
+# Print results
+print("Folders with point group C3V:")
+for folder in folders_with_C3V:
+    print(folder)
+
+print(f"\nTotal molecules with C3V: {len(folders_with_C3V)}")
+```
