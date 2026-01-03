@@ -28917,3 +28917,40 @@ for folder in folders_with_C3V:
 
 print(f"\nTotal molecules with C3V: {len(folders_with_C3V)}")
 ```
+#
+```
+def extract_geometry(dnc_value):
+    found_dnc = False
+
+    for i, line in enumerate(lines):
+        parts = line.split()
+
+        # detect DNC line
+        if len(parts) >= 4 and parts[1] == dnc_value:
+            found_dnc = True
+            continue
+
+        # if next DNC appears → stop
+        if found_dnc and len(parts) >= 4:
+            try:
+                float(parts[1])
+                return None
+            except ValueError:
+                pass
+
+        # grab first CARTESIAN block AFTER this DNC
+        if found_dnc and "CARTESIAN COORDINATES" in line:
+            geom = []
+            k = i + 2
+            while k < len(lines):
+                linek = lines[k].strip()
+                if not linek:
+                    break
+                fields = linek.split()
+                if len(fields) == 4:
+                    geom.append(fields)
+                k += 1
+            return geom
+
+    return None
+```
