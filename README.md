@@ -28954,3 +28954,35 @@ def extract_geometry(dnc_value):
 
     return None
 ```
+#
+```
+import os
+from collections import Counter
+
+# Change this to the directory containing your folders
+base_dir = "."
+
+point_groups = []
+
+# Walk through all subdirectories
+for root, dirs, files in os.walk(base_dir):
+    if "symm.log" in files:
+        filepath = os.path.join(root, "symm.log")
+        with open(filepath, "r") as f:
+            for line in f:
+                if "Full point group" in line:
+                    # Example line: Full point group                 CS      NOp   2
+                    parts = line.split()
+                    if len(parts) >= 4:
+                        point_group = parts[3]  # CS in the example
+                        point_groups.append(point_group)
+                    break  # stop reading the file after finding the line
+
+# Count occurrences of each point group
+counts = Counter(point_groups)
+
+# Print results
+print("Point group counts:")
+for pg, count in counts.items():
+    print(f"{pg}: {count}")
+```
