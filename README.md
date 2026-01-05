@@ -28986,3 +28986,29 @@ print("Point group counts:")
 for pg, count in counts.items():
     print(f"{pg}: {count}")
 ```
+#
+```
+import os
+import bz2
+
+results = []
+
+for d in sorted(os.listdir(".")):
+    if d.startswith("dnc") and os.path.isdir(d):
+        path = os.path.join(d, "tda.out.bz2")
+        if not os.path.isfile(path):
+            continue
+
+        last_energy = None
+        with bz2.open(path, "rt", encoding="latin-1", errors="ignore") as f:
+            for line in f:
+                if "FINAL SINGLE POINT ENERGY" in line:
+                    last_energy = float(line.split()[-1])
+
+        if last_energy is not None:
+            results.append((d, last_energy))
+
+# print
+for d, e in results:
+    print(f"{d:20s} {e: .12f}")
+```
