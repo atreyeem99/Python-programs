@@ -29030,3 +29030,66 @@ missing = (b | c) - a
 for mol in sorted(missing):
     print(mol)
 ```
+#
+```
+import csv
+
+neg_file = "negative_folders.txt"
+csv_files = ["a.csv", "b.csv", "c.csv", "d.csv"]
+labels = ["A", "B", "C", "D"]
+
+# read target molecule names
+with open(neg_file) as f:
+    targets = [line.strip() for line in f if line.strip()]
+
+def read_csv(fname):
+    data = {}
+    with open(fname) as f:
+        reader = csv.reader(f)
+        for row in reader:   # no header
+            data[row[0].strip()] = row
+    return data
+
+csv_data = [read_csv(f) for f in csv_files]
+
+# LaTeX table
+print(r"\begin{table}[h]")
+print(r"\centering")
+print(r"\begin{tabular}{l" + "ccc" * 4 + "}")
+print(r"\hline")
+
+print(
+    "Molecule " +
+    " ".join([f"& \\multicolumn{{3}}{{c}}{{{lab}}} " for lab in labels]) +
+    r"\\"
+)
+print(
+    " " +
+    " ".join(["& S1 & T1 & STG " for _ in labels]) +
+    r"\\"
+)
+print(r"\hline")
+
+for name in targets:
+    if not all(name in d for d in csv_data):
+        continue
+
+    # replace _ with ,
+    latex_name = name.replace("_", ",")
+
+    row = [latex_name]
+
+    for i, d in enumerate(csv_data):
+        r = d[name]
+        row.extend([f"${r[1]}$", f"${r[2]}$", f"${r[3]}$"])
+
+        # add extra & between CSV blocks
+        if i != len(csv_data) - 1:
+            row.append("")  # creates &&
+
+    print(" & ".join(row) + r" \\")
+
+print(r"\hline")
+print(r"\end{tabular}")
+print(r"\end{table}")
+```
