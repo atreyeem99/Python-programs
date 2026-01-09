@@ -29093,3 +29093,67 @@ print(r"\hline")
 print(r"\end{tabular}")
 print(r"\end{table}")
 ```
+#
+```
+import os
+
+# Define the paths
+extrapolate_folder = './Aabc'
+output_folder = './aaa'
+top46_file = 'top46.txt'
+
+# Read allowed folder names
+with open(top46_file, 'r') as f:
+    allowed_folders = {line.strip() for line in f if line.strip()}
+
+# Create the output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
+
+# Loop through each folder inside extrapolate
+for folder_name in os.listdir(extrapolate_folder):
+    if folder_name not in allowed_folders:
+        continue
+
+    folder_path = os.path.join(extrapolate_folder, folder_name)
+
+    if os.path.isdir(folder_path):
+        xyz_file = os.path.join(folder_path, 'geom_DFT_S0.xyz')
+
+        with open(xyz_file, 'r') as xyz:
+            lines = xyz.readlines()[2:]
+
+        input_template = '''memory,8,g
+charge=0
+
+gdirect
+symmetry,nosym;orient,noorient
+
+geometry={
+'''
+        input_template += ''.join(lines)
+        input_template += '''}
+
+basis={
+default,avdz
+set,mp2fit
+default,avdz/mp2fit
+set,jkfit
+default,avdz/jkfit }
+
+df-hf
+
+{lt-df-lcc2
+eom,-6.1,triplet=1, tranes=-2.1,propes=-2.1
+eomprint,popul=-1,loceom=-1 }
+
+'''
+
+        new_folder = os.path.join(output_folder, folder_name)
+        os.makedirs(new_folder, exist_ok=True)
+
+        input_file = os.path.join(new_folder, 'inp.com')
+        with open(input_file, 'w') as file:
+            file.write(input_template)
+
+print("Files created successfully!")
+```
