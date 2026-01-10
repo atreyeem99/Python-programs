@@ -29157,3 +29157,83 @@ eomprint,popul=-1,loceom=-1 }
 
 print("Files created successfully!")
 ```
+#
+```
+import csv
+import numpy as np
+import os
+
+
+def load_csv(path):
+    data = {}
+    with open(path, "r") as f:
+        reader = csv.reader(f)
+        header = next(reader)  # Molecule,S1S0,T1S0,S1T1
+        for row in reader:
+            name = row[0]
+            values = np.array([float(v) for v in row[1:]], dtype=float)
+            data[name] = values
+    return data
+
+
+def calculate_stats(ref, method):
+    errors = []
+    errors_all = []
+
+    for mol in ref:
+        if mol in method:
+            diff = method[mol] - ref[mol]   # [ΔS1, ΔT1, ΔSTG]
+            errors.append(diff)
+
+            diff_all = np.sum(method[mol]) - np.sum(ref[mol])
+            errors_all.append(diff_all)
+
+    errors = np.array(errors)
+    errors_all = np.array(errors_all)
+
+    # Individual statistics
+    mae = np.mean(np.abs(errors), axis=0)
+    sde = np.std(errors, axis=0)
+
+    # ALL = sum first, then MAE/SDE
+    mae_all = np.mean(np.abs(errors_all))
+    sde_all = np.std(errors_all)
+
+    return mae, sde, mae_all, sde_all
+
+
+def compare_all(reference_csv, csv_folder):
+
+    reference = load_csv(reference_csv)
+
+    print(
+        "Method,"
+        "MAE_S1S0,MAE_T1S0,MAE_S1T1,MAE_ALL,"
+        "SDE_S1S0,SDE_T1S0,SDE_S1T1,SDE_ALL"
+    )
+
+    for file in os.listdir(csv_folder):
+        if file.startswith("Method_") and file.endswith(".csv"):
+            method_path = os.path.join(csv_folder, file)
+            method_data = load_csv(method_path)
+
+            mae, sde, mae_all, sde_all = calculate_stats(reference, method_data)
+
+            formatted = (
+                [file]
+                + [f"{x:.3f}" for x in mae]
+                + [f"{mae_all:.3f}"]
+                + [f"{x:.3f}" for x in sde]
+                + [f"{sde_all:.3f}"]
+            )
+
+            print(",".join(formatted))
+
+
+# ---------------- HOW TO RUN ----------------
+
+reference_csv = "/home/atreyee/P/all_csv_files/H.csv"
+csv_folder = "/home/atreyee/P/all_csv_files"
+
+compare_all(reference_csv, csv_folder)
+```
