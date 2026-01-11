@@ -29237,3 +29237,21 @@ csv_folder = "/home/atreyee/P/all_csv_files"
 
 compare_all(reference_csv, csv_folder)
 ```
+#
+```
+import csv
+
+def read_first_column(filename):
+    with open(filename) as f:
+        reader = csv.reader(f)
+        return {row[0].strip() for row in reader if row}
+
+a = read_first_column("a.csv")
+b = read_first_column("b.csv")
+c = read_first_column("c.csv")
+
+missing = (b | c) - a
+
+for mol in sorted(missing):
+    print(mol)
+```
