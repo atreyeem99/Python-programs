@@ -29396,3 +29396,68 @@ for mol in molecules:
 
     print(f"Copied files for {mol}")
 ```
+#
+```
+import os
+
+xyz_file = "AP13_obabel_hs.xyz"
+
+gaussian_header = """%mem=64GB
+%nprocs=18
+#P wB97XD/Def2TZVP SCF(maxcycles=100,verytight) Opt(maxcyc=1000,calcall,verytight) Freq
+
+Test
+
+0 1
+"""
+
+with open(xyz_file, "r") as f:
+    lines = [line.rstrip() for line in f]
+
+i = 0
+n = len(lines)
+
+while i < n:
+    line = lines[i].strip()
+
+    # skip empty lines
+    if not line:
+        i += 1
+        continue
+
+    # skip atom-count lines (e.g. 21, 22)
+    if line.isdigit():
+        i += 1
+        continue
+
+    # molecule name
+    name = line
+    i += 1
+
+    coords = []
+    while i < n:
+        curr = lines[i].strip()
+
+        if not curr:
+            i += 1
+            continue
+
+        # stop at next molecule (atom count)
+        if curr.isdigit():
+            break
+
+        parts = curr.split()
+        if len(parts) == 4:
+            coords.append(curr)
+            i += 1
+        else:
+            break
+
+    # create folder and write opt.com
+    os.makedirs(name, exist_ok=True)
+    with open(os.path.join(name, "opt.com"), "w") as f:
+        f.write(gaussian_header)
+        for c in coords:
+            f.write(c + "\n")
+        f.write("\n\n\n")   # required empty lines for Gaussian
+```
