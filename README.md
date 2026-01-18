@@ -29527,3 +29527,54 @@ while i < n:
             f.write(c + "\n")
         f.write("\n\n\n")   # Gaussian-required blank lines
 ```
+#
+```
+import os
+
+xyz_file = "AP13_obabel_hs.xyz"
+
+gaussian_header = """%mem=64GB
+%nprocs=18
+#P wB97XD/Def2TZVP SCF(maxcycles=100,verytight) Opt(maxcyc=1000,calcall,verytight) Freq
+
+Test
+
+0 1
+"""
+
+with open(xyz_file, "r") as f:
+    lines = [line.rstrip() for line in f if line.strip()]
+
+molecules = []
+i = 0
+n = len(lines)
+
+while i < n:
+    name = lines[i]
+    i += 1
+
+    coords = []
+    while i < n:
+        parts = lines[i].split()
+        # stop if next molecule starts (number or name)
+        if len(parts) == 1 and parts[0].isdigit():
+            i += 1
+            break
+        if len(parts) == 4:
+            coords.append(lines[i])
+            i += 1
+        else:
+            break
+
+    molecules.append((name, coords))
+
+for name, coords in molecules:
+    os.makedirs(name, exist_ok=True)
+
+    opt_path = os.path.join(name, "opt.com")
+    with open(opt_path, "w") as f:
+        f.write(gaussian_header)
+        for line in coords:
+            f.write(line + "\n")
+        f.write("\n")
+```
