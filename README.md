@@ -29578,3 +29578,39 @@ for name, coords in molecules:
             f.write(line + "\n")
         f.write("\n")
 ```
+#
+```
+import os
+import shutil
+
+base_dir = os.getcwd()
+frequency_dir = os.path.join(base_dir, "frequency")
+imag_file = os.path.join(base_dir, "imag.txt")
+
+template_freq = os.path.join(frequency_dir, "freq.com")
+
+# Read molecule names
+with open(imag_file, "r") as f:
+    molecules = [line.strip() for line in f if line.strip()]
+
+for mol in molecules:
+    mol_dir = os.path.join(base_dir, mol)
+    if not os.path.isdir(mol_dir):
+        continue
+
+    geom_src = os.path.join(mol_dir, "geom.xyz")
+    if not os.path.exists(geom_src):
+        continue
+
+    # Create frequency/mol folder
+    freq_mol_dir = os.path.join(frequency_dir, mol)
+    os.makedirs(freq_mol_dir, exist_ok=True)
+
+    # Copy geom.xyz
+    shutil.copy2(geom_src, os.path.join(freq_mol_dir, "geom.xyz"))
+
+    # Copy freq.com template
+    shutil.copy2(template_freq, os.path.join(freq_mol_dir, "freq.com"))
+
+    print(f"Copied files for {mol}")
+```
