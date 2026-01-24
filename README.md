@@ -29762,3 +29762,15 @@ plt.show()
 #
 '''
 '''
+#
+```
+%geom
+  Calc_Hess true
+  Recalc_Hess 5
+  MaxIter 50
+end
+
+%method
+  RangeSepMu 0.33
+end
+```
