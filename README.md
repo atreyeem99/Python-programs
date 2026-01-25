@@ -29774,3 +29774,23 @@ end
   RangeSepMu 0.33
 end
 ```
+#
+```
+for dnc in dnc*; do
+  [ -d "$dnc" ] || continue
+  echo "Entering $dnc"
+  cd "$dnc" || exit
+
+  for conf in conf_*; do
+    [ -d "$conf" ] || continue
+    echo "  Running in $dnc/$conf"
+    cd "$conf" || exit
+
+    runorca "${dnc}_${conf}_tda" qb 16 tda.com min 6.0.0
+
+    cd ..
+  done
+
+  cd ..
+done
+```
