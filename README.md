@@ -30044,3 +30044,42 @@ for folder in os.listdir(src_base):
     # Copy tddft.com
     shutil.copy(tddft_template, os.path.join(dst_folder, "tddft.com"))
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+import numpy as np
+
+def read_stg(filename):
+    try:
+        df = pd.read_csv(filename)
+        stg = df.iloc[:, 3]
+    except:
+        df = pd.read_csv(filename, header=None)
+        stg = df.iloc[:, 3]
+    return stg.dropna().values
+
+def kde_plot(data, title):
+    kde = gaussian_kde(data)
+    x = np.linspace(min(data), max(data), 500)
+    y = kde(x)
+
+    plt.figure()
+    plt.plot(x, y)
+    plt.xlabel("STG")
+    plt.ylabel("Density")
+    plt.title(title)
+    plt.tight_layout()
+    plt.show()
+
+# Read data
+stg_dimer = read_stg("dimer.csv")
+stg_trimer = read_stg("trimer.csv")
+stg_tetramer = read_stg("tetramer.csv")
+
+# KDE plots
+kde_plot(stg_dimer, "STG KDE – Dimer")
+kde_plot(stg_trimer, "STG KDE – Trimer")
+kde_plot(stg_tetramer, "STG KDE – Tetramer")
+```
