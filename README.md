@@ -30083,3 +30083,35 @@ kde_plot(stg_dimer, "STG KDE – Dimer")
 kde_plot(stg_trimer, "STG KDE – Trimer")
 kde_plot(stg_tetramer, "STG KDE – Tetramer")
 ```
+#
+```
+import os
+import shutil
+
+# Base directories
+src_base = "g16_wB97XD_opt_freq"
+dst_base = "wB97XD_g16_SCS-PBE-QIDH"
+
+# Template file
+tddft_template = os.path.join(dst_base, "tddft.com")
+
+# Loop through source subfolders
+for folder in os.listdir(src_base):
+    src_folder = os.path.join(src_base, folder)
+    if not os.path.isdir(src_folder):
+        continue
+
+    xyz_src = os.path.join(src_folder, "geom_DFT_S0.xyz")
+    if not os.path.exists(xyz_src):
+        continue
+
+    # Create destination subfolder
+    dst_folder = os.path.join(dst_base, folder)
+    os.makedirs(dst_folder, exist_ok=True)
+
+    # Copy xyz file
+    shutil.copy(xyz_src, os.path.join(dst_folder, "geom_DFT_S0.xyz"))
+
+    # Copy tddft.com
+    shutil.copy(tddft_template, os.path.join(dst_folder, "tddft.com"))
+```
