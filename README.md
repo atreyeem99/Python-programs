@@ -30115,3 +30115,82 @@ for folder in os.listdir(src_base):
     # Copy tddft.com
     shutil.copy(tddft_template, os.path.join(dst_folder, "tddft.com"))
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV (no header)
+df = pd.read_csv("nu_energies.csv", header=None)
+df.columns = ["Nu_folder", "S1", "T1", "STG", "osc"]
+
+# Extract nu
+df["Nu"] = df["Nu_folder"].str.replace("Nu_", "", regex=False).astype(float)
+df = df.sort_values("Nu")
+
+highlight_nu = [0.01, 0.33, 0.99]
+
+# Global style tweaks
+plt.rcParams.update({
+    "font.size": 11,
+    "axes.linewidth": 1.2,
+    "xtick.direction": "in",
+    "ytick.direction": "in",
+})
+
+fig, ax = plt.subplots(figsize=(7.2, 4.8))
+
+# Dotted background trends
+ax.plot(
+    df["Nu"], df["S1"],
+    linestyle=":",
+    linewidth=2.2,
+    color="darkgreen",
+    alpha=0.65,
+    label="S1"
+)
+
+ax.plot(
+    df["Nu"], df["T1"],
+    linestyle=":",
+    linewidth=2.2,
+    color="hotpink",
+    alpha=0.65,
+    label="T1"
+)
+
+# Emphasized horizontal bars
+for nu in highlight_nu:
+    row = df[df["Nu"] == nu]
+    if not row.empty:
+        ax.hlines(
+            row["S1"].values[0],
+            nu - 0.018,
+            nu + 0.018,
+            color="darkgreen",
+            linewidth=4.5,
+            alpha=0.95
+        )
+        ax.hlines(
+            row["T1"].values[0],
+            nu - 0.018,
+            nu + 0.018,
+            color="hotpink",
+            linewidth=4.5,
+            alpha=0.95
+        )
+
+# Labels
+ax.set_xlabel(r"Range-separation parameter $\nu$", labelpad=8)
+ax.set_ylabel("Energy (eV)", labelpad=8)
+
+# Grid: subtle, not dominant
+ax.grid(True, which="major", linestyle="--", alpha=0.25)
+
+# Legend: clean, floating
+ax.legend(frameon=False, loc="best")
+
+# Tight but breathable layout
+fig.tight_layout()
+plt.show()
+```
