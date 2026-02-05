@@ -30244,3 +30244,47 @@ for folder in os.listdir(src_base):
     # Copy tddft.com
     shutil.copy(tddft_template, os.path.join(dst_folder, "tddft.com"))
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+import numpy as np
+
+def read_stg(filename):
+    try:
+        df = pd.read_csv(filename)
+        stg = df.iloc[:, 3]
+    except:
+        df = pd.read_csv(filename, header=None)
+        stg = df.iloc[:, 3]
+    return stg.dropna().values
+
+# Read data
+stg_dimer = read_stg("dimer.csv")
+stg_trimer = read_stg("trimer.csv")
+stg_tetramer = read_stg("tetramer.csv")
+
+# Common x-range
+xmin = min(stg_dimer.min(), stg_trimer.min(), stg_tetramer.min())
+xmax = max(stg_dimer.max(), stg_trimer.max(), stg_tetramer.max())
+x = np.linspace(xmin, xmax, 600)
+
+# KDEs
+kde_dimer = gaussian_kde(stg_dimer)
+kde_trimer = gaussian_kde(stg_trimer)
+kde_tetramer = gaussian_kde(stg_tetramer)
+
+# Plot
+plt.figure(figsize=(8,6))
+plt.plot(x, kde_dimer(x), label="Dimer", linewidth=2)
+plt.plot(x, kde_trimer(x), label="Trimer", linewidth=2)
+plt.plot(x, kde_tetramer(x), label="Tetramer", linewidth=2)
+
+plt.xlabel("STG")
+plt.ylabel("Density")
+plt.title("KDE of STG for Dimer, Trimer, and Tetramer")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
