@@ -30320,3 +30320,66 @@ for folder in os.listdir(src_base):
     # Copy tddft.com
     shutil.copy(tddft_template, os.path.join(dst_folder, "tddft.com"))
 ```
+#
+```
+import os
+import shutil
+import numpy as np
+
+DFT_DIR = "DFT"
+SCAN_DIR = "SCAN_q_distance_varied"
+TDA_FILE = os.path.join(SCAN_DIR, "tda.com")
+
+os.makedirs(SCAN_DIR, exist_ok=True)
+
+# Distance scan (Angstrom)
+distances = np.arange(2.0, 5.01, 0.1)
+
+for dnc in sorted(os.listdir(DFT_DIR)):
+    if not dnc.startswith("dnc"):
+        continue
+
+    dnc_path = os.path.join(DFT_DIR, dnc)
+    monomer_xyz = os.path.join(dnc_path, "geom_DFT_S0.xyz")
+
+    if not os.path.isfile(monomer_xyz):
+        print(f"Missing geometry in {dnc}")
+        continue
+
+    # Create dnc folder inside scan directory
+    dnc_scan_dir = os.path.join(SCAN_DIR, dnc)
+    os.makedirs(dnc_scan_dir, exist_ok=True)
+
+    # Read monomer geometry
+    with open(monomer_xyz, "r") as f:
+        lines = f.readlines()
+
+    n_atoms = int(lines[0].strip())
+    atoms = []
+
+    for line in lines[2:2 + n_atoms]:
+        atom, x, y, z = line.split()[:4]
+        atoms.append((atom, float(x), float(y), float(z)))
+
+    # Distance scan
+    for d in distances:
+        conf_dir = os.path.join(dnc_scan_dir, f"conf_{d:.1f}")
+        os.makedirs(conf_dir, exist_ok=True)
+
+        # Write geom.xyz
+        geom_xyz = os.path.join(conf_dir, "geom.xyz")
+        with open(geom_xyz, "w") as f:
+            f.write(f"{2 * n_atoms}\n")
+            f.write(f"Eclipsed dimer, interplanar distance = {d:.1f} Å\n")
+
+            for atom, x, y, z in atoms:
+                f.write(f"{atom:2s} {x:15.8f} {y:15.8f} {z:15.8f}\n")
+
+            for atom, x, y, z in atoms:
+                f.write(f"{atom:2s} {x:15.8f} {y:15.8f} {z + d:15.8f}\n")
+
+        # Copy tda.com
+        shutil.copy(TDA_FILE, conf_dir)
+
+print("✅ Distance scan setup completed.")
+```
