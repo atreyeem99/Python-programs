@@ -30383,3 +30383,69 @@ for dnc in sorted(os.listdir(DFT_DIR)):
 
 print("✅ Distance scan setup completed.")
 ```
+#
+```
+import os
+
+xyz_file = "AP13_obabel_hs.xyz"
+
+gaussian_header = """%mem=64GB
+%nprocs=18
+#P wB97XD/Def2TZVP SCF(maxcycles=100,verytight) Opt(maxcyc=1000,calcall,verytight) Freq
+
+Test
+
+0 1
+"""
+
+with open(xyz_file, "r") as f:
+    lines = [line.rstrip() for line in f]
+
+i = 0
+n = len(lines)
+conf_idx = 1
+
+while i < n:
+    line = lines[i].strip()
+
+    # skip empty lines
+    if not line:
+        i += 1
+        continue
+
+    # skip atom-count lines (21, 22, ...)
+    if line.isdigit():
+        i += 1
+        continue
+
+    # skip original molecule name line
+    i += 1
+
+    coords = []
+    while i < n:
+        curr = lines[i].strip()
+
+        if not curr:
+            i += 1
+            continue
+
+        if curr.isdigit():
+            break
+
+        parts = curr.split()
+        if len(parts) == 4:
+            coords.append(curr)
+            i += 1
+        else:
+            break
+
+    folder = f"conf{conf_idx}"
+    conf_idx += 1
+
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, "opt.com"), "w") as f:
+        f.write(gaussian_header)
+        for c in coords:
+            f.write(c + "\n")
+        f.write("\n\n\n")   # Gaussian-required blank lines
+```
