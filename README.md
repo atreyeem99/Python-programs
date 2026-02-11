@@ -30578,3 +30578,35 @@ missing = (b | c) - a
 for mol in sorted(missing):
     print(mol)
 ```
+#
+```
+import os
+import shutil
+
+# Paths
+xyz_source = "/xyz_files/xyz_nonalternant_hydrocarbons"
+target_base = "nonalternant_hydrocarbons"
+opt_template = os.path.join(target_base, "opt.com")
+
+# Make sure target base exists
+os.makedirs(target_base, exist_ok=True)
+
+# Loop over xyz files
+for file in os.listdir(xyz_source):
+    if file.endswith(".xyz"):
+        mol_name = os.path.splitext(file)[0]  # Mol1 from Mol1.xyz
+        mol_folder = os.path.join(target_base, mol_name)
+
+        # Create molecule folder
+        os.makedirs(mol_folder, exist_ok=True)
+
+        # Copy and rename xyz -> geom.xyz
+        src_xyz = os.path.join(xyz_source, file)
+        dst_xyz = os.path.join(mol_folder, "geom.xyz")
+        shutil.copy(src_xyz, dst_xyz)
+
+        # Copy opt.com into molecule folder
+        shutil.copy(opt_template, mol_folder)
+
+print("Done.")
+```
