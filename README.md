@@ -30975,3 +30975,34 @@ fig.tight_layout()
 plt.savefig("Nu_dependence_S1_T1.pdf", bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV files (no header)
+df1 = pd.read_csv("file1.csv", header=None)
+df2 = pd.read_csv("file2.csv", header=None)
+
+# Extract 4th column (index 3)
+y1 = df1[3].values
+y2 = df2[3].values
+
+# Set font to Arial
+plt.rcParams["font.family"] = "Arial"
+
+# Create square scatter plot
+plt.figure(figsize=(6, 6))
+plt.scatter(y1, y2)
+
+# y = x line
+min_val = min(y1.min(), y2.min())
+max_val = max(y1.max(), y2.max())
+plt.plot([min_val, max_val], [min_val, max_val])
+
+plt.xlabel("File 1 (4th column)")
+plt.ylabel("File 2 (4th column)")
+plt.axis("equal")
+plt.tight_layout()
+plt.show()
+```
