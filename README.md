@@ -31006,3 +31006,57 @@ plt.axis("equal")
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# -----------------------------
+# Input CSV files
+# -----------------------------
+csv_files = [
+    "file1.csv",
+    "file2.csv",
+    "file3.csv",
+    "file4.csv",
+    "file5.csv"
+]
+
+# -----------------------------
+# Read all STG values
+# -----------------------------
+stg_values = []
+
+for f in csv_files:
+    df = pd.read_csv(f, header=None)
+    stg_values.extend(df.iloc[:, 3].values)  # 4th column = STG
+
+stg_values = np.array(stg_values)
+
+# -----------------------------
+# Plot settings
+# -----------------------------
+plt.rcParams["font.family"] = "Arial"
+
+bins = np.linspace(-0.3, 0.3, 13)  # nice symmetric bins
+
+plt.figure(figsize=(7, 4.5))
+
+plt.hist(
+    stg_values,
+    bins=bins,
+    edgecolor="black",
+    alpha=0.85
+)
+
+plt.xlim(-0.3, 0.3)
+plt.xlabel("STG", fontsize=13)
+plt.ylabel("Count", fontsize=13)
+
+plt.tick_params(axis="both", labelsize=11)
+plt.grid(axis="y", linestyle="--", alpha=0.4)
+
+plt.tight_layout()
+plt.show()
+```
