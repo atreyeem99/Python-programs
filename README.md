@@ -31083,3 +31083,90 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV (no header)
+df = pd.read_csv("nu_energies.csv", header=None)
+df.columns = ["Nu_folder", "S1", "T1", "STG", "osc"]
+
+# Extract nu values
+df["Nu"] = df["Nu_folder"].str.replace("Nu_", "", regex=False).astype(float)
+df = df.sort_values("Nu")
+
+highlight_nu = [0.01, 0.33, 0.99]
+
+# Global aesthetic settings
+plt.rcParams.update({
+    "font.size": 11,
+    "axes.linewidth": 1.2,
+    "pdf.fonttype": 42,   # editable text in PDF
+    "ps.fonttype": 42,
+    "xtick.direction": "in",
+    "ytick.direction": "in",
+})
+
+fig, ax = plt.subplots(figsize=(7.5, 4.8))
+
+# Dotted background trends
+ax.plot(
+    df["Nu"], df["S1"],
+    linestyle=":",
+    linewidth=2.3,
+    color="darkgreen",
+    alpha=0.6,
+    label="S1"
+)
+
+ax.plot(
+    df["Nu"], df["T1"],
+    linestyle=":",
+    linewidth=2.3,
+    color="hotpink",
+    alpha=0.6,
+    label="T1"
+)
+
+# Horizontal emphasis bars
+for nu in highlight_nu:
+    row = df[df["Nu"] == nu]
+    if not row.empty:
+        ax.hlines(
+            row["S1"].values[0],
+            nu - 0.018, nu + 0.018,
+            linewidth=4.5,
+            color="darkgreen"
+        )
+        ax.hlines(
+            row["T1"].values[0],
+            nu - 0.018, nu + 0.018,
+            linewidth=4.5,
+            color="hotpink"
+        )
+
+# Highlight nu = 0.33
+ax.axvline(0.33, linestyle="--", color="gray", alpha=0.4)
+ax.text(
+    0.33, ax.get_ylim()[1],
+    r"$\nu = 0.33$",
+    ha="center", va="bottom",
+    fontsize=10, color="gray"
+)
+
+# Labels
+ax.set_xlabel(r"Range-separation parameter $\nu$", labelpad=8)
+ax.set_ylabel("Energy (eV)", labelpad=8)
+
+# Subtle grid
+ax.grid(True, linestyle="--", alpha=0.22)
+
+# Legend
+ax.legend(frameon=False)
+
+# Layout + export
+fig.tight_layout()
+plt.savefig("Nu_dependence_S1_T1.pdf", dpi=300, bbox_inches="tight")
+plt.show()
+```
