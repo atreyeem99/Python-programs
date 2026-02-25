@@ -31238,3 +31238,60 @@ for mol in molecules:
 
     print(f"Copied files for {mol}")
 ```
+#
+```
+import os
+import shutil
+import subprocess
+
+extract_script = "G16_extract_xyz.sh"
+nmr_base = "NMR"
+
+nmr_header = """%mem=64GB
+%nprocs=18
+#P mPW1PW91/6-311+G(2d,p) SCF(maxcycles=100,verytight) Int(Grid=ultrafine) NMR
+
+NMR calculation
+
+0 1
+"""
+
+os.makedirs(nmr_base, exist_ok=True)
+
+for folder in sorted(os.listdir(".")):
+    if not folder.startswith("conf"):
+        continue
+    if not os.path.isdir(folder):
+        continue
+
+    # copy extraction script
+    shutil.copy(extract_script, folder)
+
+    # run extraction
+    subprocess.run(
+        ["bash", extract_script, "opt.log"],
+        cwd=folder,
+        check=True
+    )
+
+    # find xyz file (assume only one is created)
+    xyz_files = [f for f in os.listdir(folder) if f.endswith(".xyz")]
+    if not xyz_files:
+        raise RuntimeError(f"No xyz file found in {folder}")
+
+    xyz_path = os.path.join(folder, xyz_files[0])
+
+    with open(xyz_path, "r") as f:
+        lines = f.readlines()[2:]  # remove atom count + title
+
+    # create NMR/confX
+    nmr_conf = os.path.join(nmr_base, folder)
+    os.makedirs(nmr_conf, exist_ok=True)
+
+    # write nmr.com
+    with open(os.path.join(nmr_conf, "nmr.com"), "w") as f:
+        f.write(nmr_header)
+        for line in lines:
+            f.write(line)
+        f.write("\n\n\n")  # Gaussian-required blank lines
+```
