@@ -31327,3 +31327,34 @@ for file in os.listdir(xyz_source):
 
 print("Done.")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV (no header)
+df = pd.read_csv("nu_energies.csv", header=None)
+
+# Assign column names
+df.columns = ["Nu_folder", "S1", "T1", "STG", "osc"]
+
+# Extract numeric nu value from folder name
+df["Nu"] = df["Nu_folder"].str.replace("Nu_", "", regex=False).astype(float)
+
+# Sort by nu (important for nice curves)
+df = df.sort_values("Nu")
+
+# Plot
+plt.figure(figsize=(7, 5))
+
+plt.plot(df["Nu"], df["S1"], marker="o", linewidth=2, label="S1")
+plt.plot(df["Nu"], df["T1"], marker="s", linewidth=2, label="T1")
+
+plt.xlabel(r"Range-separation parameter $\nu$", fontsize=12)
+plt.ylabel("Energy (eV)", fontsize=12)
+plt.legend(frameon=False)
+plt.grid(True, linestyle="--", alpha=0.5)
+
+plt.tight_layout()
+plt.show()
+```
