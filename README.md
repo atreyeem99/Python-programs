@@ -31473,3 +31473,55 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import os
+import csv
+import re
+
+base_dir = "dimer"
+csv_file = os.path.join(base_dir, "dimer.csv")
+output_xyz = os.path.join(base_dir, "all_dimer_conf.xyz")
+
+# Read STG values from CSV
+stg_dict = {}
+with open(csv_file, newline='') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if not row:
+            continue
+        stg_dict[row[0].strip()] = row[3].strip()
+
+# Function to extract number from confX
+def conf_number(name):
+    m = re.search(r'\d+', name)
+    return int(m.group()) if m else 0
+
+conf_folders = [
+    f for f in os.listdir(base_dir)
+    if f.startswith("conf") and os.path.isdir(os.path.join(base_dir, f))
+]
+
+conf_folders.sort(key=conf_number)
+
+with open(output_xyz, "w") as out:
+    for folder in conf_folders:
+        xyz_path = os.path.join(base_dir, folder, "conf_DFT_S0.xyz")
+        if not os.path.isfile(xyz_path):
+            continue
+
+        with open(xyz_path) as f:
+            lines = f.readlines()
+
+        if len(lines) < 2:
+            continue
+
+        natoms = lines[0].strip()
+        stg = stg_dict.get(folder, "NA")
+
+        out.write(f"{natoms}\n")
+        out.write(f"{folder} STG={stg}\n")
+        out.writelines(lines[2:])
+
+print("Done: conf folders ordered numerically")
+```
