@@ -31826,3 +31826,38 @@ plt.grid(axis="y", linestyle="--", alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---------- read csv (with or without header) ----------
+def read_stg(filename):
+    try:
+        df = pd.read_csv(filename)
+        stg = df.iloc[:, 3]   # STG is 4th column
+    except:
+        df = pd.read_csv(filename, header=None)
+        stg = df.iloc[:, 3]
+    return stg.dropna()
+
+# ---------- load data ----------
+stg_dimer = read_stg("dimer.csv")
+stg_trimer = read_stg("trimer.csv")
+stg_tetramer = read_stg("tetramer.csv")
+
+# ---------- plot histograms ----------
+plt.figure(figsize=(8,6))
+
+plt.hist(stg_dimer, bins=30, alpha=0.6, label="Dimer")
+plt.hist(stg_trimer, bins=30, alpha=0.6, label="Trimer")
+plt.hist(stg_tetramer, bins=30, alpha=0.6, label="Tetramer")
+
+plt.xlabel("STG")
+plt.ylabel("Frequency")
+plt.title("STG Distribution for Dimer, Trimer, and Tetramer")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+```
