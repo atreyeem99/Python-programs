@@ -31952,3 +31952,47 @@ plt.grid(axis="y", linestyle="--", alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+plt.rcParams['font.family'] = 'Arial'
+
+# wavelength range
+w = np.linspace(400,700,2000)
+
+def gaussian(x, mu, sigma, amp):
+    return amp*np.exp(-(x-mu)**2/(2*sigma**2))
+
+# BODIPY-like sharp spectrum but red
+df = pd.DataFrame({
+    "wavelength": w,
+    "intensity": gaussian(w,440,10,0.25)
+})
+
+fig, ax = plt.subplots(figsize=(5,3.5))
+
+ax.plot(df["wavelength"], df["intensity"], color="red", linewidth=3)
+ax.fill_between(df["wavelength"], df["intensity"], color="red", alpha=0.4)
+
+ax.set_xlabel("Wavelength", fontsize=14, fontweight="bold")
+ax.set_ylabel("Intensity", fontsize=14, fontweight="bold")
+
+ax.set_xticks([])
+ax.set_yticks([])
+
+ax.set_xlim(400,700)
+ax.set_ylim(0,1.0)
+
+ax.spines['bottom'].set_linewidth(2.5)
+ax.spines['left'].set_linewidth(2.5)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+plt.tight_layout()
+
+plt.savefig("invest_red_sharp_spectrum.pdf")
+plt.show()
+```
