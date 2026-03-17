@@ -32063,3 +32063,57 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0
+
+positions = [
+    (-1.0, 1.0),
+    (1.0, 1.0),
+    (-1.0, -1.0),
+    (1.0, -1.0)
+]
+
+fill_colors = [
+    "#a9c8f5",  # blue
+    "#f2a7a7",  # red
+    "#aee3ae",  # green
+    "#f5c29a"   # orange
+]
+
+# filled circles
+for (x, y), color in zip(positions, fill_colors):
+    ax.add_patch(Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="none",
+        alpha=0.6,
+        zorder=1
+    ))
+
+# 🔑 thin + brighter borders
+for (x, y) in positions:
+    ax.add_patch(Circle(
+        (x, y), r,
+        facecolor="none",
+        edgecolor="#9aa0a6",  # light, slightly cool grey (like your image)
+        linewidth=1.1,        # thinner
+        zorder=2
+    ))
+
+ax.set_xlim(-3.2, 3.2)
+ax.set_ylim(-3.2, 3.2)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_final_refined.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
