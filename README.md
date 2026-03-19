@@ -32171,3 +32171,42 @@ plt.tight_layout()
 plt.savefig("venn4_final_refined.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+fig, ax = plt.subplots(figsize=(6,6))
+
+r = 1.5
+
+# positions: 2 top, 2 bottom
+c1 = (-1.2, 1.0)
+c2 = (1.2, 1.0)
+c3 = (-1.2, -1.0)
+c4 = (1.2, -1.0)
+
+# soft pastel palette (harmonized)
+colors = [
+    "#cfe0f5",  # pastel blue
+    "#f5d6d6",  # pastel red
+    "#d6ecd6",  # pastel green
+    "#efe0f7"   # pastel lavender
+]
+
+circles = [
+    Circle(c1, r, facecolor=colors[0], edgecolor="#555555", lw=1.2, alpha=0.6),
+    Circle(c2, r, facecolor=colors[1], edgecolor="#555555", lw=1.2, alpha=0.6),
+    Circle(c3, r, facecolor=colors[2], edgecolor="#555555", lw=1.2, alpha=0.6),
+    Circle(c4, r, facecolor=colors[3], edgecolor="#555555", lw=1.2, alpha=0.6),
+]
+
+for circle in circles:
+    ax.add_patch(circle)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
