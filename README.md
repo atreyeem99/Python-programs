@@ -32264,3 +32264,68 @@ plt.grid(axis="y", linestyle="--", alpha=0.4)
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# -------- FONT SETTINGS --------
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 13
+
+file1 = "AP_paper_neg_30.csv"
+file2 = "BNPAH_paper_neg_46.csv"
+file3 = "NA_paper_neg_8.csv"
+
+def read_column(filename, col_index):
+    data = []
+    with open(filename, "r") as f:
+        for line in f:
+            parts = line.strip().replace(",", " ").split()
+            if len(parts) > col_index:
+                try:
+                    data.append(float(parts[col_index]))
+                except:
+                    continue
+    return data
+
+gaps1 = read_column(file1, 3)
+gaps2 = read_column(file2, 3)
+gaps3 = read_column(file3, 1)
+
+print("Counts:", len(gaps1), len(gaps2), len(gaps3))
+
+# -------- PLOT --------
+plt.figure(figsize=(7,5))
+
+bins = np.linspace(-0.3, 0.3, 25)
+
+plt.hist(gaps1, bins=bins, density=True, alpha=0.7,
+         color="#5EC2B7", label="AP", edgecolor="black", linewidth=0.4)
+
+plt.hist(gaps2, bins=bins, density=True, alpha=0.7,
+         color="#FF7FA7", label="BNPAH", edgecolor="black", linewidth=0.4)
+
+plt.hist(gaps3, bins=bins, density=True, alpha=0.7,
+         color="#FFB26B", label="NA", edgecolor="black", linewidth=0.4)
+
+# -------- STYLE --------
+plt.xlabel("Singlet–Triplet Gap (eV)", fontsize=16)
+plt.ylabel("Density", fontsize=16)
+plt.xlim(-0.3, 0.3)
+
+plt.xticks(fontsize=13)
+plt.yticks(fontsize=13)
+
+plt.legend(frameon=False, fontsize=13)
+plt.grid(alpha=0.12)
+
+ax = plt.gca()
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+plt.tight_layout()
+
+plt.savefig("STG_histogram.pdf", dpi=600)
+plt.show()
+```
