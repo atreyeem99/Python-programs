@@ -32388,3 +32388,64 @@ plt.tight_layout()
 plt.savefig("STG_histogram.pdf", dpi=600)
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --------- FILE NAMES ----------
+file1 = "file1.csv"   # gaps in 4th column
+file2 = "file2.csv"   # gaps in 4th column
+file3 = "file3.csv"   # values in 2nd column
+
+# --------- READ DATA ----------
+def read_column(filename, col_index):
+    data = []
+    with open(filename, "r") as f:
+        for line in f:
+            parts = line.strip().split()
+            if len(parts) > col_index:
+                try:
+                    data.append(float(parts[col_index]))
+                except:
+                    pass
+    return data
+
+gaps1 = read_column(file1, 3)
+gaps2 = read_column(file2, 3)
+gaps3 = read_column(file3, 1)
+
+# --------- PLOT ----------
+plt.figure(figsize=(7,5))
+
+bins = np.linspace(-0.3, 0.3, 40)
+
+# Pastel colors
+colors = ["#AEC6CF", "#FFB7B2", "#B5EAD7"]  # pastel blue, pink, green
+
+plt.hist(gaps1, bins=bins, alpha=0.7, label="Set 1", edgecolor='white', linewidth=0.8)
+plt.hist(gaps2, bins=bins, alpha=0.7, label="Set 2", edgecolor='white', linewidth=0.8)
+plt.hist(gaps3, bins=bins, alpha=0.7, label="Set 3", edgecolor='white', linewidth=0.8)
+
+# Apply colors manually
+for patch, color in zip(plt.gca().patches[:len(gaps1)], [colors[0]]*len(gaps1)):
+    patch.set_facecolor(colors[0])
+
+# --------- STYLE ----------
+plt.xlabel("Singlet-Triplet Gap (eV)", fontsize=12)
+plt.ylabel("Count", fontsize=12)
+plt.xlim(-0.3, 0.3)
+
+plt.legend(frameon=False)
+plt.grid(alpha=0.2)
+
+# Clean look
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+
+plt.tight_layout()
+
+# --------- SAVE ----------
+plt.savefig("beautiful_histogram.pdf", dpi=300)
+plt.show()
+```
