@@ -32634,3 +32634,57 @@ for folder in sorted(os.listdir(".")):
             f.write(line)
         f.write("\n\n\n")  # Gaussian-required blank lines
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+file1 = "file1.csv"
+file2 = "file2.csv"
+file3 = "file3.csv"
+
+def read_column(filename, col_index):
+    data = []
+    with open(filename, "r") as f:
+        for line in f:
+            parts = line.strip().replace(",", " ").split()  # handles both comma/space
+            if len(parts) > col_index:
+                try:
+                    data.append(float(parts[col_index]))
+                except:
+                    continue
+    return data
+
+# Read data
+gaps1 = read_column(file1, 3)
+gaps2 = read_column(file2, 3)
+gaps3 = read_column(file3, 1)
+
+print(len(gaps1), len(gaps2), len(gaps3))  # DEBUG → should not be 0
+
+# -------- PLOT --------
+plt.figure(figsize=(7,5))
+
+bins = np.linspace(-0.3, 0.3, 40)
+
+# Proper pastel colors
+plt.hist(gaps1, bins=bins, alpha=0.6, color="#A8DADC", label="Set 1", edgecolor='black', linewidth=0.5)
+plt.hist(gaps2, bins=bins, alpha=0.6, color="#FFAFCC", label="Set 2", edgecolor='black', linewidth=0.5)
+plt.hist(gaps3, bins=bins, alpha=0.6, color="#CDB4DB", label="Set 3", edgecolor='black', linewidth=0.5)
+
+plt.xlabel("Singlet-Triplet Gap (eV)", fontsize=12)
+plt.ylabel("Count", fontsize=12)
+plt.xlim(-0.3, 0.3)
+
+plt.legend(frameon=False)
+plt.grid(alpha=0.2)
+
+# Clean style
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+
+plt.tight_layout()
+
+plt.savefig("histogram.pdf")
+plt.show()
+```
