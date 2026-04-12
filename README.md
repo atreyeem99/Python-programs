@@ -33279,3 +33279,46 @@ for folder in os.listdir(source_base):
         else:
             print(f"Error: tddft.com not found in {destination_root}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def read_stg(filename):
+    try:
+        df = pd.read_csv(filename)
+        stg = df.iloc[:, 3]   # STG = 4th column
+    except:
+        df = pd.read_csv(filename, header=None)
+        stg = df.iloc[:, 3]
+    return stg.dropna()
+
+# Read data
+stg_dimer = read_stg("dimer.csv")
+stg_trimer = read_stg("trimer.csv")
+stg_tetramer = read_stg("tetramer.csv")
+
+# ---- Dimer ----
+plt.figure()
+plt.hist(stg_dimer, bins=30)
+plt.xlabel("STG")
+plt.ylabel("Frequency")
+plt.title("STG Histogram – Dimer")
+plt.show()
+
+# ---- Trimer ----
+plt.figure()
+plt.hist(stg_trimer, bins=30)
+plt.xlabel("STG")
+plt.ylabel("Frequency")
+plt.title("STG Histogram – Trimer")
+plt.show()
+
+# ---- Tetramer ----
+plt.figure()
+plt.hist(stg_tetramer, bins=30)
+plt.xlabel("STG")
+plt.ylabel("Frequency")
+plt.title("STG Histogram – Tetramer")
+plt.show()
+```
