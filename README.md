@@ -33670,3 +33670,26 @@ plt.tight_layout()
 plt.savefig("venn4_final_refined.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import csv
+
+csv_file = "input.csv"
+txt_file = "46.txt"
+output_csv = "filtered.csv"
+
+# Read molecule names from 46.txt
+with open(txt_file, "r") as f:
+    allowed_molecules = set(line.strip() for line in f if line.strip())
+
+# Filter CSV
+with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile:
+    reader = csv.reader(infile)
+    writer = csv.writer(outfile)
+
+    for row in reader:
+        if row and row[0] in allowed_molecules:
+            writer.writerow(row)
+
+print("Filtered CSV written to filtered.csv")
+```
