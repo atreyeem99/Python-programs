@@ -33864,3 +33864,40 @@ plt.tight_layout()
 plt.savefig("venn4_final_refined.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import os
+import shutil
+
+# Define paths
+source_base = "./dimer"
+destination_root = "./SCS-PBE-QIDH_def2SVP"
+destination_base = os.path.join(destination_root, "dimer")
+template_file = os.path.join(destination_root, "tddft.com")
+
+# Ensure destination dimer folder exists
+os.makedirs(destination_base, exist_ok=True)
+
+# Loop through all subfolders in source dimer
+for folder in os.listdir(source_base):
+    source_folder = os.path.join(source_base, folder)
+
+    if os.path.isdir(source_folder):
+        source_xyz = os.path.join(source_folder, "conf_DFT_S0.xyz")
+        destination_folder = os.path.join(destination_base, folder)
+
+        # Create destination subfolder
+        os.makedirs(destination_folder, exist_ok=True)
+
+        # Copy xyz file
+        if os.path.exists(source_xyz):
+            shutil.copy(source_xyz, destination_folder)
+        else:
+            print(f"Warning: conf_DFT_S0.xyz not found in {source_folder}")
+
+        # Copy tddft.com
+        if os.path.exists(template_file):
+            shutil.copy(template_file, destination_folder)
+        else:
+            print(f"Error: tddft.com not found in {destination_root}")
+```
