@@ -33945,3 +33945,67 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+file = "results_lcblyp_sto3g.csv"
+# file = "results_scspbeqidh_sto3g.csv"
+
+df = pd.read_csv(file, header=None)
+
+xa = df[1]
+ye = df[3]
+
+plt.rcParams.update({
+    "font.family": "Arial",
+    "font.size": 16,
+    "axes.linewidth": 1.2,
+})
+
+fig, ax = plt.subplots(figsize=(6, 5))
+
+# Scatter
+ax.scatter(
+    xa, ye,
+    s=80,
+    marker='s',
+    c='firebrick',
+    edgecolors='white',
+    zorder=2
+)
+
+# ---- tight limits ----
+xmin, xmax = xa.min(), xa.max()
+ymin, ymax = ye.min(), ye.max()
+
+xpad = 0.05 * (xmax - xmin)
+ypad = 0.05 * (ymax - ymin)
+
+ax.set_xlim(xmin - xpad, xmax + xpad)
+ax.set_ylim(ymin - ypad, ymax + ypad)
+
+# ---- diagonal line (corner to corner) ----
+x0, x1 = ax.get_xlim()
+y0, y1 = ax.get_ylim()
+
+ax.plot(
+    [x0, x1],
+    [y0, y1],
+    linestyle='--',
+    linewidth=1.5,
+    color='black',
+    zorder=1
+)
+
+# Labels
+ax.set_xlabel("S1")
+ax.set_ylabel("STG")
+
+ax.tick_params(direction='in', length=6, width=1.2)
+
+plt.tight_layout()
+plt.savefig("S1_vs_STG_diagonal.pdf")
+plt.show()
+```
