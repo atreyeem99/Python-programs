@@ -34073,3 +34073,68 @@ plt.tight_layout()
 plt.savefig("S1_vs_STG_diagonal.pdf")
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ===== choose file =====
+file = "results_lcblyp_sto3g.csv"
+# file = "results_scspbeqidh_sto3g.csv"
+
+# Load CSV
+df = pd.read_csv(file, header=None)
+
+# Columns
+xa = df[1]
+ye = df[3]
+
+# Style
+plt.rcParams.update({
+    "font.family": "Arial",
+    "font.size": 16,
+    "axes.linewidth": 1.2,
+})
+
+fig, ax = plt.subplots(figsize=(6, 5))  # NOT square
+
+# Scatter
+ax.scatter(
+    xa, ye,
+    s=80,
+    marker='s',
+    c='firebrick',
+    edgecolors='white',
+    zorder=2
+)
+
+# ---- axis limits (combined range) ----
+all_min = min(xa.min(), ye.min())
+all_max = max(xa.max(), ye.max())
+
+pad = 0.05 * (all_max - all_min)
+
+ax.set_xlim(all_min - pad, all_max + pad)
+ax.set_ylim(all_min - pad, all_max + pad)
+
+# ---- y = x line ----
+ax.plot(
+    [all_min - pad, all_max + pad],
+    [all_min - pad, all_max + pad],
+    linestyle='--',
+    linewidth=1.5,
+    color='black',
+    zorder=1
+)
+
+# Labels
+ax.set_xlabel("S1")
+ax.set_ylabel("STG")
+
+# Ticks
+ax.tick_params(direction='in', length=6, width=1.2)
+
+plt.tight_layout()
+plt.savefig("S1_vs_STG_with_diag.pdf")
+plt.show()
+```
