@@ -34265,3 +34265,57 @@ print("\nSDE:")
 for i, l in enumerate(labels):
     print(f"{l}: {sde[i]:.4f}")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load CSV (no header)
+df = pd.read_csv("your_file.csv", header=None)
+
+basis = df[0]
+S1 = df[1]
+T1 = df[2]
+STG = df[3]
+
+plt.rcParams.update({
+    "font.family": "Arial",
+    "font.size": 16,
+    "axes.linewidth": 1.2,
+})
+
+fig, ax = plt.subplots(figsize=(7, 5))
+
+x = range(len(basis))
+
+for i in x:
+    # --- S1 (dark pink) ---
+    ax.hlines(S1[i], i-0.3, i+0.3, color='#c2185b', linewidth=3)
+    ax.text(i+0.35, S1[i], "S1", va='center', fontsize=12)
+
+    # --- T1 (green) ---
+    ax.hlines(T1[i], i-0.3, i+0.3, color='green', linewidth=3)
+    ax.text(i+0.35, T1[i], "T1", va='center', fontsize=12)
+
+    # --- STG (red dotted vertical line) ---
+    ax.vlines(i, T1[i], S1[i], color='red', linewidth=1.5, linestyles='dotted')
+
+    # --- STG value ---
+    mid = (S1[i] + T1[i]) / 2
+    ax.text(i+0.05, mid, f"{STG[i]:.2f}", color='red', fontsize=12, va='center')
+
+# X-axis
+ax.set_xticks(list(x))
+ax.set_xticklabels(basis)
+
+# Labels
+ax.set_xlabel("Basis Set")
+ax.set_ylabel("Energy (eV)")
+
+# Ticks
+ax.tick_params(direction='in', length=6, width=1.2)
+
+plt.tight_layout()
+plt.savefig("basis_S1_T1_STG_styled.pdf")
+plt.show()
+```
