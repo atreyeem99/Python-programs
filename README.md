@@ -34443,3 +34443,34 @@ kde_plot(stg_dimer, "STG KDE – Dimer")
 kde_plot(stg_trimer, "STG KDE – Trimer")
 kde_plot(stg_tetramer, "STG KDE – Tetramer")
 ```
+#
+```
+import pandas as pd
+import numpy as np
+
+# Load files (no header)
+df_vtz = pd.read_csv("AP104_scspbeqidh_VTZ.csv", header=None)
+df_sto = pd.read_csv("AP104_scspbeqidh_STO3G.csv", header=None)
+
+# Extract columns: 1=S1, 2=T1, 3=STG
+vtz_vals = df_vtz[[1, 2, 3]].values
+sto_vals = df_sto[[1, 2, 3]].values
+
+# Error (STO3G compared to VTZ)
+error = sto_vals - vtz_vals
+
+# MAE and SDE
+mae = np.mean(np.abs(error), axis=0)
+sde = np.std(error, axis=0)
+
+# Print nicely
+labels = ["S1", "T1", "STG"]
+
+print("MAE:")
+for i, l in enumerate(labels):
+    print(f"{l}: {mae[i]:.4f}")
+
+print("\nSDE:")
+for i, l in enumerate(labels):
+    print(f"{l}: {sde[i]:.4f}")
+```
