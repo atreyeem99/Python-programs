@@ -34709,3 +34709,49 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0
+
+positions = [
+    (-1.0, 1.0),   # top-left
+    (1.0, 1.0),    # top-right
+    (-1.0, -1.0),  # bottom-left
+    (1.0, -1.0)    # bottom-right
+]
+
+# soft but visible outline colors
+colors = [
+    "#7aa6e6",  # blue
+    "#e07a7a",  # red
+    "#7fc97f",  # green
+    "#e6a96b"   # orange
+]
+
+# draw only outlines (no fill)
+for (x, y), color in zip(positions, colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor="none",     # 🔑 no fill
+        edgecolor=color,
+        linewidth=2.5         # slightly thicker for clarity
+    )
+    ax.add_patch(circle)
+
+# proper framing
+ax.set_xlim(-3.2, 3.2)
+ax.set_ylim(-3.2, 3.2)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_clean.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
