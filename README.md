@@ -35124,3 +35124,45 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import pandas as pd
+
+# Read CSVs
+file1 = pd.read_csv("negative_sorted_wB97MD4.csv", header=None)
+file2 = pd.read_csv("lcc2_46_MD4.csv", header=None)
+file3 = pd.read_csv("NAH_7_MD4.csv", header=None)
+
+cols = ["mol", "S1", "T1", "STG", "fosc"]
+file1.columns = cols
+file2.columns = cols
+file3.columns = cols
+
+def rename_mol(df, prefix):
+    df = df.copy()
+    df["mol"] = [f"{prefix}{i+1}" for i in range(len(df))]
+    return df
+
+file1 = rename_mol(file1, "I-A")
+file2 = rename_mol(file2, "I-B")
+file3 = rename_mol(file3, "I-C")
+
+# Combine
+combined = pd.concat([file1, file2, file3], ignore_index=True)
+
+left = combined.iloc[:43]
+right = combined.iloc[43:]
+
+# Updated formatting (S1 with fosc in brackets)
+def format_row(row):
+    return f"{row['mol']} & ${row['S1']} ({row['fosc']})$ & ${row['T1']}$ & ${row['STG']}$"
+
+for i in range(43):
+    left_part = format_row(left.iloc[i])
+    
+    if i < len(right):
+        right_part = format_row(right.iloc[i])
+        print(f"{left_part} && {right_part} \\\\")
+    else:
+        print(f"{left_part} &&  \\\\")
+```
