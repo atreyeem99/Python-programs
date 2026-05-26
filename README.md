@@ -35166,3 +35166,28 @@ for i in range(43):
     else:
         print(f"{left_part} &&  \\\\")
 ```
+#
+```
+import pandas as pd
+
+# List your 5 CSV files here
+files = [
+    "file1.csv",
+    "file2.csv",
+    "file3.csv",
+    "file4.csv",
+    "file5.csv"
+]
+
+for file in files:
+    # Read CSV with no header
+    df = pd.read_csv(file, header=None)
+    
+    # Extract 4th column (STG)
+    stg = df[3]
+    
+    # Count negative values
+    negative_count = (stg < 0).sum()
+    
+    print(f"{file}: {negative_count} negative STGs")
+```
