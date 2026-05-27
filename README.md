@@ -35191,3 +35191,55 @@ for file in files:
     
     print(f"{file}: {negative_count} negative STGs")
 ```
+#
+```
+import pandas as pd
+
+# Read CSVs (no headers)
+file1 = pd.read_csv("negative_sorted_wB97MD4.csv", header=None)
+file2 = pd.read_csv("lcc2_46_MD4.csv", header=None)
+file3 = pd.read_csv("NAH_7_MD4.csv", header=None)
+
+# Assign column names
+cols = ["mol", "S1", "T1", "STG", "fosc"]
+file1.columns = cols
+file2.columns = cols
+file3.columns = cols
+
+# Function to rename mol column
+def rename_mol(df, prefix):
+    df = df.copy()
+    df["mol"] = [f"{prefix}{i+1}" for i in range(len(df))]
+    return df
+
+# Rename molecules
+file1 = rename_mol(file1, "I-A")
+file2 = rename_mol(file2, "I-B")
+file3 = rename_mol(file3, "I-C")
+
+# Drop fosc
+file1 = file1.drop(columns=["fosc"])
+file2 = file2.drop(columns=["fosc"])
+file3 = file3.drop(columns=["fosc"])
+
+# Combine all
+combined = pd.concat([file1, file2, file3], ignore_index=True)
+
+# Split into two parts
+left = combined.iloc[:43]
+right = combined.iloc[43:]
+
+# Function to format a row
+def format_row(row):
+    return f"{row['mol']} & ${row['S1']}$ & ${row['T1']}$ & ${row['STG']}$"
+
+# Print LaTeX table rows
+for i in range(43):
+    left_part = format_row(left.iloc[i])
+    
+    if i < len(right):
+        right_part = format_row(right.iloc[i])
+        print(f"{left_part} && {right_part} \\\\")
+    else:
+        print(f"{left_part} &&  \\\\")
+```
