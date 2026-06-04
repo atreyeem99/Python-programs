@@ -35607,3 +35607,39 @@ def extract_freq(filepath):
 
     return all_blocks[-1] if all_blocks else []
 ```
+#
+```
+def extract_freq(filepath):
+    all_blocks = []
+    current_block = []
+    capture = False
+
+    with open(filepath) as f:
+        for line in f:
+            if "VIBRATIONAL FREQUENCIES" in line:
+                capture = True
+                current_block = []
+                continue
+
+            if "NORMAL MODES" in line and capture:
+                all_blocks.append(current_block)
+                capture = False
+                continue
+
+            if capture:
+                if "cm**-1" in line:
+                    # 🔥 extract the number BEFORE cm**-1 (with optional i)
+                    match = re.search(r'([-]?\d+\.\d+)([iI]?)\s*cm\*\*-1', line)
+                    
+                    if match:
+                        value = match.group(1)
+                        imag = match.group(2)
+
+                        # convert imaginary → negative
+                        if imag:
+                            value = f"-{value}"
+
+                        current_block.append(value)
+
+    return all_blocks[-1] if all_blocks else []
+```
