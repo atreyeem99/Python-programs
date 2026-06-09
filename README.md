@@ -1,4 +1,4 @@
-# obminimize : for creating folders to merge the xyz of different structures to one UFF xyz file
+<img width="1000" height="198" alt="image" src="https://github.com/user-attachments/assets/46aef022-e7c8-4906-aefc-e6ad50e7f833" /># obminimize : for creating folders to merge the xyz of different structures to one UFF xyz file
 ```
 parser = argparse.ArgumentParser(description='Some versions of obabel (with --minimize) or obminimize show weird behaviour when working with multiple XYZs collected in a single file. Sometimes the outputt is pdb with fewer significant figures. This python code offers a solution. It takes as input an XYZ file containing atomic coordinates of multiple molecules and optimizes each tightly using obabel. Thelt options are set as \'--ff UFF --sd --c 1e-6 --n 10000\'. Feel free to experiment.')
 
@@ -36033,4 +36033,27 @@ with open(output_file, "w") as out:
         out.write("% }\n\n")
 
 print(f"\nDone! Output written to {output_file}")
+```
+#
+```
+import csv
+
+csv_file = "input.csv"
+txt_file = "46.txt"
+output_csv = "filtered.csv"
+
+# Read molecule names from 46.txt
+with open(txt_file, "r") as f:
+    allowed_molecules = set(line.strip() for line in f if line.strip())
+
+# Filter CSV
+with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile:
+    reader = csv.reader(infile)
+    writer = csv.writer(outfile)
+
+    for row in reader:
+        if row and row[0] in allowed_molecules:
+            writer.writerow(row)
+
+print("Filtered CSV written to filtered.csv")
 ```
