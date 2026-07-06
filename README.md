@@ -37121,3 +37121,62 @@ plt.ylabel("Frequency")
 plt.title("STG Histogram – Tetramer")
 plt.show()
 ```
+#
+```
+import pandas as pd
+
+# Read CSVs
+file1 = pd.read_csv("negative_sorted_wB97MD4.csv", header=None)
+file2 = pd.read_csv("lcc2_46_MD4.csv", header=None)
+file3 = pd.read_csv("NAH_7_MD4.csv", header=None)
+
+cols = ["mol", "S1", "T1", "STG", "fosc"]
+file1.columns = cols
+file2.columns = cols
+file3.columns = cols
+
+# 🔹 Sort each file by STG (most negative → least negative)
+file1 = file1.sort_values(by="STG")
+file2 = file2.sort_values(by="STG")
+file3 = file3.sort_values(by="STG")
+
+# Rename mol
+def rename_mol(df, prefix):
+    df = df.copy().reset_index(drop=True)
+    df["mol"] = [f"{prefix}{i+1}" for i in range(len(df))]
+    return df
+
+file1 = rename_mol(file1, "I-A")
+file2 = rename_mol(file2, "I-B")
+file3 = rename_mol(file3, "I-C")
+
+# Combine
+combined = pd.concat([file1, file2, file3], ignore_index=True)
+
+# Split 43 / 42
+left = combined.iloc[:43]
+right = combined.iloc[43:]
+
+# Clean tiny negative fosc
+def clean(x):
+    return 0.0 if abs(x) < 1e-6 else x
+
+# Format row (note the SPACE before bracket)
+def format_row(row):
+    S1 = row['S1']
+    fosc = clean(row['fosc'])
+    T1 = row['T1']
+    STG = row['STG']
+    
+    return f"{row['mol']} & ${S1:.3f} ({fosc:.3f})$ & ${T1:.3f}$ & ${STG:.3f}$"
+
+# Print LaTeX rows
+for i in range(43):
+    left_part = format_row(left.iloc[i])
+    
+    if i < len(right):
+        right_part = format_row(right.iloc[i])
+        print(f"{left_part} && {right_part} \\\\")
+    else:
+        print(f"{left_part} &&  \\\\")
+```
