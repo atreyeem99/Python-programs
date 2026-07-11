@@ -37326,3 +37326,61 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0
+
+positions = [
+    (-1.0, 1.0),   # top-left
+    (1.0, 1.0),    # top-right
+    (-1.0, -1.0),  # bottom-left
+    (1.0, -1.0)    # bottom-right
+]
+
+# soft but slightly brighter fills
+fill_colors = [
+    "#a9c8f5",  # blue
+    "#f2a7a7",  # red
+    "#aee3ae",  # green
+    "#f5c29a"   # orange
+]
+
+# draw filled circles (low alpha for blending)
+for (x, y), color in zip(positions, fill_colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="none",
+        alpha=0.6,
+        zorder=1
+    )
+    ax.add_patch(circle)
+
+# 🔑 draw strong borders ON TOP for clear separation
+for (x, y) in positions:
+    border = Circle(
+        (x, y), r,
+        facecolor="none",
+        edgecolor="#333333",   # darker boundary
+        linewidth=2.2,
+        zorder=2
+    )
+    ax.add_patch(border)
+
+# fix view
+ax.set_xlim(-3.2, 3.2)
+ax.set_ylim(-3.2, 3.2)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_final_clear.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
