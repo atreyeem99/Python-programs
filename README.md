@@ -37384,3 +37384,40 @@ plt.tight_layout()
 plt.savefig("venn4_final_clear.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+def extract_freq(filepath):
+    all_blocks = []
+    current_block = []
+    capture = False
+
+    with open(filepath) as f:
+        for line in f:
+            if "VIBRATIONAL FREQUENCIES" in line:
+                capture = True
+                current_block = []
+                continue
+
+            if "NORMAL MODES" in line and capture:
+                all_blocks.append(current_block)
+                capture = False
+                continue
+
+            if capture:
+                if "cm**-1" in line:
+                    parts = line.strip().split()
+                    try:
+                        val = parts[-2]
+
+                        # 🔥 handle imaginary frequencies
+                        if 'i' in val.lower():
+                            val = val.replace('i', '').replace('I', '')
+                            val = f"-{val}"
+
+                        current_block.append(val)
+
+                    except:
+                        pass
+
+    return all_blocks[-1] if all_blocks else []
+```
