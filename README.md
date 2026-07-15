@@ -37501,3 +37501,33 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+def extract_freq(filepath):
+    freqs = []
+    capture = False
+
+    with open(filepath) as f:
+        for line in f:
+            if "VIBRATIONAL FREQUENCIES" in line:
+                capture = True
+                continue
+
+            if "NORMAL MODES" in line:
+                break
+
+            if capture:
+                # Only lines that actually contain frequencies
+                if "cm**-1" in line:
+                    parts = line.strip().split()
+                    
+                    # format: index : value cm**-1
+                    # so value is second last element
+                    try:
+                        val = parts[-2]
+                        freqs.append(val)
+                    except:
+                        pass
+
+    return freqs
+```
