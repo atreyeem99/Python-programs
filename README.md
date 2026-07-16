@@ -37531,3 +37531,41 @@ def extract_freq(filepath):
 
     return freqs
 ```
+#
+```
+import os
+import re
+import csv
+
+results = []
+
+for angle in range(0, 181, 10):
+
+    folder = f"scan{angle}"
+    outfile = os.path.join(folder, "scan.out")
+
+    if not os.path.exists(outfile):
+        print(f"{outfile} not found.")
+        continue
+
+    energy = None
+
+    with open(outfile, "r") as f:
+        for line in f:
+            if "FINAL SINGLE POINT ENERGY" in line:
+                energy = float(line.split()[-1])
+
+    if energy is None:
+        print(f"Energy not found in {outfile}")
+        continue
+
+    results.append([angle, energy])
+
+# Write CSV
+with open("energy_vs_dihedral.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Angle (deg)", "Energy (Eh)"])
+    writer.writerows(results)
+
+print("Done! Results written to energy_vs_dihedral.csv")
+```
