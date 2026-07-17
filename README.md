@@ -37569,3 +37569,39 @@ with open("energy_vs_dihedral.csv", "w", newline="") as f:
 
 print("Done! Results written to energy_vs_dihedral.csv")
 ```
+#
+```
+import os
+import shutil
+
+scan_root = "SCAN"
+nbo_root = "NBO"
+
+os.makedirs(nbo_root, exist_ok=True)
+
+for angle in range(0, 181, 10):
+
+    scan_folder = os.path.join(scan_root, f"scan{angle}")
+    scan_file = os.path.join(scan_folder, "scan.com")
+
+    if not os.path.exists(scan_file):
+        print(f"Missing: {scan_file}")
+        continue
+
+    nbo_folder = os.path.join(nbo_root, f"NBO{angle}")
+    os.makedirs(nbo_folder, exist_ok=True)
+
+    nbo_file = os.path.join(nbo_folder, "NBO.com")
+
+    with open(scan_file, "r") as f:
+        lines = f.readlines()
+
+    # Add NBO to the first line if not already present
+    if "NBO" not in lines[0]:
+        lines[0] = lines[0].rstrip() + " NBO\n"
+
+    with open(nbo_file, "w") as f:
+        f.writelines(lines)
+
+print("Done.")
+```
