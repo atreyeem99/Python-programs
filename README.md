@@ -37605,3 +37605,48 @@ for angle in range(0, 181, 10):
 
 print("Done.")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read CSV
+df = pd.read_csv("E2_all.csv")
+
+# Select LP(N) -> BD*(1) C-O only
+mask = (
+    df["Donor"].str.contains(r"LP", regex=True) &
+    df["Donor"].str.contains(r"N", regex=True) &
+    df["Acceptor"].str.contains(r"BD\*\(\s*1\)", regex=True) &
+    df["Acceptor"].str.contains(r"C\s*1-\s*O\s*3", regex=True)
+)
+
+plot_df = df[mask].copy()
+plot_df = plot_df.sort_values("Angle")
+
+print(plot_df[["Angle","Donor","Acceptor","E2(kcal/mol)"]])
+
+plt.figure(figsize=(7,5))
+
+plt.plot(
+    plot_df["Angle"],
+    plot_df["E2(kcal/mol)"],
+    marker='o',
+    linewidth=2,
+    markersize=7
+)
+
+plt.xlabel("O–C–N–H Dihedral Angle (°)", fontsize=12)
+plt.ylabel("E(2) (kcal/mol)", fontsize=12)
+plt.title(r"LP(N) $\rightarrow$ $\pi^*$(C=O)", fontsize=13)
+
+plt.xticks(range(0,181,20))
+plt.grid(True)
+
+plt.tight_layout()
+
+plt.savefig("LPN_to_CO_pi_star.pdf")
+plt.savefig("LPN_to_CO_pi_star.png", dpi=300)
+
+plt.show()
+```
