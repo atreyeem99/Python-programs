@@ -37650,3 +37650,39 @@ plt.savefig("LPN_to_CO_pi_star.png", dpi=300)
 
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read the CSV
+df = pd.read_csv("LPO1_CN.csv")
+
+# Sort by angle
+df = df.sort_values("Angle")
+
+# Create the plot
+plt.figure(figsize=(7,5))
+
+plt.plot(
+    df["Angle"],
+    df["E2 (kcal/mol)"],
+    marker='o',
+    linewidth=2,
+    markersize=6
+)
+
+plt.xlabel("O–C–N–H Dihedral Angle (°)", fontsize=12)
+plt.ylabel("E(2) (kcal/mol)", fontsize=12)
+plt.title(r"LP(O) $\rightarrow$ BD*(C-N) Interaction")
+
+plt.xticks(range(0,181,10))
+plt.grid(True)
+
+plt.tight_layout()
+
+plt.savefig("LPO_CN_E2.png", dpi=300)
+plt.savefig("LPO_CN_E2.pdf")
+
+plt.show()
+```
