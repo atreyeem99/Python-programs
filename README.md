@@ -37686,3 +37686,33 @@ plt.savefig("LPO_CN_E2.pdf")
 
 plt.show()
 ```
+#
+```
+import re
+import csv
+
+angles = []
+energies = []
+
+with open("scan.allxyz", "r") as f:
+    for line in f:
+        m = re.search(
+            r"Relaxed Surface Scan Step\s+(\d+)\s+E\s+(-?\d+\.\d+)",
+            line,
+        )
+        if m:
+            step = int(m.group(1))
+            energy = float(m.group(2))
+
+            angle = (step - 1) * 10  # 0,10,...,180
+            angles.append(angle)
+            energies.append(energy)
+
+with open("energy_vs_dihedral.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Angle (deg)", "Energy (Eh)"])
+    writer.writerows(zip(angles, energies))
+
+print(f"Extracted {len(angles)} scan points.")
+print("Saved energy_vs_dihedral.csv")
+```
