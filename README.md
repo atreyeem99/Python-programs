@@ -37760,3 +37760,117 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 ```
+#
+```
+import os
+import re
+
+names_file = "A_names.txt"
+base_dir = "."
+output_file = "SI_output.txt"
+
+# Read molecule names
+with open(names_file) as f:
+    molecules = [line.strip() for line in f if line.strip()]
+
+# Format chemical name
+def format_mol_name(name):
+    parts = name.split("_")
+    nums = []
+    rest = None
+
+    for p in parts:
+        if p.isdigit():
+            nums.append(p)
+        else:
+            rest = p
+            break
+
+    if nums and rest:
+        return f"{','.join(nums)}-{rest}"
+    return name
+
+# Read XYZ
+def read_xyz(filepath):
+    with open(filepath) as f:
+        lines = f.readlines()
+
+    n_atoms = int(lines[0].strip())
+    coords = lines[2:]
+    return n_atoms, coords
+
+# Extract frequencies
+def extract_freq(filepath):
+    freqs = []
+    capture = False
+
+    with open(filepath) as f:
+        for line in f:
+            if "VIBRATIONAL FREQUENCIES" in line:
+                capture = True
+                continue
+
+            if "NORMAL MODES" in line:
+                break
+
+            if capture:
+                match = re.search(r"\d+:\s+([-]?\d+\.\d+)", line)
+                if match:
+                    freqs.append(match.group(1))
+
+    return freqs
+
+# Write SI
+with open(output_file, "w") as out:
+
+    for idx, mol in enumerate(molecules, start=1):
+        mol_path = os.path.join(base_dir, mol)
+
+        xyz_file = os.path.join(mol_path, "geom_DFT_S0.xyz")
+        opt_file = os.path.join(mol_path, "opt.out")
+
+        if not os.path.exists(xyz_file) or not os.path.exists(opt_file):
+            print(f"Skipping {mol}")
+            continue
+
+        n_atoms, coords = read_xyz(xyz_file)
+        freqs = extract_freq(opt_file)
+
+        pretty_name = format_mol_name(mol)
+        label = f"I-A{idx}"   # 🔥 THIS is the key change
+
+        # Format frequencies (6 per line)
+        freq_lines = []
+        for i in range(0, len(freqs), 6):
+            freq_lines.append("  " + "   ".join(freqs[i:i+6]))
+
+        # Write block
+        out.write("\\clearpage\n\n")
+        out.write("\\singlespacing\n")
+        out.write("\\footnotesize\n")
+        out.write("{\n")
+        out.write("\\begin{verbatim}\n\n")
+
+        # 🔥 Label here
+        out.write(f"MOLECULE: {label}\n")
+        out.write("-----------------------------------------------------------------\n\n")
+
+        out.write("CARTESIAN COORDINATES\n")
+        out.write("---------------------\n")
+        out.write(f"{n_atoms}\n")
+        out.write(f"{pretty_name}\n")
+
+        for line in coords:
+            out.write(line)
+
+        out.write("\nVIBRATIONAL FREQUENCIES\n")
+        out.write("------------------------\n")
+
+        for line in freq_lines:
+            out.write(line + "\n")
+
+        out.write("\n\\end{verbatim}\n")
+        out.write("}\n\n")
+
+print("Done! SI file ready.")
+```
