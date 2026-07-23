@@ -37874,3 +37874,133 @@ with open(output_file, "w") as out:
 
 print("Done! SI file ready.")
 ```
+#
+```
+import os
+import re
+
+# Input / Output
+names_file = "A_names.txt"
+base_dir = "."   # folder containing molecule folders
+output_file = "SI_output.txt"
+
+# ----------------------------
+# Read molecule names
+# ----------------------------
+with open(names_file) as f:
+    molecules = [line.strip() for line in f if line.strip()]
+
+# ----------------------------
+# Format molecule name
+# ----------------------------
+def format_mol_name(name):
+    parts = name.split("_")
+    
+    nums = []
+    rest = None
+    
+    for p in parts:
+        if p.isdigit():
+            nums.append(p)
+        else:
+            rest = p
+            break
+
+    if nums and rest:
+        return f"{','.join(nums)}-{rest}"
+    else:
+        return name
+
+# ----------------------------
+# Read XYZ
+# ----------------------------
+def read_xyz(filepath):
+    with open(filepath) as f:
+        lines = f.readlines()
+    
+    n_atoms = int(lines[0].strip())
+    coords = lines[2:]  # skip title line
+    
+    return n_atoms, coords
+
+# ----------------------------
+# Extract frequencies
+# ----------------------------
+def extract_freq(filepath):
+    freqs = []
+    capture = False
+
+    with open(filepath) as f:
+        for line in f:
+            if "VIBRATIONAL FREQUENCIES" in line:
+                capture = True
+                continue
+            
+            if "NORMAL MODES" in line:
+                break
+
+            if capture:
+                match = re.findall(r"\d+\.\d+", line)
+                if match:
+                    freqs.extend(match)
+
+    return freqs
+
+# ----------------------------
+# Write SI file
+# ----------------------------
+with open(output_file, "w") as out:
+
+    for mol in molecules:
+        mol_path = os.path.join(base_dir, mol)
+
+        xyz_file = os.path.join(mol_path, "geom_DFT_S0.xyz")
+        opt_file = os.path.join(mol_path, "opt.out")
+
+        if not os.path.exists(xyz_file) or not os.path.exists(opt_file):
+            print(f"Skipping {mol} (missing files)")
+            continue
+
+        # Read data
+        n_atoms, coords = read_xyz(xyz_file)
+        freqs = extract_freq(opt_file)
+
+        # Format frequencies: 6 per line
+        freq_lines = []
+        for i in range(0, len(freqs), 6):
+            chunk = freqs[i:i+6]
+            freq_lines.append("  " + "   ".join(chunk))
+
+        # Format molecule name
+        pretty_name = format_mol_name(mol)
+
+        # ----------------------------
+        # Write block
+        # ----------------------------
+        out.write(f"% Molecule: {pretty_name}\n")
+        out.write("\\clearpage\n\n")
+
+        out.write("% \\singlespacing\n")
+        out.write("% \\footnotesize\n")
+        out.write("% {\n")
+        out.write("% \\begin{verbatim}\n")
+
+        out.write("CARTESIAN COORDINATES:\n")
+        out.write("---------------------\n")
+        out.write(f"{n_atoms}\n")
+        out.write(f"{pretty_name}\n")
+
+        for line in coords:
+            out.write(line)
+
+        out.write("\nVIBRATIONAL FREQUENCIES:\n")
+        out.write("------------------------\n")
+
+        for line in freq_lines:
+            out.write(line + "\n")
+
+        out.write("% \\end{verbatim}\n")
+        out.write("% }\n\n")
+
+print(f"\nDone! Output written to {output_file}")
+```
