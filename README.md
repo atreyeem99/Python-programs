@@ -38677,3 +38677,48 @@ plt.tight_layout()
 plt.savefig("venn4_diagram.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 1.6
+
+# positions: 2 top, 2 bottom
+positions = {
+    'A': (-1.2, 1.0),
+    'B': (1.2, 1.0),
+    'C': (-1.2, -1.0),
+    'D': (1.2, -1.0)
+}
+
+# muted scientific pastel palette (same tone family as your venn3)
+colors = {
+    'A': '#c7d7eb',  # blue
+    'B': '#e6cfcf',  # red
+    'C': '#cfe6cf',  # green
+    'D': '#d7c6df'   # purple
+}
+
+# draw circles
+for key in positions:
+    circle = Circle(
+        positions[key], r,
+        facecolor=colors[key],
+        edgecolor="#666666",
+        linewidth=1.2,
+        alpha=0.55   # important for soft overlap like venn3
+    )
+    ax.add_patch(circle)
+
+# clean style
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_diagram.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
