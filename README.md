@@ -38869,3 +38869,48 @@ plt.tight_layout()
 plt.savefig("venn4_clean.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0
+
+positions = [
+    (-1.0, 1.0),   # top-left
+    (1.0, 1.0),    # top-right
+    (-1.0, -1.0),  # bottom-left
+    (1.0, -1.0)    # bottom-right
+]
+
+# improved palette: blue, red, green, soft orange (no purple)
+colors = [
+    "#a9c8f5",  # blue
+    "#f2a7a7",  # red
+    "#aee3ae",  # green
+    "#f5c29a"   # soft orange (replaces purple)
+]
+
+for (x, y), color in zip(positions, colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="#4d4d4d",
+        linewidth=1.2,
+        alpha=0.65
+    )
+    ax.add_patch(circle)
+
+ax.set_xlim(-3.2, 3.2)
+ax.set_ylim(-3.2, 3.2)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_proposal.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
