@@ -39651,3 +39651,51 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 1.8
+
+# 2 top, 2 bottom (no rotation)
+positions = [
+    (-1.2, 1.0),   # top-left
+    (1.2, 1.0),    # top-right
+    (-1.2, -1.0),  # bottom-left
+    (1.2, -1.0)    # bottom-right
+]
+
+# slightly brighter but still soft (balanced RGB tones)
+colors = [
+    "#bcd4f6",  # brighter soft blue
+    "#f3bcbc",  # soft red
+    "#bfe3bf",  # soft green
+    "#d8c2f0"   # soft lavender
+]
+
+# draw circles
+for (x, y), color in zip(positions, colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="#555555",
+        linewidth=1.2,
+        alpha=0.6
+    )
+    ax.add_patch(circle)
+
+# 🔑 FIX ZOOM (important)
+ax.set_xlim(-4, 4)
+ax.set_ylim(-4, 4)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_final.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
