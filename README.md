@@ -39699,3 +39699,48 @@ plt.tight_layout()
 plt.savefig("venn4_final.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+import numpy as np
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0
+
+# Arrange 4 circles around a central point (flower shape)
+angles = [90, 0, 270, 180]  # top, right, bottom, left
+centers = [(1.2*np.cos(np.radians(a)), 1.2*np.sin(np.radians(a))) for a in angles]
+
+# muted scientific pastel palette
+colors = [
+    "#c7d7eb",  # blue
+    "#e6cfcf",  # red
+    "#cfe6cf",  # green
+    "#d7c6df"   # lavender
+]
+
+# draw circles
+for (x, y), color in zip(centers, colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="#555555",
+        linewidth=1.2,
+        alpha=0.55
+    )
+    ax.add_patch(circle)
+
+# proper limits so full shape is visible
+ax.set_xlim(-3, 3)
+ax.set_ylim(-3, 3)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_flower.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
