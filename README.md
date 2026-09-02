@@ -39744,3 +39744,51 @@ plt.tight_layout()
 plt.savefig("venn4_flower.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+plt.figure(figsize=(6,6))
+ax = plt.gca()
+
+r = 2.0  # slightly larger radius
+
+# bring circles closer → bigger central overlap
+positions = [
+    (-1.0, 1.0),   # top-left
+    (1.0, 1.0),    # top-right
+    (-1.0, -1.0),  # bottom-left
+    (1.0, -1.0)    # bottom-right
+]
+
+# brighter but still soft (balanced RGB palette)
+colors = [
+    "#a9c8f5",  # blue
+    "#f2a7a7",  # red
+    "#aee3ae",  # green
+    "#d1b3f3"   # lavender
+]
+
+# draw circles
+for (x, y), color in zip(positions, colors):
+    circle = Circle(
+        (x, y), r,
+        facecolor=color,
+        edgecolor="#4d4d4d",
+        linewidth=1.2,
+        alpha=0.65   # important for smooth blending
+    )
+    ax.add_patch(circle)
+
+# proper framing (no zoom issue)
+ax.set_xlim(-3.2, 3.2)
+ax.set_ylim(-3.2, 3.2)
+
+ax.set_aspect('equal')
+ax.axis('off')
+
+plt.tight_layout()
+plt.savefig("venn4_proposal.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
