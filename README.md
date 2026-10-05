@@ -41100,3 +41100,243 @@ plt.tight_layout()
 plt.savefig("venn4_proposal.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# ============================================================
+# PARAMETERS
+# ============================================================
+
+n = 500
+t = np.linspace(0, 1, n)
+
+
+# ============================================================
+# CORRELATED NOISE
+# ============================================================
+
+def correlated_noise(n, scale, window):
+
+    x = np.random.randn(n)
+
+    kernel = np.exp(
+        -np.linspace(-3, 3, window)**2
+    )
+
+    kernel /= kernel.sum()
+
+    return scale * np.convolve(
+        x, kernel, mode="same"
+    )
+
+
+# ============================================================
+# ENERGY E(t)
+# ============================================================
+
+E = (
+    0.55
+    + 0.10 * np.sin(
+        2*np.pi*0.85*t + 0.4
+    )
+    + 0.045 * np.sin(
+        2*np.pi*2.2*t + 0.8
+    )
+    + correlated_noise(
+        n, 0.035, 35
+    )
+)
+
+E = (E - E.mean()) / np.std(E)
+
+
+# ============================================================
+# FORCE F(t)
+# ============================================================
+
+F = (
+    0.18 * np.sin(
+        2*np.pi*5.2*t + 0.5
+    )
+    + 0.09 * np.sin(
+        2*np.pi*12.0*t + 0.8
+    )
+    + correlated_noise(
+        n, 0.075, 8
+    )
+)
+
+F = F / np.std(F)
+
+
+# ============================================================
+# FIGURE
+# ============================================================
+
+fig, (axE, axF) = plt.subplots(
+    2,
+    1,
+    figsize=(6.2, 3.8),
+    sharex=True,
+    gridspec_kw={
+        "height_ratios": [1, 1],
+        "hspace": 0.08
+    }
+)
+
+
+# ============================================================
+# COLOURS
+# ============================================================
+
+E_color = "#1769AA"
+F_color = "#D1493F"
+
+grid_color = "#C5CBD0"
+
+
+# ============================================================
+# E(t)
+# ============================================================
+
+axE.plot(
+    t,
+    E,
+    color=E_color,
+    linewidth=2.5,
+    solid_capstyle="round"
+)
+
+axE.text(
+    0.025,
+    0.72,
+    r"$E(t)$",
+    transform=axE.transAxes,
+    fontsize=13,
+    fontweight="bold",
+    color=E_color
+)
+
+
+# ============================================================
+# F(t)
+# ============================================================
+
+axF.plot(
+    t,
+    F,
+    color=F_color,
+    linewidth=2.3,
+    solid_capstyle="round"
+)
+
+axF.axhline(
+    0,
+    color=F_color,
+    linewidth=1.0,
+    linestyle="--",
+    alpha=0.55
+)
+
+axF.text(
+    0.075,
+    0.70,
+    r"$\mathbf{F}(t)$",
+    transform=axF.transAxes,
+    fontsize=13,
+    fontweight="bold",
+    color=F_color
+)
+
+
+# ============================================================
+# CLEAN SCIENTIFIC AXES
+# ONLY LEFT + BOTTOM AXES
+# ============================================================
+
+for ax in (axE, axF):
+
+    ax.set_facecolor("white")
+
+    # No numerical tick marks
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # Very subtle guide grid
+    ax.grid(
+        True,
+        color=grid_color,
+        linewidth=0.30,
+        alpha=0.16
+    )
+
+    # --------------------------------------------------------
+    # LEFT Y-AXIS
+    # --------------------------------------------------------
+
+    ax.spines["left"].set_visible(True)
+    ax.spines["left"].set_linewidth(2.1)
+    ax.spines["left"].set_color("black")
+
+    # --------------------------------------------------------
+    # BOTTOM X-AXIS
+    # --------------------------------------------------------
+
+    ax.spines["bottom"].set_visible(True)
+    ax.spines["bottom"].set_linewidth(2.1)
+    ax.spines["bottom"].set_color("black")
+
+    # --------------------------------------------------------
+    # REMOVE TOP + RIGHT
+    # --------------------------------------------------------
+
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+
+# ============================================================
+# LIMITS
+# ============================================================
+
+axE.set_xlim(0, 1)
+
+axE.set_ylim(
+    E.min() - 0.15,
+    E.max() + 0.15
+)
+
+axF.set_ylim(
+    F.min() - 0.15,
+    F.max() + 0.15
+)
+
+
+# ============================================================
+# LAYOUT
+# ============================================================
+
+plt.tight_layout()
+
+
+# ============================================================
+# SHOW
+# ============================================================
+
+plt.show()
+
+
+# ============================================================
+# SAVE
+# ============================================================
+
+fig.savefig(
+    "single_MD_E_F_trajectory.png",
+    dpi=600,
+    bbox_inches="tight",
+    transparent=True
+)
+```
