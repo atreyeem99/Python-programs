@@ -41541,3 +41541,204 @@ plt.savefig(
 
 plt.show()
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ============================================================
+# ILLUSTRATIVE STRUCTURE–PROPERTY SCATTER PLOT
+# ============================================================
+
+np.random.seed(18)
+
+# ------------------------------------------------------------
+# Generate illustrative data
+# x = ΔE_ST
+# y = oscillator strength
+# ------------------------------------------------------------
+
+n = 55
+
+x = np.linspace(-0.30, 0.20, n)
+
+# Positive structure-property trend
+y_trend = 0.38 + 0.42 * x
+
+# Scatter around the trend
+y = y_trend + np.random.normal(0, 0.075, n)
+
+# Keep values in sensible schematic range
+y = np.clip(y, 0.02, 0.60)
+
+
+# ============================================================
+# DIFFERENT CHEMICAL CLASSES
+# ============================================================
+
+# 4 illustrative classes
+groups = np.array([
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3,
+    0, 1, 2, 3
+])[:n]
+
+
+# Strong but proposal-friendly colours
+colors = [
+    "#2E86DE",   # blue
+    "#27AE60",   # green
+    "#F39C12",   # orange
+    "#D94B5B"    # red
+]
+
+
+# ============================================================
+# FIGURE
+# ============================================================
+
+fig, ax = plt.subplots(
+    figsize=(4.2, 3.2)
+)
+
+fig.patch.set_alpha(0)
+ax.set_facecolor("#FFFFFF")
+
+
+# ------------------------------------------------------------
+# Scatter points
+# ------------------------------------------------------------
+
+for g in range(4):
+
+    mask = groups == g
+
+    ax.scatter(
+        x[mask],
+        y[mask],
+        s=28,
+        color=colors[g],
+        alpha=0.85,
+        edgecolor="white",
+        linewidth=0.45,
+        zorder=3
+    )
+
+
+# ============================================================
+# TREND LINE
+# ============================================================
+
+xline = np.linspace(-0.32, 0.22, 200)
+
+yline = 0.38 + 0.42 * xline
+
+ax.plot(
+    xline,
+    yline,
+    color="#555555",
+    linewidth=1.4,
+    linestyle="--",
+    alpha=0.85,
+    zorder=2
+)
+
+
+# ============================================================
+# AXES
+# ============================================================
+
+ax.set_xlim(-0.32, 0.22)
+ax.set_ylim(0.0, 0.65)
+
+ax.set_xlabel(
+    r"$\Delta E_{\mathrm{ST}}$ (eV)",
+    fontsize=11,
+    fontweight="bold",
+    labelpad=5
+)
+
+ax.set_ylabel(
+    "Oscillator strength",
+    fontsize=11,
+    fontweight="bold",
+    labelpad=5
+)
+
+
+# ============================================================
+# GRID
+# ============================================================
+
+ax.grid(
+    True,
+    linewidth=0.6,
+    color="#D9E1E8",
+    alpha=0.55
+)
+
+ax.set_axisbelow(True)
+
+
+# ============================================================
+# TICKS
+# ============================================================
+
+ax.tick_params(
+    axis="both",
+    labelsize=8.5,
+    width=1.1,
+    length=3.5,
+    color="#34495E"
+)
+
+
+# ============================================================
+# BOLD, CLEAN FRAME
+# ============================================================
+
+for spine in ax.spines.values():
+
+    spine.set_linewidth(1.35)
+    spine.set_color("#34495E")
+
+
+# ============================================================
+# OPTIONAL: EMPHASISE DESIRABLE REGION
+# ============================================================
+
+# Very subtle region corresponding to small / inverted gaps
+ax.axvspan(
+    -0.32,
+    0,
+    color="#EAF4FB",
+    alpha=0.45,
+    zorder=0
+)
+
+
+# ============================================================
+# SAVE
+# ============================================================
+
+plt.savefig(
+    "structure_property_scatter.png",
+    dpi=600,
+    transparent=True,
+    bbox_inches="tight",
+    pad_inches=0.05
+)
+
+plt.show()
+```
