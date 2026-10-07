@@ -41742,3 +41742,166 @@ plt.savefig(
 
 plt.show()
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import re
+
+# ============================================================
+# SETTINGS
+# ============================================================
+
+filename = "your_file.csv"
+
+# ============================================================
+# READ CSV
+# ============================================================
+
+df = pd.read_csv(
+    filename,
+    header=None,
+    names=["name", "value1", "value2", "value3"]
+)
+
+# ============================================================
+# EXTRACT ax AND ac
+# ============================================================
+
+def extract_params(name):
+
+    ax_match = re.search(r"ax_([0-9.]+)", name)
+    ac_match = re.search(r"ac_([0-9.]+)", name)
+
+    ax = float(ax_match.group(1)) if ax_match else None
+    ac = float(ac_match.group(1)) if ac_match else None
+
+    return ax, ac
+
+
+df[["ax", "ac"]] = df["name"].apply(
+    lambda x: pd.Series(extract_params(x))
+)
+
+# Remove rows where ax/ac could not be extracted
+df = df.dropna(subset=["ax", "ac"])
+
+# ============================================================
+# PLOT
+# ============================================================
+
+fig, ax = plt.subplots(figsize=(7.2, 6.2))
+
+# Colour normalization
+norm = mpl.colors.Normalize(
+    vmin=df["value3"].min(),
+    vmax=df["value3"].max()
+)
+
+scatter = ax.scatter(
+    df["ax"],
+    df["ac"],
+    c=df["value3"],
+    cmap="RdBu_r",
+    norm=norm,
+    s=150,
+    edgecolor="black",
+    linewidth=1.0,
+    zorder=3
+)
+
+# ============================================================
+# GRID
+# ============================================================
+
+ax.grid(
+    True,
+    which="major",
+    linestyle="-",
+    linewidth=0.6,
+    alpha=0.25,
+    zorder=0
+)
+
+ax.grid(
+    True,
+    which="minor",
+    linestyle=":",
+    linewidth=0.5,
+    alpha=0.18,
+    zorder=0
+)
+
+ax.minorticks_on()
+
+# ============================================================
+# AXES
+# ============================================================
+
+ax.set_xlabel(r"$a_x$", fontsize=17)
+ax.set_ylabel(r"$a_c$", fontsize=17)
+
+ax.tick_params(
+    axis="both",
+    which="major",
+    labelsize=13,
+    width=1.2,
+    length=6
+)
+
+ax.tick_params(
+    axis="both",
+    which="minor",
+    width=0.8,
+    length=3
+)
+
+# Make axes slightly stronger
+for spine in ax.spines.values():
+    spine.set_linewidth(1.2)
+
+# ============================================================
+# COLOURBAR
+# ============================================================
+
+cbar = fig.colorbar(
+    scatter,
+    ax=ax,
+    pad=0.03
+)
+
+cbar.set_label(
+    r"$\Delta E$",
+    fontsize=15
+)
+
+cbar.ax.tick_params(
+    labelsize=12,
+    width=1
+)
+
+# ============================================================
+# LIMITS / LAYOUT
+# ============================================================
+
+ax.set_xlim(
+    df["ax"].min() - 0.05,
+    df["ax"].max() + 0.05
+)
+
+ax.set_ylim(
+    df["ac"].min() - 0.05,
+    df["ac"].max() + 0.05
+)
+
+plt.tight_layout()
+
+plt.savefig(
+    "ax_ac_plot.png",
+    dpi=400,
+    bbox_inches="tight"
+)
+
+plt.show()
+```
