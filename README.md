@@ -41905,3 +41905,192 @@ plt.savefig(
 
 plt.show()
 ```
+#
+```
+import numpy as np
+import sys
+
+
+def read_xyz(filename):
+    with open(filename, "r") as f:
+        lines = f.readlines()
+
+    n = int(lines[0].strip())
+    atoms = []
+    coords = []
+
+    for line in lines[2:2+n]:
+        parts = line.split()
+        atoms.append(parts[0])
+        coords.append([float(parts[1]), float(parts[2]), float(parts[3])])
+
+    return atoms, np.array(coords)
+
+
+def write_xyz(filename, atoms, coords, comment="10 Å face-to-face dimer"):
+    with open(filename, "w") as f:
+        f.write(f"{len(atoms)}\n")
+        f.write(comment + "\n")
+
+        for atom, xyz in zip(atoms, coords):
+            f.write(
+                f"{atom:2s} "
+                f"{xyz[0]:16.8f} "
+                f"{xyz[1]:16.8f} "
+                f"{xyz[2]:16.8f}\n"
+            )
+
+
+def center(coords):
+    return coords - np.mean(coords, axis=0)
+
+
+def orient_xy(coords):
+    """
+    Put the molecule approximately in the xy plane
+    using principal-component analysis.
+    """
+
+    coords = center(coords)
+
+    # covariance matrix
+    cov = np.cov(coords.T)
+
+    # eigenvectors
+    eigvals, eigvecs = np.linalg.eigh(cov)
+
+    # smallest eigenvalue = direction perpendicular to molecular plane
+    normal = eigvecs[:, np.argmin(eigvals)]
+
+    # construct rotation taking normal -> z
+    z = np.array([0.0, 0.0, 1.0])
+
+    v = np.cross(normal, z)
+    s = np.linalg.norm(v)
+    c = np.dot(normal, z)
+
+    if s < 1e-12:
+        if c > 0:
+            R = np.eye(3)
+        else:
+            R = np.diag([1.0, -1.0, -1.0])
+    else:
+        vx = np.array([
+            [0, -v[2], v[1]],
+            [v[2], 0, -v[0]],
+            [-v[1], v[0], 0]
+        ])
+
+        R = np.eye(3) + vx + vx @ vx * ((1 - c) / s**2)
+
+    return coords @ R.T
+
+
+def minimum_distance(A, B):
+    diff = A[:, None, :] - B[None, :, :]
+    distances = np.linalg.norm(diff, axis=2)
+
+    i, j = np.unravel_index(np.argmin(distances), distances.shape)
+
+    return distances[i, j], i, j
+
+
+# ---------------------------------------------------------
+# Input files
+# ---------------------------------------------------------
+
+if len(sys.argv) != 3:
+    print("Usage:")
+    print("python make_10A_dimer.py sensitizer.xyz emitter.xyz")
+    sys.exit()
+
+sens_file = sys.argv[1]
+emit_file = sys.argv[2]
+
+sens_atoms, sens = read_xyz(sens_file)
+emit_atoms, emit = read_xyz(emit_file)
+
+# ---------------------------------------------------------
+# Center and orient both molecules
+# ---------------------------------------------------------
+
+sens = orient_xy(sens)
+emit = orient_xy(emit)
+
+# Center both in x-y
+sens[:, 0] -= np.mean(sens[:, 0])
+sens[:, 1] -= np.mean(sens[:, 1])
+
+emit[:, 0] -= np.mean(emit[:, 0])
+emit[:, 1] -= np.mean(emit[:, 1])
+
+# Put sensitizer around z = 0
+sens[:, 2] -= np.mean(sens[:, 2])
+
+# Put emitter around z = 0 initially
+emit[:, 2] -= np.mean(emit[:, 2])
+
+# ---------------------------------------------------------
+# Put emitter above sensitizer
+# ---------------------------------------------------------
+
+# Lowest z coordinate of emitter
+emit_min_z = np.min(emit[:, 2])
+
+# Highest z coordinate of sensitizer
+sens_max_z = np.max(sens[:, 2])
+
+# Desired closest atom-atom separation
+target_distance = 10.0
+
+# Translate emitter along +z
+translation_z = sens_max_z + target_distance - emit_min_z
+
+emit[:, 2] += translation_z
+
+# ---------------------------------------------------------
+# Check actual minimum intermolecular distance
+# ---------------------------------------------------------
+
+distance, i, j = minimum_distance(sens, emit)
+
+print()
+print("==============================================")
+print("10 Å FACE-TO-FACE DIMER")
+print("==============================================")
+print(f"Sensitizer atoms : {len(sens_atoms)}")
+print(f"Emitter atoms    : {len(emit_atoms)}")
+print()
+print(
+    f"Closest atom pair: "
+    f"{sens_atoms[i]}(sensitizer) - {emit_atoms[j]}(emitter)"
+)
+print(f"Initial distance : {distance:.8f} Å")
+
+# Small numerical correction so that distance is EXACTLY 10 Å
+correction = target_distance - distance
+emit[:, 2] += correction
+
+# Final check
+final_distance, i, j = minimum_distance(sens, emit)
+
+print(f"Final distance   : {final_distance:.8f} Å")
+print("==============================================")
+print()
+
+# ---------------------------------------------------------
+# Combine molecules
+# ---------------------------------------------------------
+
+all_atoms = sens_atoms + emit_atoms
+all_coords = np.vstack([sens, emit])
+
+write_xyz(
+    "dimer_10A.xyz",
+    all_atoms,
+    all_coords,
+    "Sensitizer + emitter, face-to-face, closest distance = 10.00 Angstrom"
+)
+
+print("Written: dimer_10A.xyz")
+```
