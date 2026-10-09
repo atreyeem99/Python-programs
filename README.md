@@ -42094,3 +42094,58 @@ write_xyz(
 
 print("Written: dimer_10A.xyz")
 ```
+#
+```
+import os
+import shutil
+
+# ============================================================
+# CURRENT FOLDER = HEPTAZINE
+# ============================================================
+
+heptazine = os.getcwd()
+
+# geometry.xyz in the heptazine folder
+source_geometry = os.path.join(
+    heptazine,
+    "geometry.xyz"
+)
+
+# ============================================================
+# CHECK geometry.xyz
+# ============================================================
+
+if not os.path.isfile(source_geometry):
+    raise FileNotFoundError(
+        f"geometry.xyz not found in:\n{heptazine}"
+    )
+
+# ============================================================
+# COPY TO ALL SUBFOLDERS
+# ============================================================
+
+for item in os.listdir(heptazine):
+
+    subfolder = os.path.join(
+        heptazine,
+        item
+    )
+
+    # Only process directories
+    if not os.path.isdir(subfolder):
+        continue
+
+    destination = os.path.join(
+        subfolder,
+        "geometry.xyz"
+    )
+
+    shutil.copy2(
+        source_geometry,
+        destination
+    )
+
+    print(f"Copied geometry.xyz → {item}/")
+
+print("\nDone.")
+```
