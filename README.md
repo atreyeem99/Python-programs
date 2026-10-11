@@ -42203,3 +42203,145 @@ plt.tight_layout()
 plt.savefig("venn4_final_refined.png", dpi=600, bbox_inches="tight")
 plt.show()
 ```
+#
+```
+```python
+import csv
+import numpy as np
+import os
+
+
+def load_csv(path):
+    data = {}
+
+    with open(path, "r") as f:
+        reader = csv.reader(f)
+        header = next(reader)  # Molecule,S1S0,T1S0,S1T1
+
+        for row in reader:
+            name = row[0]
+            values = np.array([float(v) for v in row[1:]], dtype=float)
+            data[name] = values
+
+    return data
+
+
+def calculate_stats(ref, method):
+    errors = []
+
+    for mol in ref:
+        if mol in method:
+            diff = method[mol] - ref[mol]
+            errors.append(diff)
+
+    errors = np.array(errors)
+
+    # Individual MAE and SDE
+    mae = np.mean(np.abs(errors), axis=0)
+    sde = np.std(errors, axis=0)
+
+    # Overall MAE and SDE across all three quantities
+    mae_all = np.mean(np.abs(errors))
+    sde_all = np.std(errors)
+
+    # STG-only MAE (third column: S1T1)
+    mae_stg = mae[2]
+
+    return mae, sde, mae_all, sde_all, mae_stg
+
+
+def compare_all(reference_csv, csv_folder):
+    reference = load_csv(reference_csv)
+
+    results = []
+
+    # Include the reference method explicitly
+    reference_name = os.path.basename(reference_csv)
+
+    mae, sde, mae_all, sde_all, mae_stg = calculate_stats(
+        reference, reference
+    )
+
+    results.append({
+        "Method": reference_name,
+        "MAE_S1S0": mae[0],
+        "MAE_T1S0": mae[1],
+        "MAE_S1T1": mae[2],
+        "MAE_ALL": mae_all,
+        "SDE_S1S0": sde[0],
+        "SDE_T1S0": sde[1],
+        "SDE_S1T1": sde[2],
+        "SDE_ALL": sde_all,
+        "MAE_STG": mae_stg
+    })
+
+    # Calculate statistics for all other methods
+    for file in os.listdir(csv_folder):
+        if file.startswith("Method_") and file.endswith(".csv"):
+            method_path = os.path.join(csv_folder, file)
+            method_data = load_csv(method_path)
+
+            mae, sde, mae_all, sde_all, mae_stg = calculate_stats(
+                reference, method_data
+            )
+
+            results.append({
+                "Method": file,
+                "MAE_S1S0": mae[0],
+                "MAE_T1S0": mae[1],
+                "MAE_S1T1": mae[2],
+                "MAE_ALL": mae_all,
+                "SDE_S1S0": sde[0],
+                "SDE_T1S0": sde[1],
+                "SDE_T1S1": sde[2],
+                "SDE_ALL": sde_all,
+                "MAE_STG": mae_stg
+            })
+
+    # Normalized scores: 100 for zero MAE, 0 for largest MAE
+    max_mae_all = max(r["MAE_ALL"] for r in results)
+    max_mae_stg = max(r["MAE_STG"] for r in results)
+
+    for r in results:
+        r["Score_ALL_percent"] = (
+            100.0 * (1.0 - r["MAE_ALL"] / max_mae_all)
+            if max_mae_all != 0 else 100.0
+        )
+
+        r["Score_STG_percent"] = (
+            100.0 * (1.0 - r["MAE_STG"] / max_mae_stg)
+            if max_mae_stg != 0 else 100.0
+        )
+
+    # Sort from least overall error to most
+    results.sort(key=lambda r: r["MAE_ALL"])
+
+    # Print results
+    header = [
+        "Method",
+        "MAE_S1S0", "MAE_T1S0", "MAE_S1T1", "MAE_ALL",
+        "SDE_S1S0", "SDE_T1S0", "SDE_S1T1", "SDE_ALL",
+        "MAE_STG",
+        "Score_ALL_percent", "Score_STG_percent"
+    ]
+
+    print(",".join(header))
+
+    for r in results:
+        print(",".join(
+            [r["Method"]]
+            + [f"{r[k]:.3f}" for k in header[1:]]
+        ))
+
+
+# ---------------- HOW TO RUN ----------------
+
+reference_csv = (
+    "/home/atreyee/Project_AP_distorted/all_csv_files/"
+    "AP13_ex_low_sym_SCS-PBE-QIDH.csv"
+)
+
+csv_folder = "/home/atreyee/Project_AP_distorted/all_csv_files"
+
+compare_all(reference_csv, csv_folder)
+```
