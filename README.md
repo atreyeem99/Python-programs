@@ -42345,3 +42345,137 @@ csv_folder = "/home/atreyee/Project_AP_distorted/all_csv_files"
 
 compare_all(reference_csv, csv_folder)
 ```
+#
+```
+
+from pathlib import Path
+import re
+import csv
+
+base_dir = Path(
+    "/home/atreyee/Project_nanographene_colab/G16_CISD_test/32APs_wB97MD4_geom"
+)
+
+output_csv = base_dir / "BNPAH_orbital_window_check.csv"
+
+# Match lines such as:
+# Alpha occ 39 OE=-0.469 is N11-p=0.2137 ...
+# Alpha vir 45 OE=0.030 is C10-p=0.1737 ...
+orbital_pattern = re.compile(
+    r"Alpha\s+(occ|vir)\s+(\d+)\s+OE\s*=\s*"
+    r"([-+]?\d*\.?\d+(?:[Ee][-+]?\d+)?)"
+    r"(?:\s+is\s+(.*))?",
+    re.IGNORECASE
+)
+
+rows = []
+
+log_files = sorted(
+    p for p in base_dir.rglob("*")
+    if p.is_file() and p.name.lower() == "hf.log"
+)
+
+print(f"HF.log files found: {len(log_files)}")
+
+for log_file in log_files:
+    text = log_file.read_text(errors="replace")
+
+    occupied = []
+    virtual = []
+
+    for line in text.splitlines():
+        match = orbital_pattern.search(line)
+
+        if not match:
+            continue
+
+        kind = match.group(1).lower()
+        orbital_number = int(match.group(2))
+        energy = float(match.group(3))
+        character = match.group(4) or ""
+
+        entry = {
+            "orbital": orbital_number,
+            "energy": energy,
+            "character": character.strip()
+        }
+
+        if kind == "occ":
+            occupied.append(entry)
+        else:
+            virtual.append(entry)
+
+    folder = log_file.parent.name
+
+    if not occupied or not virtual:
+        print(f"WARNING: No complete orbital section in {log_file}")
+        continue
+
+    occupied.sort(key=lambda x: x["orbital"])
+    virtual.sort(key=lambda x: x["orbital"])
+
+    # Proposed window: last 30 occupied and first 50 virtual
+    selected_occ = occupied[-30:]
+    selected_vir = virtual[:50]
+
+    occ_numbers = [x["orbital"] for x in selected_occ]
+    vir_numbers = [x["orbital"] for x in selected_vir]
+
+    occ_ok = len(selected_occ) == 30
+    vir_ok = len(selected_vir) == 50
+
+    occ_range = (
+        f"{min(occ_numbers)}-{max(occ_numbers)}"
+        if occ_numbers else "missing"
+    )
+
+    vir_range = (
+        f"{min(vir_numbers)}-{max(vir_numbers)}"
+        if vir_numbers else "missing"
+    )
+
+    row = {
+        "Folder": folder,
+        "Occupied_orbitals_found": len(occupied),
+        "Virtual_orbitals_found": len(virtual),
+        "Selected_occupied_count": len(selected_occ),
+        "Selected_occupied_range": occ_range,
+        "Selected_virtual_count": len(selected_vir),
+        "Selected_virtual_range": vir_range,
+        "Selection_complete": occ_ok and vir_ok,
+        "HOMO_number": max(x["orbital"] for x in occupied),
+        "LUMO_number": min(x["orbital"] for x in virtual)
+    }
+
+    rows.append(row)
+
+    print(
+        f"{folder}: "
+        f"occupied {occ_range} ({len(selected_occ)} orbitals); "
+        f"virtual {vir_range} ({len(selected_vir)} orbitals); "
+        f"complete={occ_ok and vir_ok}"
+    )
+
+fieldnames = [
+    "Folder",
+    "Occupied_orbitals_found",
+    "Virtual_orbitals_found",
+    "Selected_occupied_count",
+    "Selected_occupied_range",
+    "Selected_virtual_count",
+    "Selected_virtual_range",
+    "Selection_complete",
+    "HOMO_number",
+    "LUMO_number"
+]
+
+with open(output_csv, "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(rows)
+
+print("\n========== SUMMARY ==========")
+print(f"HF logs processed: {len(rows)}")
+print(f"CSV saved to: {output_csv}")
+print("Check Selection_complete before proceeding.")
+```
