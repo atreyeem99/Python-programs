@@ -42502,3 +42502,140 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+
+from pathlib import Path
+import re
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+
+file_path = Path("P11_orbital.txt")
+
+WINDOW_START = 320
+WINDOW_END = 379
+HARTREE_TO_EV = 27.211386245988
+
+pattern = re.compile(
+    r"Alpha\s+(occ|vir)\s+(\d+)\s+OE\s*=\s*"
+    r"([-+]?(?:\d+\.?\d*|\.\d+)(?:[Ee][-+]?\d+)?)",
+    re.IGNORECASE
+)
+
+occupied = []
+virtual = []
+selected_occ = []
+selected_vir = []
+
+with file_path.open("r", errors="ignore") as f:
+    for line in f:
+        match = pattern.search(line)
+        if not match:
+            continue
+
+        kind = match.group(1).lower()
+        orbital_number = int(match.group(2))
+        energy_hartree = float(match.group(3))
+        energy_ev = energy_hartree * HARTREE_TO_EV
+
+        if kind == "occ":
+            occupied.append((orbital_number, energy_ev))
+            if WINDOW_START <= orbital_number <= WINDOW_END:
+                selected_occ.append((orbital_number, energy_ev))
+        else:
+            virtual.append((orbital_number, energy_ev))
+            if WINDOW_START <= orbital_number <= WINDOW_END:
+                selected_vir.append((orbital_number, energy_ev))
+
+if not occupied or not virtual:
+    raise ValueError("The file must contain both occupied and virtual orbitals.")
+
+selected = selected_occ + selected_vir
+if not selected:
+    raise ValueError("No orbitals found inside the selected window.")
+
+occ_e = np.array([e for _, e in occupied])
+vir_e = np.array([e for _, e in virtual])
+selected_energies = np.array([e for _, e in selected])
+
+low_energy = selected_energies.min()
+high_energy = selected_energies.max()
+
+# HOMO and LUMO energies
+homo = occ_e.max()
+lumo = vir_e.min()
+
+print(f"HOMO energy: {homo:.3f} eV")
+print(f"LUMO energy: {lumo:.3f} eV")
+print(f"HF HOMO-LUMO gap: {lumo - homo:.3f} eV")
+
+# Set a common x-axis, but evaluate each KDE only on its own
+# physically relevant side of the HOMO-LUMO gap.
+all_energies = np.concatenate([occ_e, vir_e])
+padding = max(0.2, 0.05 * np.ptp(all_energies))
+
+x_min = all_energies.min() - padding
+x_max = all_energies.max() + padding
+
+# Separate x grids: occupied KDE ends at HOMO; virtual KDE starts at LUMO.
+x_occ = np.linspace(x_min, homo, 700)
+x_vir = np.linspace(lumo, x_max, 700)
+
+fig, ax = plt.subplots(figsize=(9, 5.5))
+
+def add_kde(energies, x, label, color):
+    if len(energies) < 2 or np.std(energies) == 0:
+        return
+
+    kde = gaussian_kde(energies)
+
+    # Evaluate only in the specified energy interval.
+    density = kde(x)
+
+    ax.plot(x, density, linewidth=2.2, color=color, label=label)
+    ax.fill_between(x, density, color=color, alpha=0.15)
+
+add_kde(occ_e, x_occ, "Occupied orbitals", "#286A9B")
+add_kde(vir_e, x_vir, "Virtual orbitals", "#D64B45")
+
+# Shade the HF energy interval covered by selected orbital indices.
+ax.axvspan(
+    low_energy,
+    high_energy,
+    color="grey",
+    alpha=0.25,
+    label=f"Selected CIS(D) window ({WINDOW_START}–{WINDOW_END})",
+    zorder=0
+)
+
+ax.axvline(homo, color="#286A9B", linestyle=":", linewidth=1.2)
+ax.axvline(lumo, color="#D64B45", linestyle=":", linewidth=1.2)
+
+ax.axvline(low_energy, color="grey", linestyle="--", linewidth=1)
+ax.axvline(high_energy, color="grey", linestyle="--", linewidth=1)
+
+ax.set_xlim(x_min, x_max)
+ax.set_xlabel("HF orbital energy (eV)")
+ax.set_ylabel("KDE density")
+ax.set_title("P11: HF orbital-energy distribution")
+
+ax.legend(frameon=False)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.grid(axis="both", alpha=0.18, linewidth=0.6)
+
+fig.tight_layout()
+fig.savefig("P11_orbital_KDE.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+print(f"Total occupied orbitals: {len(occupied)}")
+print(f"Total virtual orbitals: {len(virtual)}")
+print(f"Selected occupied orbitals: {len(selected_occ)}")
+print(f"Selected virtual orbitals: {len(selected_vir)}")
+print(
+    f"Selected HF energy span: {low_energy:.3f} to "
+    f"{high_energy:.3f} eV"
+)
+print("Saved figure: P11_orbital_KDE.png")
+```
