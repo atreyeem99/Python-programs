@@ -42639,3 +42639,47 @@ print(
 )
 print("Saved figure: P11_orbital_KDE.png")
 ```
+#
+```
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Distance in Angstrom
+R = np.linspace(3, 20, 500)
+
+# Illustrative exponential decay parameter (1/Angstrom)
+beta = 1.0
+
+# Normalised DET rate, referenced to R = 3 Angstrom
+R_ref = 3.0
+k_det = np.exp(-beta * (R - R_ref))
+
+fig, ax = plt.subplots(figsize=(5.2, 3.6))
+
+ax.plot(R, k_det, color="black", linewidth=2)
+
+ax.text(
+    0.97, 0.94,
+    r"$k_{\mathrm{DET}}\propto e^{-\beta R}$",
+    transform=ax.transAxes,
+    ha="right", va="top", fontsize=12
+)
+
+ax.set_xlabel(r"Donor--acceptor distance, $R$ ($\mathrm{\AA}$)",
+              fontsize=11)
+ax.set_ylabel(r"Normalised DET rate", fontsize=11)
+
+ax.set_yscale("log")
+ax.set_xlim(3, 20)
+ax.set_ylim(1e-8, 2)
+
+ax.tick_params(direction="in", top=True, right=True)
+for spine in ax.spines.values():
+    spine.set_linewidth(1)
+
+plt.tight_layout()
+plt.savefig("DET_distance_dependence.png", dpi=600,
+            bbox_inches="tight")
+plt.show()
+```
