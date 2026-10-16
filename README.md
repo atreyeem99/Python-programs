@@ -42683,3 +42683,72 @@ plt.savefig("DET_distance_dependence.png", dpi=600,
             bbox_inches="tight")
 plt.show()
 ```
+#
+```
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Wavelength range
+wavelength = np.linspace(350, 650, 1200)
+
+# Gaussian spectra (illustrative)
+def gaussian(x, center, fwhm):
+    sigma = fwhm / (2 * np.sqrt(2 * np.log(2)))
+    return np.exp(-0.5 * ((x - center) / sigma)**2)
+
+# Donor emission and acceptor absorption
+donor_emission = gaussian(wavelength, 470, 65)
+acceptor_absorption = gaussian(wavelength, 500, 65)
+
+# Normalize both spectra
+donor_emission /= np.max(donor_emission)
+acceptor_absorption /= np.max(acceptor_absorption)
+
+# Spectral overlap contribution (illustrative normalized spectra)
+overlap = donor_emission * acceptor_absorption
+
+# Plot
+fig, ax = plt.subplots(figsize=(7.2, 4.6))
+
+ax.plot(
+    wavelength, donor_emission,
+    color="black", linewidth=2,
+    label=r"Donor emission, $F_D(\lambda)$"
+)
+
+ax.plot(
+    wavelength, acceptor_absorption,
+    color="black", linewidth=2, linestyle="--",
+    label=r"Acceptor absorption, $\varepsilon_A(\lambda)$"
+)
+
+ax.fill_between(
+    wavelength, 0, overlap,
+    color="0.75", alpha=0.65,
+    label="Spectral overlap"
+)
+
+ax.set_xlabel("Wavelength (nm)", fontsize=12)
+ax.set_ylabel("Normalized intensity / absorption", fontsize=12)
+ax.set_xlim(350, 650)
+ax.set_ylim(0, 1.12)
+
+ax.text(
+    0.04, 0.94,
+    r"$J(\lambda)=\int F_D(\lambda)\,"
+    r"\varepsilon_A(\lambda)\lambda^4\,d\lambda$",
+    transform=ax.transAxes,
+    fontsize=11,
+    va="top"
+)
+
+ax.legend(frameon=False, fontsize=9, loc="upper right")
+ax.tick_params(direction="in", top=True, right=True)
+ax.spines["top"].set_visible(True)
+ax.spines["right"].set_visible(True)
+
+fig.tight_layout()
+fig.savefig("spectral_overlap.png", dpi=600, bbox_inches="tight")
+plt.show()
+```
