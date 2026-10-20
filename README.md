@@ -42929,3 +42929,134 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Distance (nm)
+R = np.linspace(0, 12, 1200)
+
+# FRET efficiency
+R0 = 4.0
+fret = 100 / (1 + (R / R0)**6)
+
+# DET efficiency (exponential distance dependence)
+L = 0.55
+det = 100 * np.exp(-R / L)
+
+# Create figure
+fig, ax = plt.subplots(figsize=(9.2, 6.4), dpi=160)
+
+# Plot FRET and DET
+ax.plot(R, fret, color='red', linewidth=1.8, label='FRET')
+ax.plot(R, det, color='blue', linewidth=1.8, label='DET')
+
+# R0 guide lines
+green = '#6b9658'
+
+ax.axhline(
+    50, xmin=0, xmax=R0 / 12,
+    color=green, linestyle=(0, (6, 3)), linewidth=1.5
+)
+
+ax.axvline(
+    R0, ymin=0, ymax=0.5,
+    color=green, linestyle=(0, (6, 3)), linewidth=1.5
+)
+
+# R0 annotation
+ax.annotate(
+    r'$R_0$',
+    xy=(4.15, 52),
+    xytext=(4.9, 58),
+    fontsize=18,
+    color=green,
+    arrowprops=dict(
+        arrowstyle='-|>',
+        color=green,
+        lw=1.0
+    )
+)
+
+# Axis limits
+ax.set_xlim(0, 12)
+ax.set_ylim(0, 110)
+
+# Major and minor ticks
+ax.set_xticks(np.arange(0, 13, 2))
+ax.set_xticks(np.arange(0, 13, 1), minor=True)
+
+ax.set_yticks([0, 25, 50, 75, 100])
+ax.set_yticks(np.arange(12.5, 100, 25), minor=True)
+
+# Axis labels
+ax.set_xlabel(
+    'Distance / nm',
+    fontsize=18,
+    fontweight='bold'
+)
+
+ax.set_ylabel(
+    'Efficiency of Energy transfer (%)',
+    fontsize=16,
+    fontweight='bold'
+)
+
+# Grid
+ax.grid(
+    which='major',
+    linestyle='--',
+    color='#d9d9d9',
+    linewidth=0.8
+)
+
+ax.grid(
+    which='minor',
+    linestyle='--',
+    color='#e8e8e8',
+    linewidth=0.6
+)
+
+# Axis frame
+for spine in ax.spines.values():
+    spine.set_linewidth(1.2)
+    spine.set_color('#333333')
+
+# Tick styling
+ax.tick_params(
+    axis='both',
+    which='major',
+    labelsize=12,
+    length=6,
+    width=1.1
+)
+
+ax.tick_params(
+    axis='both',
+    which='minor',
+    length=3,
+    width=0.9
+)
+
+# Legend
+ax.legend(
+    loc='upper right',
+    frameon=False,
+    fontsize=15,
+    handlelength=2.4,
+    handletextpad=0.4,
+    borderpad=0.1,
+    labelspacing=0.25
+)
+
+# Layout and save
+fig.tight_layout()
+fig.savefig(
+    'fret_det_efficiency.png',
+    dpi=300,
+    bbox_inches='tight'
+)
+
+plt.show()
+```
