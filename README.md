@@ -43060,3 +43060,123 @@ fig.savefig(
 
 plt.show()
 ```
+#
+```
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+REFERENCE = 0.32
+
+# Darker, distinct colours
+colors = {
+    "32 APs": "#1764A0",
+    "46 BN-PAHs": "#C43C39",
+    "7 NAHs": "#16845B",
+}
+
+def plot_dots(show_reference=False):
+    fig, ax = plt.subplots(figsize=(10, 5.8))
+
+    # Separate horizontal bands for each dataset
+    offsets = {
+        "32 APs": 2,
+        "46 BN-PAHs": 1,
+        "7 NAHs": 0,
+    }
+
+    for i, (label, values) in enumerate(data.items()):
+        rng = np.random.default_rng(42 + i)
+        jitter = rng.uniform(-0.20, 0.20, len(values))
+
+        ax.scatter(
+            values,
+            offsets[label] + jitter,
+            s=48,
+            color=colors[label],
+            alpha=0.95,
+            edgecolors="white",
+            linewidths=0.65,
+            label=f"{label}  (N = {len(values)})",
+            zorder=3,
+        )
+
+    if show_reference:
+        ax.axvline(
+            REFERENCE,
+            color="#292929",
+            linestyle=(0, (5, 3)),
+            linewidth=1.8,
+            label="Reference: 0.32 eV",
+            zorder=2,
+        )
+
+    # Labels and limits
+    ax.set_xlabel(
+        r"$E(S_1,\mathrm{CIS}) - E(S_1,\mathrm{CISD})$ (eV)",
+        fontsize=13,
+        labelpad=10,
+    )
+    ax.set_yticks([0, 1, 2])
+    ax.set_yticklabels(["7 NAHs", "46 BN-PAHs", "32 APs"], fontsize=11)
+    ax.set_ylabel("Dataset", fontsize=12, labelpad=10)
+
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(-0.55, 2.55)
+
+    # Light background grid
+    ax.set_axisbelow(True)
+    ax.grid(
+        axis="x",
+        color="#D9DDE2",
+        linestyle="-",
+        linewidth=0.75,
+        alpha=0.8,
+    )
+    ax.grid(
+        axis="y",
+        color="#E8EAED",
+        linestyle="-",
+        linewidth=0.65,
+        alpha=0.8,
+    )
+
+    # Clean background and borders
+    ax.set_facecolor("#FCFCFD")
+    fig.patch.set_facecolor("white")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color("#B8BEC5")
+    ax.spines["bottom"].set_color("#B8BEC5")
+
+    ax.tick_params(axis="x", labelsize=11, length=4, color="#777777")
+    ax.tick_params(axis="y", length=0, pad=9)
+
+    ax.legend(
+        frameon=True,
+        facecolor="white",
+        edgecolor="#E0E0E0",
+        framealpha=0.95,
+        fontsize=10,
+        loc="best",
+        borderpad=0.8,
+    )
+
+    fig.tight_layout()
+    return fig
+
+
+# Plot 1: Individual molecular energy differences
+fig1 = plot_dots(show_reference=False)
+fig1.savefig("S1_CIS_CISD_dotplot.png", dpi=400, bbox_inches="tight")
+
+# Plot 2: Same plot with the 0.32 eV reference
+fig2 = plot_dots(show_reference=True)
+fig2.savefig(
+    "S1_CIS_CISD_dotplot_reference_032eV.png",
+    dpi=400,
+    bbox_inches="tight",
+)
+
+plt.show()
+```
