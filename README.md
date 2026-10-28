@@ -43566,3 +43566,251 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
+# ==================================================
+# 1. INPUT FILES (CSV FILES HAVE NO HEADERS)
+# ==================================================
+files = {
+    "7AP": "7AP.csv",
+    "DBP": "dbp.csv",
+    "7AP–DBP": "7ap_dbp.csv",
+    "7AP–linker–DBP": "7ap_link_dbp.csv",
+}
+
+# ==================================================
+# 2. COLOURS
+# ==================================================
+COLORS = {
+    "7AP": "#4C9A68",             # Green
+    "DBP": "#E69545",             # Orange
+    "7AP–DBP": "#6CADD0",         # Blue
+    "7AP–linker–DBP": "#D98282",  # Red
+}
+
+LINE_WIDTH = 2.0
+LABEL_SIZE = 7
+
+# ==================================================
+# 3. READ AND PROCESS CSV FILES
+# ==================================================
+data = {}
+
+for system, filename in files.items():
+
+    # CSV format: molecule, state, energy
+    df = pd.read_csv(filename, header=None)
+
+    df = df.iloc[:, :3].copy()
+    df.columns = ["Molecule", "State", "Energy"]
+
+    df["Molecule"] = df["Molecule"].astype(str).str.strip()
+    df["State"] = df["State"].astype(str).str.strip()
+    df["Energy"] = pd.to_numeric(df["Energy"], errors="coerce")
+    df = df.dropna(subset=["Energy"])
+
+    # Identify spin multiplicity from state label
+    df["Spin"] = df["State"].str.upper().str[0]
+    df = df[df["Spin"].isin(["S", "T"])]
+
+    # Sort and renumber each spin manifold by energy
+    for spin in ["S", "T"]:
+
+        subset = df[df["Spin"] == spin].sort_values(
+            "Energy", kind="stable"
+        ).copy()
+
+        subset = subset.reset_index(drop=True)
+        subset["Label"] = [
+            f"{spin}{i + 1}" for i in range(len(subset))
+        ]
+
+        data[(system, spin)] = subset
+
+# ==================================================
+# 4. X-AXIS LAYOUT: SIX COLUMNS
+# ==================================================
+# Column 1: Isolated singlets (7AP + DBP)
+# Column 2: Isolated triplets (7AP + DBP)
+# Column 3: 7AP-DBP singlets
+# Column 4: 7AP-DBP triplets
+# Column 5: 7AP-linker-DBP singlets
+# Column 6: 7AP-linker-DBP triplets
+
+columns = [
+    ("isolated", "S", 0),
+    ("isolated", "T", 1),
+    ("7AP–DBP", "S", 3),
+    ("7AP–DBP", "T", 4),
+    ("7AP–linker–DBP", "S", 6),
+    ("7AP–linker–DBP", "T", 7),
+]
+
+# ==================================================
+# 5. CREATE PLOT
+# ==================================================
+fig, ax = plt.subplots(figsize=(13, 9))
+
+column_width = 0.48
+half_width = column_width / 2
+
+for system, spin, x in columns:
+
+    # Isolated molecules share the same x position
+    if system == "isolated":
+        systems_to_plot = ["7AP", "DBP"]
+    else:
+        systems_to_plot = [system]
+
+    for molecule in systems_to_plot:
+
+        df = data.get((molecule, spin), pd.DataFrame())
+        color = COLORS[molecule]
+
+        # Small horizontal offsets distinguish 7AP and DBP
+        # within the same isolated-state column.
+        if system == "isolated":
+            offset = -0.12 if molecule == "7AP" else 0.12
+            line_halfwidth = 0.105
+        else:
+            offset = 0
+            line_halfwidth = half_width
+
+        for _, row in df.iterrows():
+
+            energy = row["Energy"]
+            label = row["Label"]
+            xpos = x + offset
+
+            # Draw energy level
+            ax.hlines(
+                y=energy,
+                xmin=xpos - line_halfwidth,
+                xmax=xpos + line_halfwidth,
+                color=color,
+                linewidth=LINE_WIDTH,
+                zorder=3
+            )
+
+            # State label
+            ax.text(
+                xpos + line_halfwidth + 0.025,
+                energy,
+                label,
+                fontsize=LABEL_SIZE,
+                color=color,
+                va="center",
+                ha="left"
+            )
+
+# ==================================================
+# 6. GROUP HEADINGS
+# ==================================================
+group_specs = [
+    (0.5, "Isolated molecules"),
+    (3.5, "7AP–DBP"),
+    (6.5, "7AP–linker–DBP"),
+]
+
+for x, title in group_specs:
+    ax.text(
+        x, 1.12, title,
+        transform=ax.get_xaxis_transform(),
+        ha="center",
+        va="bottom",
+        fontsize=12,
+        fontweight="bold"
+    )
+
+# Column labels
+column_labels = [
+    (0, "Singlets"),
+    (1, "Triplets"),
+    (3, "Singlets"),
+    (4, "Triplets"),
+    (6, "Singlets"),
+    (7, "Triplets"),
+]
+
+for x, label in column_labels:
+    ax.text(
+        x, 1.015, label,
+        transform=ax.get_xaxis_transform(),
+        ha="center",
+        va="bottom",
+        fontsize=10
+    )
+
+# ==================================================
+# 7. AXES FORMATTING
+# ==================================================
+all_energies = [
+    row["Energy"]
+    for df in data.values()
+    for _, row in df.iterrows()
+]
+
+ax.set_ylabel("Excitation energy (eV)", fontsize=12)
+ax.set_xlim(-0.7, 8.0)
+
+if all_energies:
+    ax.set_ylim(0, max(all_energies) + 0.5)
+
+ax.set_xticks([])
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.spines["bottom"].set_visible(False)
+
+ax.tick_params(axis="y", labelsize=10)
+
+ax.grid(
+    axis="y",
+    linestyle=":",
+    linewidth=0.6,
+    alpha=0.3
+)
+
+# ==================================================
+# 8. LEGEND
+# ==================================================
+legend_elements = [
+    Line2D([0], [0], color=COLORS["7AP"],
+           lw=LINE_WIDTH, label="7AP"),
+    Line2D([0], [0], color=COLORS["DBP"],
+           lw=LINE_WIDTH, label="DBP"),
+    Line2D([0], [0], color=COLORS["7AP–DBP"],
+           lw=LINE_WIDTH, label="7AP–DBP"),
+    Line2D([0], [0], color=COLORS["7AP–linker–DBP"],
+           lw=LINE_WIDTH, label="7AP–linker–DBP"),
+]
+
+ax.legend(
+    handles=legend_elements,
+    loc="upper right",
+    frameon=False,
+    fontsize=9
+)
+
+# ==================================================
+# 9. SAVE FIGURES
+# ==================================================
+plt.tight_layout()
+
+plt.savefig(
+    "state_energy_diagram.png",
+    dpi=600,
+    bbox_inches="tight"
+)
+
+plt.savefig(
+    "state_energy_diagram.pdf",
+    bbox_inches="tight"
+)
+
+plt.show()
+```
