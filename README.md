@@ -43860,3 +43860,82 @@ with open(csv_file, "r") as infile, open(output_csv, "w", newline="") as outfile
 
 print("Filtered CSV written to filtered.csv")
 ```
+#
+```
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+REFERENCE = 0.32
+
+def plot_dots(show_reference=False):
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+
+    offsets = {
+        "32 APs": 0.00,
+        "46 BN-PAHs": 0.12,
+        "7 NAHs": 0.24,
+    }
+
+    for label, values in data.items():
+        # Small vertical jitter separates dots with similar energies
+        rng = np.random.default_rng(42)
+        jitter = rng.uniform(-0.035, 0.035, len(values))
+
+        ax.scatter(
+            values,
+            np.full(len(values), offsets[label]) + jitter,
+            color=colors[label],
+            s=35,
+            alpha=0.8,
+            edgecolors="white",
+            linewidths=0.4,
+            label=f"{label} (N = {len(values)})",
+            zorder=3
+        )
+
+    if show_reference:
+        ax.axvline(
+            REFERENCE,
+            color="black",
+            linestyle="--",
+            linewidth=1.6,
+            label="Reference = 0.32 eV",
+            zorder=2
+        )
+
+    ax.set_xlabel(
+        r"$E(S_1,\mathrm{CIS}) - E(S_1,\mathrm{CISD})$ (eV)",
+        fontsize=12
+    )
+    ax.set_ylabel("Dataset", fontsize=12)
+
+    ax.set_yticks([])
+    ax.set_ylim(-0.15, 0.39)
+    ax.set_xlim(x_min, x_max)
+
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.tick_params(axis="both", labelsize=10)
+    ax.legend(frameon=False, fontsize=10, loc="best")
+
+    fig.tight_layout()
+    return fig
+
+
+# Plot 1: All molecules as individual dots
+fig1 = plot_dots(show_reference=False)
+fig1.savefig("S1_CIS_CISD_dotplot.png", dpi=400, bbox_inches="tight")
+
+# Plot 2: Same dots with 0.32 eV reference
+fig2 = plot_dots(show_reference=True)
+fig2.savefig(
+    "S1_CIS_CISD_dotplot_reference_032eV.png",
+    dpi=400,
+    bbox_inches="tight"
+)
+
+plt.show()
+```
