@@ -44401,3 +44401,40 @@ print(f"\nCSV saved at:\n{output_csv}")
 
 print("\nProcessing completed!")
 ```
+#
+```
+import os
+import shutil
+
+# File containing folder names
+input_file = "top46.txt"
+
+# Source directory (directory containing the folders)
+source_dir = "."
+
+# Destination directory
+destination_dir = "/home/atreyee/Project_AP_distorted/data/INVEST-85_wB97M-D4_def2TZVP_geometries"
+
+# Create destination directory if it doesn't exist
+os.makedirs(destination_dir, exist_ok=True)
+
+# Read folder names in the given order
+with open(input_file, "r") as f:
+    folders = [line.strip() for line in f if line.strip()]
+
+# Copy geometries
+for i, folder in enumerate(folders, start=1):
+
+    source_file = os.path.join(source_dir, folder, "geom_DFT_S0.xyz")
+
+    new_filename = f"INVEST-BNPAH{i}.xyz"
+    destination_file = os.path.join(destination_dir, new_filename)
+
+    if os.path.isfile(source_file):
+        shutil.copy2(source_file, destination_file)
+        print(f"Copied: {folder}/geom_DFT_S0.xyz -> {new_filename}")
+    else:
+        print(f"WARNING: File not found: {source_file}")
+
+print(f"\nCompleted. Processed {len(folders)} folder names.")
+```
