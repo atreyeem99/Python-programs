@@ -44438,3 +44438,80 @@ for i, folder in enumerate(folders, start=1):
 
 print(f"\nCompleted. Processed {len(folders)} folder names.")
 ```
+#
+```
+
+from pathlib import Path
+
+source_dir = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "BNPAH_72_wB97MD4_def2TZVP_opt_freq"
+)
+
+destination_dir = Path(
+    "/home/atreyee/Project_doubles/G16_VDZ_CISD_337/"
+    "46BNPAH_wB97MD4_geom"
+)
+
+top_file = source_dir / "top46.txt"
+
+header = """%NProcShared=8
+
+%Mem=18GB
+
+#P CIS(D,50-50,NStates=5)/cc-pVDZ
+
+CIS(D) calculation of singlet and triplet excited states
+
+0 1
+
+"""
+
+destination_dir.mkdir(parents=True, exist_ok=True)
+
+with open(top_file, "r") as f:
+    folders = [line.strip() for line in f if line.strip()]
+
+created = 0
+missing = []
+
+for folder in folders:
+
+    geom_file = source_dir / folder / "geom_DFT_S0.xyz"
+
+    if not geom_file.is_file():
+        print(f"Missing geometry: {geom_file}")
+        missing.append(folder)
+        continue
+
+    with open(geom_file, "r") as f:
+        lines = f.readlines()
+
+    # Skip first two XYZ lines and remove leading whitespace
+    coordinates = "\n".join(
+        line.strip() for line in lines[2:] if line.strip()
+    )
+
+    target_folder = destination_dir / folder
+    target_folder.mkdir(parents=True, exist_ok=True)
+
+    inp_file = target_folder / "inp.com"
+
+    with open(inp_file, "w") as f:
+        f.write(header)
+        f.write(coordinates)
+        f.write("\n\n\n\n")
+
+    created += 1
+    print(f"Created: {inp_file}")
+
+print("\n========== SUMMARY ==========")
+print(f"Total folders in top46.txt : {len(folders)}")
+print(f"Inputs created             : {created}")
+print(f"Missing geometries         : {len(missing)}")
+
+if missing:
+    print("\nMissing folders:")
+    for folder in missing:
+        print(folder)
+```
