@@ -44515,3 +44515,30 @@ if missing:
     for folder in missing:
         print(folder)
 ```
+#
+```
+import os
+
+# Read folder names from top46.txt
+with open("top46.txt", "r") as f:
+    top_folders = {line.strip() for line in f if line.strip()}
+
+# Get all folders in the current directory
+all_folders = {
+    name for name in os.listdir(".")
+    if os.path.isdir(name)
+}
+
+# Find folders not present in top46.txt
+remaining_folders = sorted(all_folders - top_folders)
+
+# Write remaining folder names to rest26.txt
+with open("rest26.txt", "w") as f:
+    for folder in remaining_folders:
+        f.write(folder + "\n")
+
+print(f"Folders listed in top46.txt: {len(top_folders)}")
+print(f"Total folders present: {len(all_folders)}")
+print(f"Remaining folders: {len(remaining_folders)}")
+print("Saved to rest26.txt")
+```
