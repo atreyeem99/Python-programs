@@ -44905,3 +44905,386 @@ print(f"CSV saved at:\n{output_csv}")
 
 print("\nProcessing completed!")
 ```
+#
+```
+
+import os
+import re
+import csv
+
+# ==================================================
+# DIRECTORIES
+# ==================================================
+
+dft_dir = "/home/atreyee/Project_AP_distorted/BNPAH_72_wB97MD4_def2TZVP_opt_freq"
+
+lcc2_dir = "/home/atreyee/Project_AP_distorted/BNPAH_46_LCC2_AVDZ_wB97MD4_geom"
+
+folder_file = os.path.join(dft_dir, "BNPAH_neg.txt")
+
+output_csv = os.path.join(
+    dft_dir,
+    "BNPAH_46_combined_results.csv"
+)
+
+
+# ==================================================
+# FORMAT VALUES
+# ==================================================
+
+def format_value(value):
+
+    if value is None:
+        return "NA"
+
+    return f"{value:.3f}"
+
+
+# ==================================================
+# 1. EXTRACT DFT HOMO, LUMO AND GAP FROM ORCA
+# ==================================================
+
+def extract_dft_orbitals(filepath):
+
+    if not os.path.isfile(filepath):
+        return None, None, None
+
+    with open(filepath, "r", errors="ignore") as f:
+        lines = f.readlines()
+
+    # Find ORBITAL ENERGIES section
+    start = None
+
+    for i, line in enumerate(lines):
+
+        if "ORBITAL ENERGIES" in line:
+            start = i
+            break
+
+    if start is None:
+        return None, None, None
+
+    orbitals = []
+
+    # Read orbital rows
+    for line in lines[start + 1:]:
+
+        fields = line.split()
+
+        if len(fields) < 4:
+
+            if orbitals:
+                break
+
+            continue
+
+        try:
+            orbital_no = int(fields[0])
+            occupation = float(fields[1])
+            energy_ev = float(fields[3])
+
+        except ValueError:
+
+            if orbitals:
+                break
+
+            continue
+
+        orbitals.append(
+            (orbital_no, occupation, energy_ev)
+        )
+
+    # Identify occupied and virtual orbitals
+    occupied = [
+        orb for orb in orbitals
+        if abs(orb[1] - 2.0) < 0.001
+    ]
+
+    virtual = [
+        orb for orb in orbitals
+        if abs(orb[1]) < 0.001
+    ]
+
+    if not occupied or not virtual:
+        return None, None, None
+
+    # Last occupied = HOMO
+    homo = occupied[-1][2]
+
+    # First virtual = LUMO
+    lumo = virtual[0][2]
+
+    # HOMO-LUMO gap
+    gap = lumo - homo
+
+    return homo, lumo, gap
+
+
+# ==================================================
+# 2. EXTRACT HF HOMO, LUMO AND GAP FROM MOLPRO
+# ==================================================
+
+def extract_hf_orbitals(filepath):
+
+    if not os.path.isfile(filepath):
+        return None, None, None
+
+    with open(filepath, "r", errors="ignore") as f:
+        content = f.read()
+
+    homo_match = re.search(
+        r"HOMO\s+\S+\s+([-+\d.]+)\s*=\s*([-+\d.]+)\s*eV",
+        content
+    )
+
+    lumo_match = re.search(
+        r"LUMO\s+\S+\s+([-+\d.]+)\s*=\s*([-+\d.]+)\s*eV",
+        content
+    )
+
+    gap_match = re.search(
+        r"LUMO-HOMO\s+([-+\d.]+)\s*=\s*([-+\d.]+)\s*eV",
+        content
+    )
+
+    if homo_match and lumo_match and gap_match:
+
+        homo = float(homo_match.group(2))
+        lumo = float(lumo_match.group(2))
+        gap = float(gap_match.group(2))
+
+        return homo, lumo, gap
+
+    return None, None, None
+
+
+# ==================================================
+# 3. EXTRACT S1, T1, STG AND OSCILLATOR STRENGTH
+#    FROM MOLPRO L-CC2 OUTPUT
+# ==================================================
+
+def extract_lcc2(filepath):
+
+    S1 = None
+    T1 = None
+    f01 = None
+
+    if not os.path.isfile(filepath):
+        return S1, T1, None, f01
+
+    with open(filepath, "r", errors="ignore") as f:
+        lines = f.readlines()
+
+    # ----------------------------------------------
+    # Excited-state energies
+    # ----------------------------------------------
+
+    state_lines = [
+        line for line in lines
+        if "Final LT-DF-LCC2-LR-Results for state" in line
+    ]
+
+    # First matching line, 10th field = S1
+    if len(state_lines) >= 1:
+
+        fields = state_lines[0].split()
+
+        if len(fields) >= 10:
+
+            try:
+                S1 = float(fields[9])
+            except ValueError:
+                pass
+
+    # Seventh matching line, 10th field = T1
+    if len(state_lines) >= 7:
+
+        fields = state_lines[6].split()
+
+        if len(fields) >= 10:
+
+            try:
+                T1 = float(fields[9])
+            except ValueError:
+                pass
+
+    # ----------------------------------------------
+    # Oscillator strength
+    # ----------------------------------------------
+
+    for line in lines:
+
+        if "DF-LCC2" in line and "oszillator strength:" in line:
+
+            fields = line.split()
+
+            if len(fields) >= 4:
+
+                try:
+                    f01 = float(fields[3])
+                    break
+                except ValueError:
+                    pass
+
+    # ----------------------------------------------
+    # Singlet-triplet gap
+    # ----------------------------------------------
+
+    if S1 is not None and T1 is not None:
+
+        STG = S1 - T1
+
+    else:
+
+        STG = None
+
+    return S1, T1, STG, f01
+
+
+# ==================================================
+# 4. READ FOLDER NAMES IN ORIGINAL ORDER
+# ==================================================
+
+with open(folder_file, "r") as f:
+
+    folders = [
+        line.strip()
+        for line in f
+        if line.strip()
+    ]
+
+
+# ==================================================
+# 5. PROCESS ALL MOLECULES
+# ==================================================
+
+results = []
+
+for i, folder in enumerate(folders, start=1):
+
+    molecule = f"INVEST-BNPAH{i}"
+
+    print(f"\nProcessing {molecule}: {folder}")
+
+    # ----------------------------------------------
+    # DFT orbital energies from opt.out
+    # ----------------------------------------------
+
+    opt_file = os.path.join(
+        dft_dir,
+        folder,
+        "opt.out"
+    )
+
+    homo, lumo, gap = extract_dft_orbitals(opt_file)
+
+    # ----------------------------------------------
+    # HF orbital energies from inp.out
+    # ----------------------------------------------
+
+    inp_file = os.path.join(
+        lcc2_dir,
+        folder,
+        "inp.out"
+    )
+
+    hf_homo, hf_lumo, hf_gap = extract_hf_orbitals(inp_file)
+
+    # ----------------------------------------------
+    # L-CC2 properties
+    # ----------------------------------------------
+
+    S1, T1, STG, f01 = extract_lcc2(inp_file)
+
+    # ----------------------------------------------
+    # Check missing values
+    # ----------------------------------------------
+
+    values = {
+        "HOMO": homo,
+        "LUMO": lumo,
+        "HF_HOMO": hf_homo,
+        "HF_LUMO": hf_lumo,
+        "S1": S1,
+        "T1": T1,
+        "f": f01
+    }
+
+    missing = [
+        key for key, value in values.items()
+        if value is None
+    ]
+
+    if missing:
+
+        print("  WARNING: Missing:", ", ".join(missing))
+
+    # ----------------------------------------------
+    # Store results
+    # ----------------------------------------------
+
+    row = [
+        molecule,
+        format_value(homo),
+        format_value(lumo),
+        format_value(gap),
+        format_value(hf_homo),
+        format_value(hf_lumo),
+        format_value(hf_gap),
+        format_value(S1),
+        format_value(T1),
+        format_value(STG),
+        format_value(f01)
+    ]
+
+    results.append(row)
+
+
+# ==================================================
+# 6. WRITE CSV
+# ==================================================
+
+headers = [
+    "Molecule",
+    "HOMO",
+    "LUMO",
+    "H-L_gap",
+    "HF_HOMO",
+    "HF_LUMO",
+    "HF_H-L_gap",
+    "S1",
+    "T1",
+    "STG",
+    "f"
+]
+
+with open(output_csv, "w", newline="") as f:
+
+    writer = csv.writer(f)
+
+    writer.writerow(headers)
+    writer.writerows(results)
+
+
+# ==================================================
+# 7. PRINT ALL RESULTS
+# ==================================================
+
+print("\n" + "=" * 120)
+
+print(",".join(headers))
+
+print("=" * 120)
+
+for row in results:
+
+    print(",".join(row))
+
+print("=" * 120)
+
+print(f"\nTotal molecules processed: {len(results)}")
+
+print(f"\nCSV saved at:\n{output_csv}")
+
+print("\nProcessing completed!")
+```
