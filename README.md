@@ -45671,3 +45671,28 @@ print(f"\nCSV saved at:\n{output_csv}")
 
 print("\nProcessing completed!")
 ```
+#
+```
+import pandas as pd
+
+df = pd.read_csv("BNPAH46_LCC2_SOC_rate.csv", sep=r"\s+")
+
+df["SOC11"] = pd.to_numeric(df["SOC11"], errors="coerce")
+df["LCC2_gap"] = pd.to_numeric(df["LCC2_gap"], errors="coerce")
+
+# Select non-zero SOC11 and sort in descending order
+nonzero_soc = (
+    df.loc[df["SOC11"].notna() & (df["SOC11"] != 0),
+           ["Molecule", "LCC2_gap", "SOC11"]]
+    .sort_values(by="SOC11", ascending=False)
+)
+
+# Print molecule names, L-CC2 gaps and SOC values
+print(f"{'Molecule':25s} {'LCC2_gap (eV)':>15s} {'SOC11 (cm-1)':>15s}")
+print("-" * 58)
+
+for _, row in nonzero_soc.iterrows():
+    print(f"{row['Molecule']:25s} {row['LCC2_gap']:15.3f} {row['SOC11']:15.3f}")
+
+print(f"\nTotal molecules with non-zero SOC11: {len(nonzero_soc)}")
+```
