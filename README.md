@@ -45696,3 +45696,39 @@ for _, row in nonzero_soc.iterrows():
 
 print(f"\nTotal molecules with non-zero SOC11: {len(nonzero_soc)}")
 ```
+#
+```
+
+import pandas as pd
+
+# Read the first CSV
+df1 = pd.read_csv("BNPAH28_with_LCC2_f.csv")
+
+# Read SOC_OOP data, skipping the header and separator
+df2 = pd.read_csv(
+    "SOC_OOP.csv",
+    sep=r'\s+',
+    skiprows=2,
+    header=None,
+    names=[
+        "Molecule", "S1", "T1", "Gap",
+        "SOC11", "RMS11", "OOP_RMS", "OOP_Max"
+    ]
+)
+
+# Match molecules and append OOP RMS
+df1 = df1.merge(
+    df2[["Molecule", "OOP_RMS"]],
+    on="Molecule",
+    how="left",
+    sort=False
+)
+
+# Save updated CSV
+df1.to_csv("BNPAH28_with_LCC2_f.csv", index=False)
+
+# Print results
+print(df1.to_string(index=False))
+
+print("\nUpdated successfully!")
+```
