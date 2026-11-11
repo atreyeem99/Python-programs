@@ -45732,3 +45732,37 @@ print(df1.to_string(index=False))
 
 print("\nUpdated successfully!")
 ```
+#
+```
+
+import pandas as pd
+
+# Read first CSV normally
+df1 = pd.read_csv("BNPAH28_with_LCC2_f.csv")
+
+# Read SOC_OOP file using whitespace separation
+df2 = pd.read_csv("SOC_OOP.csv", sep=r'\s+', skiprows=2)
+
+# Print detected column names
+print("Columns in SOC_OOP:")
+print(df2.columns.tolist())
+
+# Rename columns for easier handling
+df2.columns = [
+    "Molecule", "S1", "T1", "Gap", "SOC11",
+    "RMS11", "OOP_RMS", "OOP_Max"
+]
+
+# Match molecules and add OOP RMS
+df1 = df1.merge(
+    df2[["Molecule", "OOP_RMS"]],
+    on="Molecule",
+    how="left"
+)
+
+# Save updated file
+df1.to_csv("BNPAH28_with_LCC2_f.csv", index=False)
+
+print("\nUpdated CSV:")
+print(df1.to_string(index=False))
+```
