@@ -45766,3 +45766,130 @@ df1.to_csv("BNPAH28_with_LCC2_f.csv", index=False)
 print("\nUpdated CSV:")
 print(df1.to_string(index=False))
 ```
+#
+```
+
+import re
+import math
+
+# ============================================================
+# INPUT
+# ============================================================
+
+filename = "soc.out"
+
+delta_EST = -0.028   # S1-T1 energy gap in eV; change as required
+temperature = 300   # K
+
+lambdas = [0.1, 0.2, 0.3]  # Reorganisation energies in eV
+
+# Constants
+hbar = 6.582119569e-16       # eV s
+kB = 8.617333262e-5          # eV K-1
+cm_to_ev = 8065.544005       # 1 eV = 8065.544005 cm-1
+
+
+# ============================================================
+# 1. EXTRACT S1-T1 SOC FROM ORCA OUTPUT
+# ============================================================
+
+number = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?"
+pair_pattern = rf"\(\s*({number})\s*,\s*({number})\s*\)"
+
+with open(filename, "r") as f:
+    lines = f.readlines()
+
+section_start = None
+
+for i, line in enumerate(lines):
+    if "CALCULATED SOCME BETWEEN TRIPLETS AND SINGLETS" in line:
+        section_start = i
+        break
+
+if section_start is None:
+    raise RuntimeError("SOCME section not found in soc.out")
+
+soc_values = None
+
+for line in lines[section_start + 1:]:
+
+    match = re.match(r"^\s*(\d+)\s+(\d+)\s+", line)
+
+    if not match:
+        continue
+
+    triplet = int(match.group(1))
+    singlet = int(match.group(2))
+
+    # T=1, S=1 corresponds to T1-S1
+    if triplet == 1 and singlet == 1:
+
+        pairs = re.findall(pair_pattern, line)
+
+        if len(pairs) != 3:
+            raise RuntimeError("Could not extract Z, X and Y SOC components.")
+
+        soc_values = [tuple(map(float, pair)) for pair in pairs]
+        break
+
+if soc_values is None:
+    raise RuntimeError("T=1, S=1 SOCME row not found.")
+
+
+# ============================================================
+# 2. CALCULATE TOTAL SOC USING EQ. 2
+# ============================================================
+
+components = ["Z", "X", "Y"]
+
+print("\nSOC components for S1-T1 coupling")
+print("----------------------------------")
+
+for name, (real, imag) in zip(components, soc_values):
+    magnitude = math.sqrt(real**2 + imag**2)
+
+    print(
+        f"{name}: Re = {real:8.3f}, "
+        f"Im = {imag:8.3f}, "
+        f"|{name}| = {magnitude:8.4f} cm-1"
+    )
+
+Vd_cm = math.sqrt(
+    sum(real**2 + imag**2 for real, imag in soc_values)
+)
+
+Vd_eV = Vd_cm / cm_to_ev
+
+print("----------------------------------")
+print(f"|Vd| = {Vd_cm:.6f} cm-1")
+print(f"|Vd| = {Vd_eV:.8e} eV")
+print("----------------------------------")
+
+
+# ============================================================
+# 3. CALCULATE DIRECT rISC RATE USING MARCUS EQUATION
+# ============================================================
+
+print("\nDirect rISC rates")
+print("----------------------------------")
+print(f"Delta E_ST = {delta_EST:.4f} eV")
+print(f"Temperature = {temperature} K")
+print(f"SOC = {Vd_cm:.6f} cm-1")
+print("----------------------------------")
+
+for lam in lambdas:
+
+    rate = (
+        (2 * math.pi * Vd_eV**2) /
+        (3 * hbar * math.sqrt(4 * math.pi * lam * kB * temperature))
+        *
+        math.exp(
+            -((delta_EST + lam)**2) /
+            (4 * lam * kB * temperature)
+        )
+    )
+
+    print(f"Lambda = {lam:.1f} eV : k_rISC = {rate:.6e} s-1")
+
+print("----------------------------------")
+```
