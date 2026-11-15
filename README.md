@@ -46147,3 +46147,50 @@ for lam in lambdas:
 
 print("----------------------------------")
 ```
+#
+```
+
+import pandas as pd
+import numpy as np
+
+# Read input CSV
+df = pd.read_csv("BNPAH28_with_LCC2_f.csv")
+
+# Constants
+hbar = 6.582119569e-16       # Reduced Planck constant (eV s)
+kB = 8.617333262e-5          # Boltzmann constant (eV K-1)
+T = 300                      # Temperature (K)
+lam = 0.2                    # Reorganization energy (eV)
+
+# Convert SOC from cm-1 to eV
+# 1 eV = 8065.544005 cm-1
+df["V_eV"] = df["SOC11 (cm-1)"] / 8065.544005
+
+# L-CC2 singlet-triplet energy gap (eV)
+delta_EST = df["LCC2_gap (eV)"]
+
+# Calculate direct rISC rate using Marcus equation
+V = df["V_eV"]
+
+df["k_rISC_d (s-1)"] = (
+    (2 * np.pi * V**2) /
+    (3 * hbar * np.sqrt(4 * np.pi * lam * kB * T))
+    *
+    np.exp(
+        -((delta_EST + lam)**2) /
+        (4 * lam * kB * T)
+    )
+)
+
+# Print results
+print("\nDirect rISC rates at 300 K:\n")
+print(df[["Molecule", "LCC2_gap (eV)", "SOC11 (cm-1)",
+          "k_rISC_d (s-1)"]].to_string(index=False))
+
+# Save results to a new CSV
+df.drop(columns=["V_eV"]).to_csv(
+    "BNPAH28_with_LCC2_f_rISC.csv", index=False
+)
+
+print("\nSaved: BNPAH28_with_LCC2_f_rISC.csv")
+```
