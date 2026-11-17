@@ -46266,3 +46266,83 @@ print(df1.to_string(index=False))
 
 print("\nUpdated successfully!")
 ```
+#
+```
+
+import re
+import math
+
+filename = "soc.out"
+
+# Match a complex number written as (Re, Im)
+number = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?"
+pair_pattern = rf"\(\s*({number})\s*,\s*({number})\s*\)"
+
+# Read ORCA output
+with open(filename, "r") as f:
+    lines = f.readlines()
+
+# Locate the SOCME section
+section_start = None
+
+for i, line in enumerate(lines):
+    if "CALCULATED SOCME BETWEEN TRIPLETS AND SINGLETS" in line:
+        section_start = i
+        break
+
+if section_start is None:
+    raise RuntimeError("SOCME section not found in soc.out")
+
+# Extract the T=1, S=1 row
+soc_values = None
+
+for line in lines[section_start + 1:]:
+    # Each data row must contain two state indices and three complex pairs
+    state_match = re.match(r"^\s*(\d+)\s+(\d+)\s+", line)
+
+    if not state_match:
+        continue
+
+    triplet = int(state_match.group(1))
+    singlet = int(state_match.group(2))
+
+    if triplet == 1 and singlet == 1:
+        pairs = re.findall(pair_pattern, line)
+
+        if len(pairs) != 3:
+            raise RuntimeError("Could not extract all three SOC components.")
+
+        soc_values = {
+            "Z": tuple(map(float, pairs[0])),
+            "X": tuple(map(float, pairs[1])),
+            "Y": tuple(map(float, pairs[2]))
+        }
+        break
+
+if soc_values is None:
+    raise RuntimeError("T=1, S=1 SOCME row not found.")
+
+# Calculate |Vd| using Eq. 2
+soc_squared = sum(
+    real**2 + imag**2
+    for real, imag in soc_values.values()
+)
+
+Vd = math.sqrt(soc_squared)
+
+# Print results
+print("\nSOC components for S1-T1 coupling")
+print("----------------------------------")
+
+for component, (real, imag) in soc_values.items():
+    magnitude = math.sqrt(real**2 + imag**2)
+    print(
+        f"{component}: Re = {real:8.3f}, "
+        f"Im = {imag:8.3f}, "
+        f"|{component}| = {magnitude:8.4f} cm-1"
+    )
+
+print("----------------------------------")
+print(f"|Vd| = {Vd:.6f} cm-1")
+print("----------------------------------")
+```
