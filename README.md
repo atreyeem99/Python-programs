@@ -46346,3 +46346,51 @@ print("----------------------------------")
 print(f"|Vd| = {Vd:.6f} cm-1")
 print("----------------------------------")
 ```
+#
+```
+
+import os
+import shutil
+
+# Source and destination directories
+source_root = "/home/atreyee/Project_AP_distorted/Range_sep_HybFunc_SCS-PBE-QIDH/Method_wB97M-D4"
+
+destination_root = "/home/atreyee/Project_AP_distorted/CHECK_symmetry_ORCA/wB97MD4_def2TZVP"
+
+# sp.com present in the destination root
+sp_file = os.path.join(destination_root, "sp.com")
+
+# Check whether sp.com exists
+if not os.path.isfile(sp_file):
+    raise FileNotFoundError(f"sp.com not found: {sp_file}")
+
+# Traverse all folders in source directory
+for root, dirs, files in os.walk(source_root):
+
+    # Relative folder path
+    relative_path = os.path.relpath(root, source_root)
+
+    # Corresponding destination folder
+    destination_folder = os.path.join(destination_root, relative_path)
+
+    # Create same folder structure
+    os.makedirs(destination_folder, exist_ok=True)
+
+    # Copy geometry file if present
+    if "geom_DFT_S0.xyz" in files:
+
+        source_geom = os.path.join(root, "geom_DFT_S0.xyz")
+
+        destination_geom = os.path.join(
+            destination_folder, "geom_DFT_S0.xyz"
+        )
+
+        shutil.copy2(source_geom, destination_geom)
+
+        # Copy sp.com into the same folder
+        shutil.copy2(sp_file, destination_folder)
+
+        print(f"Copied: {relative_path}")
+
+print("\nAll files copied successfully!")
+```
