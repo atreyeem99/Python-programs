@@ -47295,3 +47295,177 @@ print("T4I_177 - T4I_363 : Non-alternant hydrocarbons")
 
 print("\nCSV saved successfully!")
 ```
+#
+```
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
+
+# ============================================================
+# 1. Read input file
+# ============================================================
+
+filename = "BNPAH28_with_LCC2_f.csv"
+
+df = pd.read_csv(filename)
+
+df["LCC2_f"] = pd.to_numeric(df["LCC2_f"], errors="coerce")
+df["SOC11 (cm-1)"] = pd.to_numeric(
+    df["SOC11 (cm-1)"], errors="coerce"
+)
+
+df = df.dropna(subset=["LCC2_f", "SOC11 (cm-1)"])
+
+# ============================================================
+# 2. Global style
+# ============================================================
+
+plt.rcParams.update({
+    "font.family": "Arial",
+    "font.size": 16,
+    "axes.linewidth": 1.2,
+})
+
+fig, ax = plt.subplots(figsize=(6, 6))
+
+# ============================================================
+# 3. Scatter plot: BNPAH
+# ============================================================
+
+ax.scatter(
+    df["LCC2_f"],
+    df["SOC11 (cm-1)"],
+    s=80,
+    marker='o',
+    label=f'BNPAH ({len(df)})',
+    facecolors='none',
+    edgecolors='darkgreen',
+    linewidths=1.5,
+    zorder=2,
+    alpha=1.0
+)
+
+# ============================================================
+# 4. Axis labels
+# ============================================================
+
+ax.set_xlabel(
+    r"L-CC2 oscillator strength ($f$)",
+    fontsize=16,
+    labelpad=10
+)
+
+ax.set_ylabel(
+    r"Spin-orbit coupling [$\mathrm{cm}^{-1}$]",
+    fontsize=16,
+    labelpad=10
+)
+
+# ============================================================
+# 5. Axis limits
+# ============================================================
+
+xmin = df["LCC2_f"].min()
+xmax = df["LCC2_f"].max()
+
+ymin = df["SOC11 (cm-1)"].min()
+ymax = df["SOC11 (cm-1)"].max()
+
+xrange = xmax - xmin
+yrange = ymax - ymin
+
+ax.set_xlim(
+    xmin - 0.05 * xrange,
+    xmax + 0.05 * xrange
+)
+
+ax.set_ylim(
+    ymin - 0.05 * yrange,
+    ymax + 0.05 * yrange
+)
+
+# ============================================================
+# 6. Major and minor ticks
+# ============================================================
+
+ax.xaxis.set_major_locator(ticker.MaxNLocator(5))
+ax.yaxis.set_major_locator(ticker.MultipleLocator(0.05))
+
+ax.xaxis.set_minor_locator(ticker.AutoMinorLocator(2))
+ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.025))
+
+# ============================================================
+# 7. Tick parameters
+# ============================================================
+
+ax.tick_params(
+    axis="both",
+    which="major",
+    direction="in",
+    length=6,
+    width=1,
+    top=True,
+    right=True
+)
+
+ax.tick_params(
+    axis="both",
+    which="minor",
+    direction="in",
+    length=3,
+    width=0.8,
+    top=True,
+    right=True
+)
+
+# ============================================================
+# 8. Grey background grid
+# ============================================================
+
+ax.grid(
+    which='major',
+    linestyle=(0, (4, 5)),
+    linewidth=0.5,
+    alpha=0.5,
+    color='grey'
+)
+
+ax.grid(
+    which='minor',
+    linestyle=(0, (4, 5)),
+    linewidth=0.4,
+    alpha=0.25,
+    color='grey'
+)
+
+# ============================================================
+# 9. Legend
+# ============================================================
+
+leg = ax.legend(
+    title_fontsize=13,
+    loc="upper left",
+    frameon=True,
+    fontsize=13
+)
+
+# ============================================================
+# 10. Save and show
+# ============================================================
+
+plt.tight_layout()
+
+plt.savefig(
+    "BNPAH28_f_SOC_scatter.png",
+    dpi=600,
+    bbox_inches="tight"
+)
+
+plt.savefig(
+    "BNPAH28_f_SOC_scatter.pdf",
+    bbox_inches="tight"
+)
+
+plt.show()
+```
