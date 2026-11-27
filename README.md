@@ -47469,3 +47469,332 @@ plt.savefig(
 
 plt.show()
 ```
+#
+```
+
+#!/usr/bin/env python3
+
+from pathlib import Path
+import re
+import csv
+
+# ============================================================
+# SOURCE DIRECTORIES
+# ============================================================
+
+AP_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "AP_104_LCC2_AVDZ_wB97M-D4_geom"
+)
+
+BNPAH_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "BNPAH_46_LCC2_AVDZ_wB97MD4_geom"
+)
+
+BNPAH_REST_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "BNPAH_rest26_LCC2_AVDZ_wB97MD4_geom"
+)
+
+NAH_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "Non_alternant_hydrocarbons_CHemSci/"
+    "nonalternant_hydrocarbons_LCC2_AVDZ"
+)
+
+# ============================================================
+# OUTPUT
+# ============================================================
+
+OUTPUT_DIR = Path("/home/atreyee/TrialByInvest")
+
+OUTPUT_FILE = OUTPUT_DIR / "LCC2_results.csv"
+
+TOTAL = 363
+
+# ============================================================
+# NATURAL SORTING
+# ============================================================
+
+def natural_sort_key(path):
+
+    return [
+        int(part) if part.isdigit() else part.lower()
+        for part in re.split(r"(\d+)", path.name)
+    ]
+
+
+# ============================================================
+# GET SOURCE FOLDERS
+# ============================================================
+
+def get_subdirs(parent, prefix=None):
+
+    if not parent.is_dir():
+        raise FileNotFoundError(
+            f"Directory not found: {parent}"
+        )
+
+    folders = [
+        p for p in parent.iterdir()
+        if p.is_dir()
+        and (prefix is None or p.name.startswith(prefix))
+    ]
+
+    return sorted(folders, key=natural_sort_key)
+
+
+# ============================================================
+# EXTRACT NUMERICAL VALUES
+# ============================================================
+
+def extract_number(value):
+
+    try:
+        return float(value.replace("D", "E").replace("d", "e"))
+    except (ValueError, AttributeError):
+        return None
+
+
+def format_value(value):
+
+    if value is None:
+        return "NA"
+
+    return f"{value:.3f}"
+
+
+# ============================================================
+# EXTRACT RESULTS FROM inp.out
+# ============================================================
+
+def extract_results(folder):
+
+    outfile = folder / "inp.out"
+
+    if not outfile.is_file():
+
+        print(f"WARNING: Missing inp.out in {folder.name}")
+
+        return "NA", "NA", "NA", "NA"
+
+    with open(outfile, "r", errors="replace") as f:
+        lines = f.readlines()
+
+    # --------------------------------------------------------
+    # Oscillator strength (f01)
+    # --------------------------------------------------------
+
+    f01 = None
+
+    for line in lines:
+
+        if "DF-LCC2" in line and "oszillator strength:" in line:
+
+            fields = line.split()
+
+            if len(fields) >= 4:
+                f01 = extract_number(fields[3])
+
+            break
+
+    # --------------------------------------------------------
+    # S1 and T1 energies
+    # --------------------------------------------------------
+
+    state_energies = []
+
+    for line in lines:
+
+        if "Final LT-DF-LCC2-LR-Results for state" in line:
+
+            fields = line.split()
+
+            # Equivalent to awk '{print $10}'
+            if len(fields) >= 10:
+
+                energy = extract_number(fields[9])
+
+                state_energies.append(energy)
+
+    # S1 = first matching state
+    S1 = (
+        state_energies[0]
+        if len(state_energies) >= 1
+        else None
+    )
+
+    # T1 = seventh matching state
+    T1 = (
+        state_energies[6]
+        if len(state_energies) >= 7
+        else None
+    )
+
+    # --------------------------------------------------------
+    # Singlet-triplet gap
+    # --------------------------------------------------------
+
+    if S1 is not None and T1 is not None:
+
+        STG = S1 - T1
+
+    else:
+
+        STG = None
+
+    return (
+        format_value(S1),
+        format_value(T1),
+        format_value(STG),
+        format_value(f01)
+    )
+
+
+# ============================================================
+# COLLECT SOURCE FOLDERS IN THE SAME ORDER AS BEFORE
+# ============================================================
+
+# AP: exclude waste
+ap_folders = [
+    folder for folder in get_subdirs(AP_DIR)
+    if folder.name.lower() != "waste"
+]
+
+# BNPAH
+bnpah_folders = get_subdirs(BNPAH_DIR)
+
+# Remaining BNPAH
+bnpah_rest_folders = get_subdirs(BNPAH_REST_DIR)
+
+# Non-alternant hydrocarbons: only mol* folders
+nah_folders = get_subdirs(
+    NAH_DIR,
+    prefix="mol"
+)
+
+# ============================================================
+# CHECK FOLDER COUNTS
+# ============================================================
+
+expected_counts = {
+    "AP": (ap_folders, 104),
+    "BNPAH": (bnpah_folders, 46),
+    "BNPAH_rest": (bnpah_rest_folders, 26),
+    "NAH": (nah_folders, 187),
+}
+
+print("\nSOURCE FOLDER COUNTS")
+print("-" * 50)
+
+for name, (folders, expected) in expected_counts.items():
+
+    print(f"{name:15s}: {len(folders):4d} (expected {expected})")
+
+    if len(folders) != expected:
+
+        raise RuntimeError(
+            f"{name}: Expected {expected}, "
+            f"found {len(folders)}. Stopping."
+        )
+
+
+# Combine in the same order as the previous script
+all_folders = (
+    ap_folders
+    + bnpah_folders
+    + bnpah_rest_folders
+    + nah_folders
+)
+
+if len(all_folders) != TOTAL:
+
+    raise RuntimeError(
+        f"Expected {TOTAL} folders, found {len(all_folders)}."
+    )
+
+
+# ============================================================
+# EXTRACT ALL RESULTS
+# ============================================================
+
+print("\nExtracting LCC2 results...")
+print("-" * 65)
+
+rows = []
+
+for i, folder in enumerate(all_folders, start=1):
+
+    t4i_id = f"T4I_{i:03d}"
+
+    S1, T1, STG, f01 = extract_results(folder)
+
+    row = [
+        folder.name,
+        t4i_id,
+        S1,
+        T1,
+        STG,
+        f01
+    ]
+
+    rows.append(row)
+
+    print(
+        f"{folder.name:25s} "
+        f"{t4i_id:10s} "
+        f"S1={S1:>8s} "
+        f"T1={T1:>8s} "
+        f"STG={STG:>8s} "
+        f"f={f01:>8s}"
+    )
+
+
+# ============================================================
+# WRITE CSV FILE
+# ============================================================
+
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+header = [
+    "Original_Name",
+    "T4I_ID",
+    "S1_eV",
+    "T1_eV",
+    "STG_eV",
+    "f01"
+]
+
+with open(OUTPUT_FILE, "w", newline="") as f:
+
+    writer = csv.writer(f)
+
+    writer.writerow(header)
+
+    writer.writerows(rows)
+
+
+# ============================================================
+# FINAL SUMMARY
+# ============================================================
+
+print("\n" + "=" * 65)
+
+print("EXTRACTION COMPLETE!")
+
+print("=" * 65)
+
+print(f"Total molecules : {len(rows)}")
+
+print(f"CSV file        : {OUTPUT_FILE}")
+
+print("\nNumbering:")
+
+print("T4I_001 - T4I_104 : AP")
+print("T4I_105 - T4I_150 : BNPAH")
+print("T4I_151 - T4I_176 : BNPAH_rest")
+print("T4I_177 - T4I_363 : Non-alternant hydrocarbons")
+
+print("\nCSV saved successfully!")
+```
