@@ -47798,3 +47798,253 @@ print("T4I_177 - T4I_363 : Non-alternant hydrocarbons")
 
 print("\nCSV saved successfully!")
 ```
+#
+```
+
+#!/usr/bin/env python3
+
+from pathlib import Path
+import re
+
+# ============================================================
+# PATHS
+# ============================================================
+
+DEST = Path("/home/atreyee/TOC4INVEST/B3LYP")
+
+AP_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "AP_104_LCC2_AVDZ_wB97M-D4_geom"
+)
+
+BNPAH_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "BNPAH_46_LCC2_AVDZ_wB97MD4_geom"
+)
+
+BNPAH_REST_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "BNPAH_rest26_LCC2_AVDZ_wB97MD4_geom"
+)
+
+NAH_DIR = Path(
+    "/home/atreyee/Project_AP_distorted/"
+    "Non_alternant_hydrocarbons_CHemSci/"
+    "nonalternant_hydrocarbons_LCC2_AVDZ"
+)
+
+TOTAL = 363
+
+# ============================================================
+# NATURAL SORTING
+# ============================================================
+
+def natural_sort_key(path):
+    return [
+        int(part) if part.isdigit() else part.lower()
+        for part in re.split(r"(\d+)", path.name)
+    ]
+
+
+# ============================================================
+# GET SOURCE SUBDIRECTORIES
+# ============================================================
+
+def get_subdirs(parent, prefix=None):
+    if not parent.is_dir():
+        raise FileNotFoundError(f"Source directory not found: {parent}")
+
+    folders = [
+        p for p in parent.iterdir()
+        if p.is_dir()
+        and (prefix is None or p.name.startswith(prefix))
+    ]
+
+    return sorted(folders, key=natural_sort_key)
+
+
+# ============================================================
+# EXTRACT GEOMETRY FROM inp.com
+# ============================================================
+
+def extract_geometry(folder):
+
+    inp_file = folder / "inp.com"
+
+    if not inp_file.is_file():
+        raise FileNotFoundError(f"Missing inp.com: {inp_file}")
+
+    content = inp_file.read_text(encoding="utf-8")
+
+    # Extract everything inside geometry={ ... }
+    match = re.search(
+        r"geometry\s*=\s*\{(.*?)\}",
+        content,
+        re.IGNORECASE | re.DOTALL
+    )
+
+    if not match:
+        raise ValueError(f"Geometry block not found in {inp_file}")
+
+    geometry_text = match.group(1)
+
+    atoms = []
+
+    for line in geometry_text.splitlines():
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        fields = line.split()
+
+        # Element + x + y + z
+        if len(fields) == 4:
+
+            element = fields[0]
+            x, y, z = fields[1:]
+
+            # Validate coordinates
+            try:
+                float(x)
+                float(y)
+                float(z)
+            except ValueError:
+                continue
+
+            atoms.append((element, x, y, z))
+
+    if not atoms:
+        raise ValueError(f"No atoms extracted from {inp_file}")
+
+    return atoms
+
+
+# ============================================================
+# PREPARE ALL SOURCE FOLDERS
+# ============================================================
+
+ap_folders = get_subdirs(AP_DIR)
+bnpah_folders = get_subdirs(BNPAH_DIR)
+bnpah_rest_folders = get_subdirs(BNPAH_REST_DIR)
+nah_folders = get_subdirs(NAH_DIR, prefix="mol")
+
+# Check expected source counts
+expected_counts = {
+    "AP": (ap_folders, 104),
+    "BNPAH": (bnpah_folders, 46),
+    "BNPAH_rest": (bnpah_rest_folders, 26),
+    "NAH": (nah_folders, 187),
+}
+
+print("\nSOURCE FOLDER COUNTS")
+
+for name, (folders, expected) in expected_counts.items():
+    print(f"{name:15s}: {len(folders):4d} (expected {expected})")
+
+    if len(folders) != expected:
+        raise RuntimeError(
+            f"{name}: Expected {expected} folders, "
+            f"but found {len(folders)}. Stopping."
+        )
+
+# Maintain the requested source order
+all_folders = (
+    ap_folders
+    + bnpah_folders
+    + bnpah_rest_folders
+    + nah_folders
+)
+
+if len(all_folders) != TOTAL:
+    raise RuntimeError(
+        f"Expected {TOTAL} folders, found {len(all_folders)}."
+    )
+
+
+# ============================================================
+# EXTRACT AND VALIDATE ALL GEOMETRIES BEFORE WRITING
+# ============================================================
+
+print("\nExtracting geometries...")
+
+geometries = []
+
+for folder in all_folders:
+
+    atoms = extract_geometry(folder)
+
+    geometries.append((folder.name, atoms))
+
+print(f"Successfully extracted {len(geometries)} geometries.")
+
+
+# ============================================================
+# CHECK DESTINATION BEFORE WRITING
+# ============================================================
+
+DEST.mkdir(parents=True, exist_ok=True)
+
+destinations = []
+
+for i in range(1, TOTAL + 1):
+
+    dest_folder = DEST / f"T4I_{i:03d}"
+
+    if (dest_folder / "geom.xyz").exists():
+        raise FileExistsError(
+            f"{dest_folder / 'geom.xyz'} already exists. "
+            "Nothing was overwritten."
+        )
+
+    destinations.append(dest_folder)
+
+
+# ============================================================
+# CREATE DIRECTORIES AND WRITE geom.xyz
+# ============================================================
+
+print("\nCreating directories and writing XYZ files...")
+
+for i, (source_name, atoms) in enumerate(geometries, start=1):
+
+    dest_folder = destinations[i - 1]
+
+    dest_folder.mkdir(parents=True, exist_ok=True)
+
+    xyz_file = dest_folder / "geom.xyz"
+
+    with open(xyz_file, "w") as f:
+
+        # Line 1: Number of atoms
+        f.write(f"{len(atoms)}\n")
+
+        # Line 2: Original source folder name
+        f.write(f"{source_name}\n")
+
+        # Remaining lines: Cartesian coordinates
+        for element, x, y, z in atoms:
+            f.write(f"{element:2s} {x} {y} {z}\n")
+
+    print(
+        f"T4I_{i:03d}  <--  {source_name}  "
+        f"({len(atoms)} atoms)"
+    )
+
+
+# ============================================================
+# FINAL CHECK
+# ============================================================
+
+print("\n" + "=" * 55)
+print("ALL DONE!")
+print("=" * 55)
+
+print(f"Destination       : {DEST}")
+print(f"Total directories : {TOTAL}")
+print(f"First directory   : T4I_001")
+print(f"Last directory    : T4I_363")
+
+print("\nXYZ files created successfully.")
+```
